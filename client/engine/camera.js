@@ -93,5 +93,3 @@
   };
   D.Camera.prototype.bump=function(amount){this.shake=Math.max(this.shake,amount||1);};
 })();
-</script>
-<script>
