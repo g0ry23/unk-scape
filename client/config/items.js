@@ -34,7 +34,7 @@
     iron_armor:{name:'Iron Armor',icon:'🛡️',stack:false,type:'armor',slot:'body',desc:'Heavy, but dependable.',value:210},
 
     training_bow:{name:'Training Bow',icon:'🏹',stack:false,type:'weapon',slot:'weapon',combatStyle:'range',desc:'A simple bow for ranged survival.',value:45},
-    hunter_bow:{name:'Hunter Bow',icon:'🏹',stack:false,type:'weapon',slot:'weapon',combatStyle:'range',desc:'A stronger bow for island skirmishes.',value:140},
+x    hunter_bow:{name:'Hunter Bow',icon:'🏹',stack:false,type:'weapon',slot:'weapon',combatStyle:'range',desc:'A stronger bow for island skirmishes.',value:140},
     oak_staff:{name:'Oak Staff',icon:'🪄',stack:false,type:'weapon',slot:'weapon',combatStyle:'mage',desc:'A basic channeling staff for magic attacks.',value:50},
     ember_staff:{name:'Ember Staff',icon:'🔥',stack:false,type:'weapon',slot:'weapon',combatStyle:'mage',desc:'A staff humming with warm ember energy.',value:165},
     leather_hood:{name:'Leather Hood',icon:'🧢',stack:false,type:'armor',slot:'head',desc:'Light ranged headgear.',value:55},
