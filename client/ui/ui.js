@@ -40,5 +40,3 @@
     el.innerHTML=text;el.style.left=D.clamp(screenX,120,g.viewW-120)+'px';el.style.top=D.clamp(screenY,60,g.viewH-100)+'px';el.classList.add('show');
   };
 })();
-</script>
-<script>
