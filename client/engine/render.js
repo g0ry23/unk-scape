@@ -478,7 +478,3 @@
     ctx.fillStyle=color;ctx.fillText(text,x,y+1);
   }
 })();
-</script>
-
-<!-- Entities (factories — depend on config) -->
-<script>
