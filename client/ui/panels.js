@@ -106,5 +106,3 @@
     ctx.save();ctx.translate(g.player.x/D.TILE*sx,g.player.y/D.TILE*sy);ctx.rotate(g.camera.targetAngle||g.camera.angle||0);ctx.strokeStyle='#f7c65b';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(10,8);ctx.lineTo(0,2);ctx.lineTo(-10,8);ctx.closePath();ctx.stroke();ctx.restore();
   };
 })();
-</script>
-<script>
