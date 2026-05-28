@@ -28,5 +28,3 @@
     g.entities.resources.forEach(r=>r.update(dt));
   };
 })();
-</script>
-<script>
