@@ -132,3 +132,38 @@ button,input,select{font-family:inherit}
 /* Mobile helper */
 .mobile-controls{display:none;position:absolute;right:18px;bottom:18px;pointer-events:auto;gap:8px;grid-template-columns:48px 48px 48px;grid-template-rows:48px 48px 48px}.mobile-controls button{border:1px solid var(--line2);background:rgba(255,255,255,.08);color:#fff;border-radius:14px;font-weight:900}
 @media(pointer:coarse){.mobile-controls{display:grid}.mobile-controls .up{grid-column:2}.mobile-controls .left{grid-column:1;grid-row:2}.mobile-controls .down{grid-column:2;grid-row:3}.mobile-controls .right{grid-column:3;grid-row:2}}
+
+
+/* === FACTION DYNAMIC THEMES ===
+ * Faction color is set via JS: document.documentElement.style.setProperty('--faction-primary', color)
+ * These CSS variables are used by buttons, borders, and glow effects throughout the UI.
+ */
+:root {
+    --faction-primary: #6aa7ff;
+    --faction-glow: rgba(106,167,255,0.2);
+}
+
+/* Action hint box — kept compact and floating */
+#action-hint {
+    max-width: 240px !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+}
+
+/* Faction-colored accents on interactive elements */
+.big-btn:hover, .small-btn:hover {
+    border-color: var(--faction-primary) !important;
+    box-shadow: 0 0 14px var(--faction-glow) !important;
+}
+.tab-btn.active {
+    border-color: var(--faction-primary);
+    background: linear-gradient(180deg, var(--faction-glow), rgba(0,0,0,0.3));
+}
+
+/* Race / Faction / Class selection cards in the new game flow */
+.item-card:hover {
+    border-color: var(--faction-primary) !important;
+    box-shadow: 0 0 18px var(--faction-glow) !important;
+    transform: translateY(-2px);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
