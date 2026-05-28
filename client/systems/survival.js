@@ -14,5 +14,3 @@
     if(this.timer>10){this.timer=0;g.systems.skills.addXp('survival',night?4:2);}
   };
 })();
-</script>
-<script>
