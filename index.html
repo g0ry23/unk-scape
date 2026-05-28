@@ -7,25 +7,70 @@
   <link rel="stylesheet" href="client/styles/main.css">
 </head>
 <body>
-  <!-- Game canvas and UI root -->
-  <canvas id="game"></canvas>
-  <div id="ui-root"></div>
-  <div id="hud"></div>
-  <div id="panel"></div>
-  <div id="dialog"></div>
-  <div id="menu" class="hidden"></div>
-  <div id="toast-container"></div>
-  <div id="action-hint"></div>
-  <div id="log"></div>
-  <canvas id="minimap" width="164" height="164" style="display:none"></canvas>
-  <div id="hotbar"></div>
-  <div id="combat-ui"></div>
-  <div id="float-texts"></div>
 
-  <!-- Config -->
+  <!-- ============================================================ -->
+  <!-- UNK-SCAPE GAME SHELL                                         -->
+  <!-- Full-screen isometric survival RPG container                 -->
+  <!-- ============================================================ -->
+  <div id="unkscape-game-container" style="position: relative; width: 100vw; height: 100vh; overflow: hidden; background-color: #0f0c1b; font-family: 'Courier New', Courier, monospace; user-select: none; -webkit-user-select: none;">
+
+    <!-- Primary render surface -->
+    <canvas id="gameCanvas" width="1280" height="720" style="width: 100%; height: 100%; display: block; z-index: 1;"></canvas>
+
+    <!-- HUD overlay layer (pointer-events: none by default, re-enabled per child) -->
+    <div id="unkscape-hud-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;">
+
+      <!-- Title banner -->
+      <div style="position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: rgba(18, 14, 26, 0.9); border: 2px solid #cbd5e1; padding: 6px 24px; color: #ffffff; text-align: center; border-radius: 4px; pointer-events: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.6);">
+        <h1 style="margin: 0; font-size: 18px; color: #f1c40f; letter-spacing: 3px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">UNK-SCAPE</h1>
+        <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">Day 1 — Survival Sandbox Alpha v0.4.5</div>
+      </div>
+
+      <!-- Right panel: Skills / Quests / G.E. tabs -->
+      <div id="unkscape-right-tabs" style="position: absolute; right: 20px; top: 20px; width: 330px; background: rgba(22, 18, 30, 0.95); border: 2px solid #47385a; border-radius: 5px; pointer-events: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.8); color: #e2e8f0; display: flex; flex-direction: column;">
+
+        <!-- Tab bar -->
+        <div style="display: flex; background: #120e1a; border-bottom: 2px solid #47385a; height: 42px;">
+          <button onclick="UnkScape.UI.switchTab('skills')" style="flex: 1; background: none; border: none; color: #f1c40f; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 12px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">SKILLS</button>
+          <button onclick="UnkScape.UI.switchTab('quests')" style="flex: 1; background: none; border: none; color: #f1c40f; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 12px; border-left: 1px solid #47385a; border-right: 1px solid #47385a; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">QUESTS</button>
+          <button onclick="UnkScape.UI.switchTab('ge')" style="flex: 1; background: none; border: none; color: #f1c40f; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 12px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">G.E.</button>
+        </div>
+
+        <!-- Tab content viewport -->
+        <div id="tab-content-viewport" style="padding: 18px; height: 380px; overflow-y: auto; font-size: 13px; line-height: 1.4; background-image: radial-gradient(circle at top, rgba(88, 66, 119, 0.1) 0%, rgba(0,0,0,0) 80%);"></div>
+
+      </div>
+
+      <!-- Chat / event log box -->
+      <div id="unkscape-chatbox" style="position: absolute; bottom: 20px; left: 20px; width: 450px; height: 140px; background: rgba(14, 11, 20, 0.85); border: 2px solid #332742; border-radius: 4px; padding: 12px; pointer-events: auto; box-shadow: 0 4px 16px rgba(0,0,0,0.7); display: flex; flex-direction: column-reverse; overflow-y: hidden; font-size: 12px;">
+        <div style="color: #2ecc71;">[SYSTEM]: Global network initialized. Welcome back to the frontier, Survivor.</div>
+        <div style="color: #f1c40f;">[COMBAT]: Ironbound Order territory anchoring guard spawned nearby.</div>
+        <div style="color: #bdc3c7;">[SYSTEM]: Code namespace audit finalized completely: [UnkScape] standard active.</div>
+      </div>
+
+      <!-- Legacy DOM hooks (kept for existing system compatibility) -->
+      <div id="ui-root"></div>
+      <div id="hud"></div>
+      <div id="panel"></div>
+      <div id="dialog"></div>
+      <div id="menu" class="hidden"></div>
+      <div id="toast-container"></div>
+      <div id="action-hint"></div>
+      <div id="log"></div>
+      <canvas id="minimap" width="164" height="164" style="display:none"></canvas>
+      <div id="hotbar"></div>
+      <div id="combat-ui"></div>
+      <div id="float-texts"></div>
+
+    </div><!-- /unkscape-hud-layer -->
+  </div><!-- /unkscape-game-container -->
+
+  <!-- ============================================================ -->
+  <!-- CONFIG                                                        -->
+  <!-- ============================================================ -->
   <script src="client/config/classes.js"></script>
-<script src="client/config/factions.js"></script>
-      <script src="client/config/races.js"></script>
+  <script src="client/config/factions.js"></script>
+  <script src="client/config/races.js"></script>
   <script src="client/config/enemies.js"></script>
   <script src="client/config/equipment.js"></script>
   <script src="client/config/items.js?v=3"></script>
@@ -38,13 +83,18 @@
   <script src="client/config/tiles.js"></script>
   <script src="client/config/worldbosses.js"></script>
 
-  <!-- Engine -->
+  <!-- ============================================================ -->
+  <!-- ENGINE                                                        -->
+  <!-- ============================================================ -->
   <script src="client/engine/camera.js"></script>
   <script src="client/engine/input.js"></script>
+  <script src="client/engine/player.js"></script>
   <script src="client/engine/render.js"></script>
   <script src="client/engine/game.js"></script>
 
-  <!-- Entities -->
+  <!-- ============================================================ -->
+  <!-- ENTITIES                                                      -->
+  <!-- ============================================================ -->
   <script src="client/entities/resource.js"></script>
   <script src="client/entities/projectile.js"></script>
   <script src="client/entities/enemy.js"></script>
@@ -52,7 +102,9 @@
   <script src="client/entities/portal.js"></script>
   <script src="client/entities/player.js"></script>
 
-  <!-- Systems -->
+  <!-- ============================================================ -->
+  <!-- SYSTEMS                                                       -->
+  <!-- ============================================================ -->
   <script src="client/systems/worldgen.js"></script>
   <script src="client/systems/inventory.js"></script>
   <script src="client/systems/skills.js"></script>
@@ -61,8 +113,8 @@
   <script src="client/systems/combat.js"></script>
   <script src="client/systems/ai.js"></script>
   <script src="client/systems/daynight.js"></script>
-    <script src="client/systems/survival.js"></script>
-    <script src="client/systems/crafting.js"></script>
+  <script src="client/systems/survival.js"></script>
+  <script src="client/systems/crafting.js"></script>
   <script src="client/systems/economy.js"></script>
   <script src="client/systems/bank.js"></script>
   <script src="client/systems/gathering.js"></script>
@@ -71,9 +123,11 @@
   <script src="client/systems/turf.js"></script>
   <script src="client/systems/loot.js"></script>
   <script src="client/systems/audio.js"></script>
-<script src="client/systems/save.js"></script>
+  <script src="client/systems/save.js"></script>
 
-  <!-- UI -->
+  <!-- ============================================================ -->
+  <!-- UI                                                            -->
+  <!-- ============================================================ -->
   <script src="client/ui/ui.js"></script>
   <script src="client/ui/hud.js"></script>
   <script src="client/ui/panels.js"></script>
@@ -82,7 +136,10 @@
   <script src="client/ui/log.js"></script>
   <script src="client/ui/menu.js"></script>
 
-  <!-- Boot -->
+  <!-- ============================================================ -->
+  <!-- BOOT                                                          -->
+  <!-- ============================================================ -->
   <script src="client/main.js"></script>
+
 </body>
 </html>
