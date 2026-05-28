@@ -12,5 +12,3 @@
     for(const l of e.cfg.loot||[]){if(Math.random()<l.chance)this.drop(l.id,D.irand(l.min,l.max),e.x,e.y);}
   };
 })();
-</script>
-<script>
