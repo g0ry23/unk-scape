@@ -30,9 +30,13 @@
   --font:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   --display:"Space Grotesk",Inter,system-ui,sans-serif;
   --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ui-scale:1;
 }
+:root[data-ui-scale="small"]{--ui-scale:.88}
+:root[data-ui-scale="large"]{--ui-scale:1.12}
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--text);user-select:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--text);user-select:none;font-size:calc(16px * var(--ui-scale))}
+body.reduced-fx *{transition:none!important;animation:none!important}
 canvas#game{display:block;width:100vw;height:100vh;background:#0b111a;image-rendering:auto}
 #ui-root{position:fixed;inset:0;pointer-events:none}
 #ui-root.menu-open #hud,#ui-root.menu-open #toasts,#ui-root.menu-open #panel,#ui-root.menu-open #dialog,#ui-root.menu-open #log,#ui-root.menu-open #combat-ui{display:none!important}
@@ -67,6 +71,10 @@ button,input,select{font-family:inherit}
 /* Combat / Interface Upgrade */
 #combat-ui{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);pointer-events:none;z-index:4}
 #hotbar{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);pointer-events:none;z-index:5}
+#action-hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:6;display:none;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;background:linear-gradient(180deg,rgba(13,18,31,.90),rgba(7,10,17,.82));border:1px solid rgba(247,198,91,.30);box-shadow:0 18px 60px rgba(0,0,0,.45);backdrop-filter:blur(12px);font:900 12px/1 var(--mono);color:#e9f0ff;white-space:nowrap}
+#action-hint.show{display:flex}
+#action-hint b{color:var(--gold)}
+#action-hint .hint-dot{width:8px;height:8px;border-radius:99px;background:var(--gold);box-shadow:0 0 18px rgba(247,198,91,.5)}
 .hotbar-card{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:20px;background:linear-gradient(180deg,rgba(13,18,31,.88),rgba(7,10,17,.82));border:1px solid rgba(255,255,255,.14);box-shadow:var(--shadow);backdrop-filter:blur(12px)}
 .hotbar-slot{width:58px;height:58px;border-radius:16px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.055);display:grid;place-items:center;position:relative;color:var(--text);font-weight:900}
 .hotbar-slot.selected{border-color:rgba(247,198,91,.72);background:rgba(247,198,91,.16);box-shadow:0 0 24px rgba(247,198,91,.16)}
@@ -98,9 +106,9 @@ button,input,select{font-family:inherit}
 @keyframes toastIn{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
 
 /* Panels */
-#panel{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:28px;pointer-events:auto;background:rgba(0,0,0,.22);backdrop-filter:blur(3px)}
+#panel{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:clamp(28px,5vw,70px);pointer-events:auto;background:rgba(0,0,0,.22);backdrop-filter:blur(3px)}
 #panel.show{display:flex}
-.panel-box{width:min(1040px,96vw);max-height:min(780px,92vh);overflow:hidden;display:grid;grid-template-rows:auto 1fr;background:linear-gradient(180deg,rgba(15,20,34,.98),rgba(8,11,19,.97));border:1px solid var(--line2);border-radius:24px;box-shadow:0 28px 90px rgba(0,0,0,.6)}
+.panel-box{width:min(980px,calc(100vw - clamp(56px,10vw,140px)));max-height:min(740px,calc(100vh - clamp(56px,10vw,140px)));overflow:hidden;display:grid;grid-template-rows:auto 1fr;background:linear-gradient(180deg,rgba(15,20,34,.98),rgba(8,11,19,.97));border:1px solid var(--line2);border-radius:24px;box-shadow:0 28px 90px rgba(0,0,0,.6)}
 .panel-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px;border-bottom:1px solid var(--line)}
 .panel-head h2{margin:0;font:800 22px/1 var(--display)}
 .panel-head .sub{color:var(--muted);font-size:12px;margin-top:5px}
@@ -114,6 +122,7 @@ button,input,select{font-family:inherit}
 .item-card .tag{display:inline-block;margin-top:9px;color:var(--gold);font:700 11px var(--mono)}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:850px){.two-col{grid-template-columns:1fr}.hud-right{display:none}.hud-left{max-width:94vw}.bars{min-width:260px}}
 .table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}.table th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}.table td strong{font-family:var(--display)}
+.stat-sheet{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}.stat-hero{min-height:360px;display:grid;place-items:center;background:radial-gradient(circle at 50% 28%,rgba(106,167,255,.16),rgba(255,255,255,.035) 46%,rgba(0,0,0,.16));border:1px solid var(--line);border-radius:22px;position:relative;overflow:hidden}.stat-hero:before{content:"";position:absolute;inset:auto -20% -12% -20%;height:130px;background:radial-gradient(ellipse,rgba(247,198,91,.16),rgba(0,0,0,0) 68%)}.paperdoll{position:relative;width:150px;height:245px;filter:drop-shadow(0 22px 30px rgba(0,0,0,.42))}.paperdoll .pd-head{position:absolute;left:50%;top:18px;transform:translateX(-50%);width:50px;height:50px;border-radius:50%;background:#d7a86e;border:2px solid rgba(0,0,0,.18)}.paperdoll .pd-body{position:absolute;left:50%;top:75px;transform:translateX(-50%);width:66px;height:82px;border-radius:18px 18px 16px 16px;background:#2f6eea;border:2px solid rgba(255,255,255,.12)}.paperdoll .pd-arm{position:absolute;top:86px;width:24px;height:78px;border-radius:999px;background:#d7a86e;border:2px solid rgba(0,0,0,.12)}.paperdoll .pd-arm.left{left:19px;transform:rotate(14deg)}.paperdoll .pd-arm.right{right:19px;transform:rotate(-14deg)}.paperdoll .pd-leg{position:absolute;top:151px;width:27px;height:70px;border-radius:12px;background:#1d2738;border:2px solid rgba(255,255,255,.08)}.paperdoll .pd-leg.left{left:43px}.paperdoll .pd-leg.right{right:43px}.paperdoll .pd-boot{position:absolute;top:213px;width:35px;height:19px;border-radius:8px;background:#14100c;border:1px solid rgba(255,255,255,.10)}.paperdoll .pd-boot.left{left:34px}.paperdoll .pd-boot.right{right:34px}.paperdoll .pd-weapon{position:absolute;right:3px;top:60px;font-size:34px;transform:rotate(18deg)}.paperdoll .pd-shield{position:absolute;left:0;top:93px;font-size:31px}.stat-card{border:1px solid var(--line);background:rgba(255,255,255,.045);border-radius:18px;padding:14px}.stat-card h3{margin:0 0 10px;font:900 16px/1 var(--display)}.stat-list{display:grid;gap:8px}.stat-line{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:7px;color:var(--muted);font-size:13px}.stat-line b{color:var(--text);font-family:var(--mono)}@media(max-width:850px){.stat-sheet{grid-template-columns:1fr}}
 .shop-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:14px;margin-bottom:8px;background:rgba(255,255,255,.035)}
 .shop-row small{color:var(--muted);display:block;margin-top:3px}.coin{color:var(--gold);font-weight:900;font-family:var(--mono)}
 
@@ -126,8 +135,8 @@ button,input,select{font-family:inherit}
 
 /* Menu overlay */
 #menu{position:absolute;inset:0;display:none;align-items:center;justify-content:center;pointer-events:auto;background:radial-gradient(circle at 50% 30%,rgba(73,91,126,.35),rgba(0,0,0,.8) 58%,rgba(0,0,0,.92));backdrop-filter:blur(6px)}
-#menu.show{display:flex}.menu-card{width:min(760px,92vw);background:linear-gradient(180deg,rgba(15,20,34,.97),rgba(7,10,17,.97));border:1px solid var(--line2);border-radius:28px;box-shadow:0 30px 110px rgba(0,0,0,.65);padding:32px;text-align:center}.menu-card h1{font:900 54px/1 var(--display);margin:0 0 10px;letter-spacing:-1.5px;background:linear-gradient(90deg,#fff,#ffd783,#ff9b5c);-webkit-background-clip:text;color:transparent}.menu-card p{color:var(--muted);line-height:1.55;margin:0 auto 22px;max-width:600px}.menu-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}.big-btn{cursor:pointer;border:1px solid rgba(247,198,91,.32);background:linear-gradient(180deg,rgba(247,198,91,.20),rgba(255,155,92,.12));color:var(--text);border-radius:16px;padding:14px 18px;font-weight:900;font-size:14px;box-shadow:0 14px 40px rgba(0,0,0,.22)}.big-btn.secondary{border-color:var(--line2);background:rgba(255,255,255,.06)}
-.class-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:22px 0}.class-card{cursor:pointer;text-align:left;border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:18px;padding:14px}.class-card:hover{background:rgba(255,255,255,.09);border-color:rgba(106,167,255,.34)}.class-card h3{margin:0 0 6px;font:900 16px/1 var(--display)}.class-card p{font-size:12px;margin:0 0 10px}.class-card ul{margin:0;padding-left:18px;color:var(--muted);font-size:12px;line-height:1.55}
+#menu.show{display:flex}.menu-card{width:min(860px,calc(100vw - clamp(48px,10vw,150px)));max-height:calc(100vh - clamp(48px,10vw,150px));overflow:auto;background:linear-gradient(180deg,rgba(15,20,34,.97),rgba(7,10,17,.97));border:1px solid var(--line2);border-radius:28px;box-shadow:0 30px 110px rgba(0,0,0,.65);padding:clamp(20px,3vw,32px);text-align:center}.menu-card::-webkit-scrollbar{width:10px}.menu-card::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:99px}.menu-card h1{font:900 clamp(34px,5vw,54px)/1 var(--display);margin:0 0 10px;letter-spacing:-1.5px;background:linear-gradient(90deg,#fff,#ffd783,#ff9b5c);-webkit-background-clip:text;color:transparent}.menu-card p{color:var(--muted);line-height:1.45;margin:0 auto 14px;max-width:620px}.menu-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.big-btn{cursor:pointer;border:1px solid rgba(247,198,91,.32);background:linear-gradient(180deg,rgba(247,198,91,.20),rgba(255,155,92,.12));color:var(--text);border-radius:16px;padding:12px 16px;font-weight:900;font-size:13px;box-shadow:0 14px 40px rgba(0,0,0,.22)}.big-btn.secondary{border-color:var(--line2);background:rgba(255,255,255,.06)}
+.class-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:14px 0;max-height:min(470px,52vh);overflow:auto;padding:2px 6px 6px}.class-grid::-webkit-scrollbar{width:10px}.class-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:99px}.class-card{cursor:pointer;text-align:left;border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:18px;padding:12px}.class-card:hover{background:rgba(255,255,255,.09);border-color:rgba(106,167,255,.34)}.class-card h3{margin:0 0 6px;font:900 15px/1 var(--display)}.class-card p{font-size:11px;margin:0 0 8px}.class-card ul{margin:0;padding-left:18px;color:var(--muted);font-size:11px;line-height:1.42}.class-card .small-btn{padding:8px 9px;font-size:11px}
 
 .help-note{border:1px solid var(--line);background:rgba(106,167,255,.07);border-radius:16px;padding:12px;color:var(--muted);font-size:12px;line-height:1.45;margin-bottom:14px}
 .kbd{font-family:var(--mono);font-weight:800;border:1px solid var(--line2);background:rgba(255,255,255,.08);border-radius:6px;padding:1px 5px;color:#fff}
@@ -135,6 +144,19 @@ button,input,select{font-family:inherit}
 /* Mobile helper */
 .mobile-controls{display:none;position:absolute;right:18px;bottom:18px;pointer-events:auto;gap:8px;grid-template-columns:48px 48px 48px;grid-template-rows:48px 48px 48px}.mobile-controls button{border:1px solid var(--line2);background:rgba(255,255,255,.08);color:#fff;border-radius:14px;font-weight:900}
 @media(pointer:coarse){.mobile-controls{display:grid}.mobile-controls .up{grid-column:2}.mobile-controls .left{grid-column:1;grid-row:2}.mobile-controls .down{grid-column:2;grid-row:3}.mobile-controls .right{grid-column:3;grid-row:2}}
+
+/* === Phase 3A polish layer: camera + launch clarity === */
+.phase-strip{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px auto 16px;max-width:760px}
+.phase-chip{border:1px solid rgba(247,198,91,.28);background:rgba(247,198,91,.09);border-radius:999px;padding:7px 10px;font:800 11px/1 var(--mono);color:#ffd783;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.class-card{position:relative;overflow:hidden}
+.class-card:before{content:'';position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,rgba(247,198,91,.75),rgba(106,167,255,.55),rgba(185,140,255,.45));opacity:.72}
+.class-card:hover{transform:translateY(-1px);box-shadow:0 18px 44px rgba(0,0,0,.28)}
+.faction-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.faction-choice{width:100%;text-align:left;line-height:1.25;white-space:normal}
+.faction-choice small{display:block;color:var(--muted);font-weight:700;margin-top:4px}
+.camera-readout{border:1px solid rgba(106,167,255,.22);background:linear-gradient(180deg,rgba(106,167,255,.10),rgba(255,255,255,.04));border-radius:16px;padding:10px;margin:10px 0;color:var(--muted);font-size:12px;line-height:1.4}
+@media (max-width:720px){.faction-row{grid-template-columns:1fr}.phase-strip{justify-content:flex-start}}
+
 </style>
 </head>
 <body>
@@ -149,6 +171,7 @@ button,input,select{font-family:inherit}
   <div id="log"></div>
   <div id="combat-ui"></div>
   <div id="hotbar"></div>
+  <div id="action-hint"></div>
   <div id="menu"></div>
 </div>
 
@@ -226,6 +249,11 @@ button,input,select{font-family:inherit}
   const D = window.Duskfall = window.Duskfall || {};
   D.ITEMS = {
     coin:{name:'Gold Coin',icon:'🪙',stack:true,type:'currency',desc:'The old world still loves shiny things.',value:1},
+    arrow:{name:'Arrow',icon:'➶',stack:true,type:'ammo',desc:'Basic ranged ammo. Most fired arrows can be recovered from the ground.',value:1},
+    class_token:{name:'Class Token',icon:'🎟️',stack:true,type:'quest',tier:1,rarity:'rare',desc:'A proof-of-training token used by class trainers.',value:25},
+    epic_cache:{name:'Epic Loot Cache',icon:'🟪',stack:false,type:'lootbox',rarity:'epic',desc:'Dungeon-grade loot cache. Boss reward foundation item.',value:250},
+    mythic_cache:{name:'Mythic Loot Cache',icon:'🟥',stack:false,type:'lootbox',rarity:'mythic',desc:'High-end boss reward cache for rare class gear.',value:650},
+    legendary_cache:{name:'Legendary Loot Cache',icon:'🟨',stack:false,type:'lootbox',rarity:'legendary',desc:'Ultra-rare world boss reward cache.',value:1500},
 
     log:{name:'Oak Log',icon:'🪵',stack:true,type:'material',tier:1,desc:'Useful for crafting and campfires.',value:3},
     pine_log:{name:'Pine Log',icon:'🪵',stack:true,type:'material',tier:2,desc:'Better wood for stronger early builds.',value:7},
@@ -267,7 +295,11 @@ button,input,select{font-family:inherit}
 
     torch:{name:'Torch',icon:'🔥',stack:true,type:'utility',desc:'A little comfort when dusk arrives.',value:6},
     health_salve:{name:'Health Salve',icon:'🧪',stack:true,type:'consumable',desc:'Restores health.',heal:28,value:18},
-    campfire:{name:'Campfire Kit',icon:'🏕️',stack:true,type:'utility',desc:'Can cook food and keep the dark away.',value:15}
+    campfire:{name:'Campfire Kit',icon:'🏕️',stack:true,type:'utility',desc:'Can cook food and keep the dark away.',value:15},
+
+    old_mule_whistle:{name:'Old Mule Whistle',icon:'🐴',stack:false,type:'mount',rarity:'rare',desc:'Summons a sturdy starter mule. Mount system foundation.',moveBonus:.12,value:350},
+    dusk_wolf_pup:{name:'Dusk Wolf Pup',icon:'🐺',stack:false,type:'pet',rarity:'rare',desc:'A loyal combat pet foundation companion.',bonus:{attack:1},value:420},
+    ember_sprite:{name:'Ember Sprite',icon:'✨',stack:false,type:'pet',rarity:'epic',desc:'A tiny support pet that hums with warm energy.',bonus:{wisdom:1},value:700}
   };
 })();
 </script>
@@ -303,14 +335,61 @@ button,input,select{font-family:inherit}
     attackSpeed:1.15,
     range:42,
     moveSpeed:180,
-    hungerMax:100
+    hungerMax:100,
+    healingPower:0,
+    supportPower:0,
+    critChance:.08,
+    critDamage:1.65
+  };
+
+  D.ATTRIBUTES = {
+    vitality:{name:'Vitality',icon:'❤️',desc:'+HP and tank survival.'},
+    strength:{name:'Strength',icon:'💪',desc:'+melee damage and block pressure.'},
+    dexterity:{name:'Dexterity',icon:'🎯',desc:'+range accuracy, movement, and crit.'},
+    intellect:{name:'Intellect',icon:'🔮',desc:'+magic damage and spell accuracy.'},
+    wisdom:{name:'Wisdom',icon:'🌿',desc:'+healing and support power.'},
+    endurance:{name:'Endurance',icon:'🛡️',desc:'+defense and stamina style survival.'},
+    luck:{name:'Luck',icon:'🍀',desc:'+crit chance, rare drops, and gathering luck.'}
+  };
+
+  D.CLASS_ROLES = {
+    melee:'Tank / Melee DPS', range:'Ranged DPS', mage:'Magic DPS', wanderer:'Hybrid', brawler:'Bruiser DPS', gatherer:'Skiller Support', prospector:'Economy Support', cleric:'Healer', warden:'Tank Support'
+  };
+
+  D.xpForCharacterLevel=function(level){
+    if(level<=1)return 0;
+    return Math.floor(75*Math.pow(level-1,1.85)+(level-1)*45);
+  };
+  D.characterLevelForXp=function(xp){
+    let lvl=1;
+    while(lvl<60 && xp>=D.xpForCharacterLevel(lvl+1))lvl++;
+    return lvl;
+  };
+  D.defaultAttributes=function(role='hybrid'){
+    const base={vitality:5,strength:5,dexterity:5,intellect:5,wisdom:5,endurance:5,luck:5};
+    if(role==='tank'){base.vitality+=3;base.endurance+=3;base.strength+=1;}
+    if(role==='melee'){base.strength+=4;base.endurance+=2;base.vitality+=1;}
+    if(role==='range'){base.dexterity+=5;base.luck+=1;base.vitality+=1;}
+    if(role==='mage'){base.intellect+=5;base.wisdom+=1;base.luck+=1;}
+    if(role==='healer'){base.wisdom+=5;base.vitality+=2;base.intellect+=1;}
+    if(role==='support'){base.wisdom+=3;base.endurance+=2;base.luck+=2;}
+    if(role==='skiller'){base.luck+=3;base.endurance+=2;base.dexterity+=1;}
+    return base;
   };
 
   D.getEquipmentStats = function(player){
     const out = {...D.STAT_BASE};
     const eq = player.equipment || {};
     const weapon = D.EQUIPMENT[eq.weapon] || D.EQUIPMENT.fists;
+    const attr = player.attributes || D.defaultAttributes(player.roleType || 'hybrid');
     out.attack += weapon.attack || 0;
+    out.attack += Math.floor((attr.strength||0)*.35) + Math.floor((attr.intellect||0)*.20);
+    out.defense += Math.floor((attr.endurance||0)*.45);
+    out.hp += Math.floor((attr.vitality||0)*5);
+    out.healingPower += Math.floor((attr.wisdom||0)*.65);
+    out.supportPower += Math.floor(((attr.wisdom||0)+(attr.luck||0))*.35);
+    out.critChance += Math.min(.22,(attr.luck||0)*.006 + (attr.dexterity||0)*.004);
+    out.moveSpeed += Math.floor((attr.dexterity||0)*1.5);
     out.accuracy = weapon.accuracy || out.accuracy;
     out.attackSpeed = weapon.speed || out.attackSpeed;
     out.range = weapon.range || out.range;
@@ -503,8 +582,8 @@ button,input,select{font-family:inherit}
 /* === config/tiles.js === */
 (function(){
   const D = window.Duskfall = window.Duskfall || {};
-  D.TILE = 48;
-  D.WORLD = { w: 96, h: 96, pxW:96*48, pxH:96*48 };
+  D.TILE = 32;
+  D.WORLD = { w: 300, h: 300, pxW:300*32, pxH:300*32 }; // Smaller tiles + larger tile-grid map for better scale and less chunky visuals. // Phase 1: expanded open-world scale for larger starter regions.
 
   D.TILES = {
     grass:{name:'Grass',solid:false,color:'#25472d',variant:'#2f5a39',speed:1},
@@ -626,7 +705,9 @@ button,input,select{font-family:inherit}
     wanderer:['ironbound','thornwatch'],
     brawler:['ironbound','bloodoak'],
     gatherer:['thornwatch','ashveil'],
-    prospector:['embercourt','moonveil']
+    prospector:['embercourt','moonveil'],
+    cleric:['embercourt','moonveil'],
+    warden:['ironbound','thornwatch']
   };
   D.getClassFactions = id => D.CLASS_FACTIONS[id] || ['ironbound','thornwatch'];
 
@@ -638,16 +719,16 @@ button,input,select{font-family:inherit}
       skills:{combat:80,survival:25,crafting:10},
       equipment:{weapon:'crude_sword',offhand:'wooden_shield',head:'bronze_helm'},
       perks:['thick_skin'],
-      start:{x:18,y:20}, zone:'Ironwake Island'
+      start:{x:28,y:28}, zone:'Ironwake Hold'
     },
     range:{
       name:'Range', icon:'🏹', archetype:'range',
       desc:'Bow-focused scout built for kiting mobs, hunting resources, and controlling forests.',
-      items:{training_bow:1,leather_hood:1,ranger_tunic:1,berry:4,coin:20},
+      items:{training_bow:1,leather_hood:1,ranger_tunic:1,arrow:35,berry:4,coin:20},
       skills:{combat:55,foraging:40,survival:25},
       equipment:{weapon:'training_bow',head:'leather_hood',body:'ranger_tunic'},
       perks:['keen_eye'],
-      start:{x:78,y:21}, zone:'Thornfall Wilds'
+      start:{x:152,y:30}, zone:'Thornfall Wilds'
     },
     mage:{
       name:'Mage', icon:'🔮', archetype:'mage',
@@ -656,13 +737,87 @@ button,input,select{font-family:inherit}
       skills:{combat:55,crafting:35,survival:20,foraging:20},
       equipment:{weapon:'oak_staff',head:'apprentice_hood',body:'apprentice_robe'},
       perks:['herbalist'],
-      start:{x:50,y:80}, zone:'Moonspire Ruins'
+      start:{x:90,y:154}, zone:'Moonspire Ruins'
     },
-    wanderer:{name:'Wanderer', icon:'🧭',archetype:'hybrid',desc:'Balanced survivor with supplies and flexible growth.',items:{log:3,berry:4,torch:2,coin:25},skills:{survival:30,foraging:20},equipment:{},perks:['light_footed'],start:{x:48,y:48},zone:'Central Crossroads'},
-    brawler:{name:'Brawler', icon:'🥊',archetype:'melee',desc:'Tougher start with a crude sword and salves.',items:{crude_sword:1,health_salve:2,coin:10},skills:{combat:60,survival:15},equipment:{weapon:'crude_sword'},perks:['thick_skin'],start:{x:18,y:20},zone:'Ironwake Island'},
-    gatherer:{name:'Gatherer', icon:'🌲',archetype:'range',desc:'Skilling-heavy start for crafting and resource progress.',items:{stone_hatchet:1,log:5,stone:5,berry:3,coin:15},skills:{woodcutting:45,mining:25,crafting:20},equipment:{tool:'stone_hatchet'},perks:['keen_eye'],start:{x:78,y:21},zone:'Thornfall Wilds'},
-    prospector:{name:'Prospector', icon:'⛏️',archetype:'mage',desc:'Mining and money-focused start near ancient stone routes.',items:{stone:8,iron_ore:2,berry:2,coin:35},skills:{mining:55,crafting:15},equipment:{},perks:['coin_sense'],start:{x:50,y:80},zone:'Moonspire Ruins'}
+    wanderer:{name:'Wanderer', icon:'🧭',archetype:'hybrid',desc:'Balanced survivor with supplies and flexible growth.',items:{log:3,berry:4,torch:2,coin:25},skills:{survival:30,foraging:20},equipment:{},perks:['light_footed'],start:{x:90,y:90},zone:'Central Crossroads'},
+    brawler:{name:'Brawler', icon:'🥊',archetype:'melee',desc:'Tougher start with a crude sword and salves.',items:{crude_sword:1,health_salve:2,coin:10},skills:{combat:60,survival:15},equipment:{weapon:'crude_sword'},perks:['thick_skin'],start:{x:30,y:150},zone:'Bloodoak Pits'},
+    gatherer:{name:'Gatherer', icon:'🌲',archetype:'range',desc:'Skilling-heavy start for crafting and resource progress.',items:{stone_hatchet:1,log:5,stone:5,berry:3,coin:15},skills:{woodcutting:45,mining:25,crafting:20},equipment:{tool:'stone_hatchet'},perks:['keen_eye'],start:{x:150,y:150},zone:'Greenroot Grove'},
+    prospector:{name:'Prospector', icon:'⛏️',archetype:'support',roleType:'skiller',desc:'Mining and money-focused start near ancient stone routes.',items:{stone:8,iron_ore:2,berry:2,coin:35},skills:{mining:55,crafting:15},equipment:{},perks:['coin_sense'],start:{x:28,y:90},zone:'Stonehook Quarry'},
+    cleric:{name:'Cleric', icon:'✨', archetype:'healer', roleType:'healer',desc:'Healer/support starter built for group survival, buffs, salves, and holy staff play.',items:{oak_staff:1,apprentice_hood:1,apprentice_robe:1,health_salve:3,herb:5,coin:25},skills:{combat:35,foraging:35,crafting:30,survival:25},equipment:{weapon:'oak_staff',head:'apprentice_hood',body:'apprentice_robe'},perks:['herbalist'],start:{x:152,y:90}, zone:'Sanctum Shoals'},
+    warden:{name:'Warden', icon:'🌿', archetype:'support', roleType:'tank',desc:'Tank/support defender built to protect groups, claim turf, and hold boss pressure.',items:{wooden_shield:1,stone_hatchet:1,hide_armor:1,log:4,health_salve:2,coin:20},skills:{combat:45,woodcutting:35,survival:35,crafting:20},equipment:{offhand:'wooden_shield',body:'hide_armor',tool:'stone_hatchet'},perks:['thick_skin','lumberjack'],start:{x:90,y:28}, zone:'Verdant Bulwark'}
   };
+
+  D.STARTER_ZONES = {
+    melee:{name:'Ironwake Hold',icon:'⚔️',x:42,y:42,r:34,biome:'stone',road:'stonepath',accent:'plaza',resourceBias:['rock','copper','iron'],desc:'Huge layered martial highlands with fortified ridges, quarry shelves, and sword-and-shield training roads.'},
+    range:{name:'Thornfall Wilds',icon:'🏹',x:218,y:44,r:38,biome:'darkgrass',road:'path',accent:'farmland',resourceBias:['tree','pine','berry','herb'],desc:'Large hunting forest with long sightlines, scout paths, raised tree lines, and ranged skirmish lanes.'},
+    mage:{name:'Moonspire Ruins',icon:'🔮',x:130,y:220,r:36,biome:'stone',road:'stonepath',accent:'plaza',resourceBias:['silver','gem','herb'],desc:'Massive ruin basin with stepped stone platforms, gem pockets, ritual roads, and enchantment materials.'},
+    wanderer:{name:'Central Crossroads',icon:'🧭',x:130,y:130,r:28,biome:'grass',road:'stonepath',accent:'plaza',resourceBias:['tree','berry','fish'],desc:'Neutral central hub where all roads eventually meet and future trading, banking, and world travel expands.'},
+    brawler:{name:'Bloodoak Pits',icon:'🥊',x:43,y:218,r:34,biome:'dirt',road:'path',accent:'plaza',resourceBias:['rock','tree','hide'],desc:'Expanded southern fight camp with rough arena pits, red dirt layers, and bruiser training territory.'},
+    gatherer:{name:'Greenroot Grove',icon:'🌲',x:217,y:217,r:40,biome:'grass',road:'path',accent:'farmland',resourceBias:['tree','pine','yew','berry'],desc:'Resource-rich woodland province for skilling, crafting, building, and deep resource progression.'},
+    prospector:{name:'Stonehook Quarry',icon:'⛏️',x:38,y:130,r:37,biome:'stone',road:'stonepath',accent:'dirt',resourceBias:['rock','copper','iron','gold'],desc:'Wide mining corridor with terraced ore shelves, stone roads, rare mineral pockets, and economy routes.'},
+    cleric:{name:'Sanctum Shoals',icon:'✨',x:222,y:130,r:35,biome:'sand',road:'stonepath',accent:'plaza',resourceBias:['herb','fish','silver'],desc:'Sacred shoreline region with healing gardens, tide roads, herb pockets, and support-class safe routes.'},
+    warden:{name:'Verdant Bulwark',icon:'🌿',x:130,y:38,r:36,biome:'darkgrass',road:'path',accent:'fence',resourceBias:['tree','herb','rock'],desc:'Northern defensive forest wall with layered watch paths, tank/support claim zones, and guardian resources.'}
+  };
+  D.getStarterZone = id => D.STARTER_ZONES[id] || D.STARTER_ZONES.wanderer;
+
+  D.CLASS_STORIES = {
+    melee:{title:'The Ironwake Oath',theme:'Hold the line, protect the roads, and prove who owns the battlefield.',starterQuest:'class_melee_oath'},
+    range:{title:'The Thornfall Hunt',theme:'Scout the wilds, recover arrows, and control forest routes before the enemy does.',starterQuest:'class_range_hunt'},
+    mage:{title:'The Moonspire Spark',theme:'Study the ruins, gather channeling materials, and unlock the first taste of old magic.',starterQuest:'class_mage_spark'},
+    wanderer:{title:'The Nine-Road Calling',theme:'Learn the roads, survive the open map, and become the bridge between every starter region.',starterQuest:'class_wanderer_roads'},
+    brawler:{title:'Bloodoak Trial by Dirt',theme:'Fight dirty, win clean, and earn respect in the red pit camps.',starterQuest:'class_brawler_trial'},
+    gatherer:{title:'Greenroot First Harvest',theme:'Build the economy from the dirt up: chop, gather, craft, and feed the world.',starterQuest:'class_gatherer_harvest'},
+    prospector:{title:'The Stonehook Claim',theme:'Mine the old shelves, find ore, and turn raw rock into power and trade.',starterQuest:'class_prospector_claim'},
+    cleric:{title:'Sanctum Light',theme:'Keep people alive, gather herbs, and prepare the support path for future group content.',starterQuest:'class_cleric_light'},
+    warden:{title:'Verdant Watch',theme:'Defend the grove roads, gather wood, and become the shield between town and chaos.',starterQuest:'class_warden_watch'}
+  };
+  D.getClassStory = id => D.CLASS_STORIES[id] || D.CLASS_STORIES.wanderer;
+
+  D.ZONE_FEATURES = {
+    melee:{trainer:'Marshal Bren',trainerIcon:'🛡️',trainingMob:'goblin',arena:'Ironwake Champion Yard',landmark:'Twin Anvil Gate'},
+    range:{trainer:'Scout Veya',trainerIcon:'🏹',trainingMob:'rat',arena:'Thornfall Hunt Ring',landmark:'The Watcher Pines'},
+    mage:{trainer:'Archivist Sol',trainerIcon:'🔮',trainingMob:'husk',arena:'Moonspire Ritual Ring',landmark:'The Broken Spire'},
+    wanderer:{trainer:'Roadwarden Milo',trainerIcon:'🧭',trainingMob:'rat',arena:'Crossroads Trial Circle',landmark:'The Nine-Road Stone'},
+    brawler:{trainer:'Bruiser Knox',trainerIcon:'🥊',trainingMob:'goblin',arena:'Bloodoak Pit Ring',landmark:'The Red Oak Stump'},
+    gatherer:{trainer:'Maela Greenhand',trainerIcon:'🌲',trainingMob:'rat',arena:'Greenroot Grove Circle',landmark:'The Elder Root'},
+    prospector:{trainer:'Foreman Brigg',trainerIcon:'⛏️',trainingMob:'goblin',arena:'Stonehook Claim Pit',landmark:'The Split Quarry'},
+    cleric:{trainer:'Sister Luma',trainerIcon:'✨',trainingMob:'husk',arena:'Sanctum Blessing Circle',landmark:'The Tide Shrine'},
+    warden:{trainer:'Keeper Orin',trainerIcon:'🌿',trainingMob:'goblin',arena:'Verdant Bulwark Ring',landmark:'The Living Wall'}
+  };
+
+  D.getZoneFeature = id => D.ZONE_FEATURES[id] || D.ZONE_FEATURES.wanderer;
+
+  D.CLASS_QUESTS = {
+    class_melee_oath:{name:'The Ironwake Oath',icon:'⚔️',classId:'melee',desc:'Your melee path begins by arming up, gathering field supplies, and clearing the first threat near Ironwake Hold.',steps:[{type:'collect',id:'log',qty:2,text:'Collect 2 Oak Logs for weapon maintenance'},{type:'kill',id:'goblin',qty:2,text:'Defeat 2 Goblin Raiders near Ironwake'}],rewards:{xp:{combat:90,survival:35},items:{coin:60,health_salve:1}}},
+    class_range_hunt:{name:'The Thornfall Hunt',icon:'🏹',classId:'range',desc:'Your ranger path begins with forest supplies, arrow discipline, and a controlled hunt around Thornfall Wilds.',steps:[{type:'collect',id:'berry',qty:3,text:'Gather 3 Wild Berries for trail food'},{type:'kill',id:'rat',qty:3,text:'Defeat 3 training beasts from range'}],rewards:{xp:{combat:75,foraging:55},items:{coin:55,arrow:15}}},
+    class_mage_spark:{name:'The Moonspire Spark',icon:'🔮',classId:'mage',desc:'Your mage path begins by gathering herbs and testing your first spells against the dusk-touched dead.',steps:[{type:'collect',id:'herb',qty:2,text:'Collect 2 Bitter Herbs for spell focus'},{type:'kill',id:'husk',qty:1,text:'Defeat 1 Husk near Moonspire'}],rewards:{xp:{combat:80,crafting:45},items:{coin:60,dusk_essence:1}}},
+    class_wanderer_roads:{name:'The Nine-Road Calling',icon:'🧭',classId:'wanderer',desc:'Your wanderer path begins by learning the central roads and preparing to travel between every starter region.',steps:[{type:'collect',id:'berry',qty:2,text:'Collect 2 Wild Berries'},{type:'collect',id:'log',qty:2,text:'Collect 2 Oak Logs'}],rewards:{xp:{survival:70,foraging:40},items:{coin:50,torch:2}}},
+    class_brawler_trial:{name:'Bloodoak Trial by Dirt',icon:'🥊',classId:'brawler',desc:'Your brawler path starts in the pits. Get supplies, take hits, and prove you can finish fights.',steps:[{type:'kill',id:'goblin',qty:2,text:'Defeat 2 Goblin Raiders near Bloodoak Pits'},{type:'collect',id:'hide',qty:1,text:'Collect 1 Torn Hide'}],rewards:{xp:{combat:95,survival:25},items:{coin:55,health_salve:1}}},
+    class_gatherer_harvest:{name:'Greenroot First Harvest',icon:'🌲',classId:'gatherer',desc:'Your gatherer path starts with resources, crafting foundations, and the first real economy loop.',steps:[{type:'collect',id:'log',qty:5,text:'Collect 5 Oak Logs'},{type:'collect',id:'berry',qty:3,text:'Collect 3 Wild Berries'}],rewards:{xp:{woodcutting:90,crafting:45,foraging:35},items:{coin:45,stone:3}}},
+    class_prospector_claim:{name:'The Stonehook Claim',icon:'⛏️',classId:'prospector',desc:'Your prospector path begins by pulling value from stone and preparing for smithing and trade.',steps:[{type:'collect',id:'stone',qty:4,text:'Mine 4 Stone'},{type:'collect',id:'copper_ore',qty:1,text:'Mine 1 Copper Ore'}],rewards:{xp:{mining:110,crafting:30},items:{coin:70}}},
+    class_cleric_light:{name:'Sanctum Light',icon:'✨',classId:'cleric',desc:'Your cleric path begins with healing supplies and clearing corruption from the sacred shoals.',steps:[{type:'collect',id:'herb',qty:3,text:'Collect 3 Bitter Herbs'},{type:'kill',id:'husk',qty:1,text:'Defeat 1 Husk near the Sanctum'}],rewards:{xp:{foraging:60,combat:55,crafting:45},items:{coin:50,health_salve:2}}},
+    class_warden_watch:{name:'Verdant Watch',icon:'🌿',classId:'warden',desc:'Your warden path begins by gathering defensive materials and pushing threats away from the northern wall.',steps:[{type:'collect',id:'log',qty:3,text:'Collect 3 Oak Logs for barricades'},{type:'kill',id:'goblin',qty:1,text:'Defeat 1 Goblin Raider near Verdant Bulwark'}],rewards:{xp:{combat:65,woodcutting:55,survival:35},items:{coin:55,health_salve:1}}}
+  };
+})();
+</script>
+<script>
+/* === config/worldbosses.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.BOSS_TIERS={faction:'Faction Boss',world:'World Boss',dungeon:'Dungeon Boss'};
+  D.FACTION_BOSSES=[];
+  Object.entries(D.CLASSES||{}).slice(0,9).forEach(([id,c])=>{
+    (D.getClassFactions(id)||[]).forEach(fid=>{
+      const f=D.FACTIONS[fid];
+      D.FACTION_BOSSES.push({id:`${id}_${fid}_boss`,name:`${f.name} ${c.name} Champion`,classId:id,factionId:fid,zone:c.zone||'Unknown',tier:'faction',rolePressure:D.CLASS_ROLES[id]||'Hybrid',hp:900,damage:28,lootTable:['coin','class_token','epic_cache'],claimBuff:f.buff||{}});
+    });
+  });
+  D.WORLD_BOSSES={
+    dusk_titan:{name:'The Dusk Titan',icon:'🗿',tier:'world',hp:6500,damage:52,zone:'Central Crossroads',lootTable:['mythic_cache','legendary_cache','old_mule_whistle']},
+    crownless_drake:{name:'The Crownless Drake',icon:'🐉',tier:'world',hp:8200,damage:64,zone:'High Ruin Expanse',lootTable:['mythic_cache','legendary_cache','dusk_wolf_pup','ember_sprite']}
+  };
+  D.MOUNTS={old_mule:{name:'Old Mule',icon:'🐴',speedBonus:.12,source:'Rare overworld reward'},ember_stag:{name:'Ember Stag',icon:'🦌',speedBonus:.22,source:'World boss reward'}};
+  D.PETS={dusk_wolf_pup:{name:'Dusk Wolf Pup',icon:'🐺',bonus:{attack:1},source:'World boss reward'},ember_sprite:{name:'Ember Sprite',icon:'✨',bonus:{wisdom:1},source:'Mythic support pet'}};
 })();
 </script>
 <script>
@@ -724,8 +879,10 @@ button,input,select{font-family:inherit}
     this.settings = {
       hungerEnabled:false,
       cameraMode:'iso',
+      display:{uiScale:'normal',showWorldLabels:true,reducedFx:false,screenShake:true,floatingText:true},
+      audio:{enabled:true,master:.55,music:.22,ambient:.34,sfx:.62,footsteps:.32},
       keybinds:{
-        inventory:'tab', skills:'k', crafting:'c', quests:'v', bank:'b', map:'m', interact:'f', attack:' ', pause:'escape', zoomIn:'=', zoomOut:'-', save:'f5', cameraToggle:'r', cameraOverhead:'o', rotateLeft:'q', rotateRight:'e', buildToggle:'g', buildCycle:'t'
+        inventory:'tab', stats:'p', skills:'k', crafting:'c', quests:'v', bank:'b', map:'m', interact:'f', attack:' ', pause:'escape', zoomIn:'=', zoomOut:'-', save:'f5', cameraToggle:'r', cameraOverhead:'o', rotateLeft:'q', rotateRight:'e', buildToggle:'g', buildCycle:'t'
       }
     };
     this.menuMode = 'main';
@@ -764,9 +921,13 @@ button,input,select{font-family:inherit}
     this.systems.build = new D.BuildSystem(this);
     this.systems.gathering = new D.GatheringSystem(this);
     this.systems.dungeon = new D.DungeonSystem(this);
+    this.systems.turf = new D.TurfSystem(this);
     this.systems.loot = new D.LootSystem(this);
+    this.systems.audio = new D.AudioSystem(this);
     this.systems.save = new D.SaveSystem(this);
+    this.ui.applyDisplaySettings();
     this.ui.showMenu();
+    this.ui.log('Preview booted. Audio starts after your first click/key press.', 'gold');
     this.running = true;
     requestAnimationFrame(t=>this.loop(t));
   };
@@ -779,6 +940,9 @@ button,input,select{font-family:inherit}
     this.entities = {resources:[], enemies:[], npcs:[], portals:[], projectiles:[], drops:[], effects:[]};
     D.populateWorld(this);
     this.player = D.createPlayer(this, classId, factionId);
+    const cls=D.CLASSES[classId]||D.CLASSES.wanderer;
+    Object.entries(cls.items||{}).forEach(([id,qty])=>this.systems.inventory.add(id,qty,true));
+    this.systems.perks.reapply();
     this.camera.setIso();
     this.camera.snapTo(this.player.x,this.player.y);
     this.systems.quests.init();
@@ -786,6 +950,7 @@ button,input,select{font-family:inherit}
     this.state = 'play';
     this.ui.closeAll();
     this.ui.toast('Welcome to UNK-SCAPE', `${this.player.zoneName} • ${this.player.factionName}`, 'gold');
+    this.systems.audio.startWorldAudio();
     this.ui.log('Your boots hit the dirt. Dusk will come soon.', 'gold');
   };
 
@@ -833,13 +998,15 @@ button,input,select{font-family:inherit}
     this.tick++;
     this.input.update(dt);
     this.systems.daynight.update(dt);
+    this.systems.audio.update(dt);
     if(this.settings.hungerEnabled) this.systems.survival.update(dt); else if(this.player) this.player.hunger = this.player.maxHunger;
     this.player.update(dt);
     this.systems.ai.update(dt);
     if(this.systems.gathering) this.systems.gathering.update(dt);
     this.systems.combat.update(dt);
     this.systems.dungeon.update(dt);
-    this.entities.projectiles.forEach(p=>p.update(dt));
+    this.systems.turf.update(dt);
+    this.entities.projectiles.forEach(p=>p.update(dt,this));
     this.entities.projectiles = this.entities.projectiles.filter(p=>!p.dead);
     this.entities.effects.forEach(e=>e.t-=dt);
     this.entities.effects = this.entities.effects.filter(e=>e.t>0);
@@ -913,8 +1080,9 @@ button,input,select{font-family:inherit}
     if(action==='buildToggle'){g.systems.build.toggle();return;}
     if(action==='buildCycle'){g.systems.build.cycle();return;}
     if(action==='save'){g.systems.save.save();return;}
-    if(g.paused && !['inventory','skills','crafting','quests','bank','map'].includes(action)) return;
+    if(g.paused && !['inventory','stats','skills','crafting','quests','bank','map'].includes(action)) return;
     if(action==='inventory') g.ui.togglePanel('inventory');
+    if(action==='stats') g.ui.togglePanel('stats');
     if(action==='skills') g.ui.togglePanel('skills');
     if(action==='crafting') g.ui.togglePanel('crafting');
     if(action==='quests') g.ui.togglePanel('quests');
@@ -930,6 +1098,7 @@ button,input,select{font-family:inherit}
     this.mouse.y=e.clientY-rect.top;
   };
   D.Input.prototype.onMouseDown=function(e){
+    if(e.target!==this.game.canvas) return;
     if(this.game.state!=='play'||this.game.paused) return;
     const world=this.game.camera.screenToWorld(this.mouse.x,this.mouse.y);
     this.mouse.worldX=world.x;this.mouse.worldY=world.y;
@@ -943,6 +1112,7 @@ button,input,select{font-family:inherit}
     if(e.button===2){this.mouse.rightDown=true;this.mouse.rightStarted=performance.now();if(this.game.player)this.game.player.blocking=true;}
   };
   D.Input.prototype.onMouseUp=function(e){
+    if(e.target!==this.game.canvas && this.game.paused){this.mouse.leftDown=false;this.mouse.rightDown=false;return;}
     if(e.button===0 && this.mouse.leftDown){
       const held=(performance.now()-this.mouse.leftStarted)/1000;
       this.mouse.leftDown=false;this.mouse.leftHeld=0;
@@ -976,10 +1146,10 @@ button,input,select{font-family:inherit}
   const D = window.Duskfall = window.Duskfall || {};
   D.Camera = function(game){
     this.game=game;this.x=0;this.y=0;this.shake=0;
-    this.zoom=1.02;this.targetZoom=1.02;this.minZoom=.58;this.maxZoom=1.85;
+    this.zoom=1.12;this.targetZoom=1.12;this.minZoom=.48;this.maxZoom=2.35;
     this.angle=0;this.targetAngle=this.angle;
-    this.pitch=.70;this.targetPitch=.70;
-    this.deadzone=34;this.lookAhead=54;
+    this.pitch=.78;this.targetPitch=.78;
+    this.deadzone=26;this.lookAhead=34;
   };
   D.Camera.prototype.snapTo=function(x,y){this.x=x-this.game.viewW/2;this.y=y-this.game.viewH/2;this.clamp();};
   D.Camera.prototype.update=function(dt){
@@ -1011,7 +1181,8 @@ button,input,select{font-family:inherit}
   D.Camera.prototype.setIso=function(){
     this.game.settings.cameraMode='iso';
     this.targetAngle=0;
-    this.targetPitch=.70;
+    this.targetPitch=.78;
+    this.targetZoom=Math.max(this.targetZoom,1.05);
     this.game.ui.toast('Camera Mode','Centered 2.5D aerial view enabled. Use Q/E only when you want to rotate.', 'gold');
   };
   D.Camera.prototype.setOverhead=function(){
@@ -1025,7 +1196,7 @@ button,input,select{font-family:inherit}
     if(this.targetAngle>Math.PI)this.targetAngle-=Math.PI*2;
     if(this.targetAngle<-Math.PI)this.targetAngle+=Math.PI*2;
     this.game.settings.cameraMode='iso';
-    this.targetPitch=.70;
+    this.targetPitch=.78;
   }; 
   D.Camera.prototype.clamp=function(){
     const W=D.WORLD.pxW,H=D.WORLD.pxH;
@@ -1081,7 +1252,10 @@ button,input,select{font-family:inherit}
     ctx.save();
     g.camera.apply(ctx);
     drawTiles(g,ctx);
+    drawTerrainVolume(g,ctx);
     drawTileDepth(g,ctx);
+    drawZoneOverlays(g,ctx);
+    drawTurfClaims(g,ctx);
     drawBuildGhost(g,ctx);
     drawGatheringNodes(g,ctx);
     drawResources(g,ctx);
@@ -1094,6 +1268,7 @@ button,input,select{font-family:inherit}
     drawGatherProgress(g,ctx);
     drawEffects(g,ctx);
     ctx.restore();
+    drawAerialAtmosphere(g,ctx);
     drawLighting(g,ctx);
     drawVignette(g,ctx);
   };
@@ -1101,7 +1276,8 @@ button,input,select{font-family:inherit}
   function visibleBounds(g,pad=6){
     const t=D.TILE;
     const cx=g.camera.x+g.viewW/2, cy=g.camera.y+g.viewH/2;
-    const reach=(Math.max(g.viewW,g.viewH)/(g.camera.zoom||1.0))*1.35 + t*pad;
+    const pitch=(g.settings?.cameraMode==='iso')?Math.max(.45,g.camera.pitch||.62):1;
+    const reach=(Math.max(g.viewW,g.viewH/pitch)/(g.camera.zoom||1.0))*1.45 + t*pad;
     return {
       x0:Math.max(0,Math.floor((cx-reach)/t)),
       y0:Math.max(0,Math.floor((cy-reach)/t)),
@@ -1114,26 +1290,63 @@ button,input,select{font-family:inherit}
     const b=visibleBounds(g), t=D.TILE;
     for(let y=b.y0;y<b.y1;y++) for(let x=b.x0;x<b.x1;x++){
       const id=g.world.tiles[y][x]; const tile=D.TILES[id];
-      ctx.fillStyle=tile.color; ctx.fillRect(x*t,y*t,t,t);
+      const px=x*t, py=y*t;
+      const grad=ctx.createLinearGradient(px,py,px,py+t);
+      grad.addColorStop(0,shade(tile.color,10));
+      grad.addColorStop(.55,tile.color);
+      grad.addColorStop(1,shade(tile.color,-14));
+      ctx.fillStyle=grad; ctx.fillRect(px,py,t,t);
       // subtle texture
       const n=g.world.noise[y][x];
       ctx.fillStyle=n>.52?tile.variant:'rgba(255,255,255,.018)';
       ctx.globalAlpha=.32;
-      ctx.fillRect(x*t+4+(n*17%8),y*t+5+(n*23%8),t*.45,t*.08);
+      ctx.fillRect(px+3+(n*13%6),py+4+(n*19%6),Math.max(7,t*.38),Math.max(2,t*.06));
       ctx.globalAlpha=1;
       if(id==='water'){
         ctx.strokeStyle='rgba(120,205,255,.15)'; ctx.lineWidth=2;
-        ctx.beginPath(); ctx.moveTo(x*t+6,y*t+20+n*10); ctx.quadraticCurveTo(x*t+24,y*t+12,x*t+42,y*t+20+n*10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(px+4,py+t*.42+n*7); ctx.quadraticCurveTo(px+t*.5,py+t*.25,px+t-4,py+t*.42+n*7); ctx.stroke();
       }
       if(id==='path'){
         ctx.fillStyle='rgba(255,255,255,.035)';
-        ctx.fillRect(x*t+8,y*t+8,5,4);ctx.fillRect(x*t+31,y*t+28,7,4);
+        ctx.fillRect(px+6,py+6,4,3);ctx.fillRect(px+t-14,py+t-15,5,3);
       }
     }
     // grid fade
-    ctx.strokeStyle='rgba(0,0,0,.08)';ctx.lineWidth=1;
-    for(let x=b.x0;x<=b.x1;x++){ctx.beginPath();ctx.moveTo(x*t,b.y0*t);ctx.lineTo(x*t,b.y1*t);ctx.stroke();}
-    for(let y=b.y0;y<=b.y1;y++){ctx.beginPath();ctx.moveTo(b.x0*t,y*t);ctx.lineTo(b.x1*t,y*t);ctx.stroke();}
+    ctx.strokeStyle='rgba(0,0,0,.045)';ctx.lineWidth=1;
+    if(t>=36){
+      for(let x=b.x0;x<=b.x1;x++){ctx.beginPath();ctx.moveTo(x*t,b.y0*t);ctx.lineTo(x*t,b.y1*t);ctx.stroke();}
+      for(let y=b.y0;y<=b.y1;y++){ctx.beginPath();ctx.moveTo(b.x0*t,y*t);ctx.lineTo(b.x1*t,y*t);ctx.stroke();}
+    }
+  }
+
+  function drawTerrainVolume(g,ctx){
+    const b=visibleBounds(g), t=D.TILE;
+    for(let y=b.y0;y<b.y1;y++) for(let x=b.x0;x<b.x1;x++){
+      const id=g.world.tiles[y][x], n=g.world.noise[y][x];
+      if(id==='water') continue;
+      let h=0;
+      if(id==='stone') h=10+Math.floor(n*24);
+      else if(id==='darkgrass') h=5+Math.floor(n*13);
+      else if(id==='dirt') h=3+Math.floor(n*9);
+      else if(id==='sand') h=2+Math.floor(n*7);
+      else if(id==='grass') h=2+Math.floor(n*6);
+      if(!h) continue;
+      const px=x*t, py=y*t;
+      ctx.save();
+      ctx.globalAlpha=.18;
+      ctx.fillStyle='rgba(255,255,255,.22)';
+      ctx.fillRect(px+3,py+3,t-6,Math.max(1,h*.08));
+      ctx.globalAlpha=.20;
+      ctx.fillStyle='rgba(0,0,0,.45)';
+      ctx.fillRect(px+5,py+t-5,t-10,Math.max(2,h*.16));
+      if(h>18){
+        ctx.globalAlpha=.16;
+        ctx.strokeStyle='rgba(247,198,91,.45)';
+        ctx.lineWidth=1;
+        ctx.strokeRect(px+6,py+6,t-12,t-12);
+      }
+      ctx.restore();
+    }
   }
 
   function drawTileDepth(g,ctx){
@@ -1156,6 +1369,52 @@ button,input,select{font-family:inherit}
       ctx.strokeRect(px+2,py+2,t-4,t-4);
       ctx.restore();
     }
+  }
+
+  function drawZoneOverlays(g,ctx){
+    if(!g.world)return;
+    Object.entries(D.STARTER_ZONES||{}).forEach(([id,z])=>{
+      const wx=z.x*D.TILE+D.TILE/2, wy=z.y*D.TILE+D.TILE/2;
+      if(!onScreen(g,{x:wx,y:wy},260))return;
+      const feat=D.getZoneFeature(id);
+      ctx.save();ctx.translate(wx,wy);
+      ctx.strokeStyle='rgba(247,198,91,.38)';ctx.lineWidth=3;circle(ctx,0,0,z.r*D.TILE*.28);ctx.stroke();
+      if(g.settings.display.showWorldLabels){
+        label(ctx,`${z.icon} ${z.name}`,0,-86,'#f7c65b');
+        label(ctx,feat.landmark,0,-62,'#e9f0ff');
+      }
+      const fids=D.getClassFactions(id)||[];
+      const offsets=[[-9,-9],[9,9]];
+      fids.forEach((fid,i)=>{
+        const f=D.FACTIONS[fid], ox=offsets[i][0]*D.TILE, oy=offsets[i][1]*D.TILE;
+        ctx.save();ctx.translate(ox,oy);
+        ctx.fillStyle='rgba(0,0,0,.25)';ellipse(ctx,0,20,32,9);ctx.fill();
+        ctx.fillStyle=f.color||'#f7c65b';round(ctx,-3,-38,6,58,3);ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,.12)';round(ctx,-3,-38,6,58,3);ctx.fill();
+        ctx.beginPath();ctx.moveTo(2,-36);ctx.lineTo(42,-25);ctx.lineTo(2,-12);ctx.closePath();ctx.fillStyle=f.color||'#f7c65b';ctx.fill();
+        ctx.font='18px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#fff';ctx.fillText(f.icon,22,-24);
+        if(D.dist(g.player,{x:wx+ox,y:wy+oy})<130) label(ctx,f.name,20,-58,f.color||'#f7c65b');
+        ctx.restore();
+      });
+      ctx.restore();
+    });
+  }
+
+  function drawTurfClaims(g,ctx){
+    const sys=g.systems.turf;if(!sys||!sys.points)return;
+    sys.points.forEach(pt=>{
+      if(!onScreen(g,pt,140))return;
+      const f=D.FACTIONS[pt.factionId]||{};
+      ctx.save();ctx.translate(pt.x,pt.y);
+      ctx.strokeStyle=pt.owner?f.color:'rgba(255,255,255,.25)';ctx.lineWidth=3;
+      ctx.globalAlpha=.78;circle(ctx,0,0,pt.r);ctx.stroke();ctx.globalAlpha=1;
+      ctx.fillStyle='rgba(0,0,0,.32)';ellipse(ctx,0,18,28,8);ctx.fill();
+      ctx.fillStyle=f.color||'#f7c65b';circle(ctx,0,0,18);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='18px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(f.icon||'⚑',0,0);
+      const pct=Math.round((pt.progress||0)*100);
+      if(D.dist(g.player,pt)<125) label(ctx,`${pt.owner?'CLAIMED':'CLAIM'} ${pct}%`,0,-35,f.color||'#f7c65b');
+      ctx.restore();
+    });
   }
 
   function drawBuildGhost(g,ctx){
@@ -1308,29 +1567,89 @@ button,input,select{font-family:inherit}
 
   function drawPlayer(g,ctx){
     const p=g.player;if(!p)return;
-    ctx.save();ctx.translate(p.x,p.y);
-    ctx.fillStyle='rgba(0,0,0,.32)';ellipse(ctx,0,18,24,8);ctx.fill();
-    // selection ring
-    ctx.strokeStyle='rgba(106,167,255,.28)';ctx.lineWidth=3;circle(ctx,0,0,24+Math.sin(g.time*4)*1.5);ctx.stroke();
-    const body=p.equipment.body==='iron_armor'?'#9ea7b8':p.equipment.body==='hide_armor'?'#7a5138':'#2f6eea';
-    ctx.fillStyle=shade(body,-32);round(ctx,-13,5,26,30,10);ctx.fill();
-    ctx.fillStyle=body;round(ctx,-12,0,24,31,9);ctx.fill();
-    ctx.fillStyle='#d7a86e';circle(ctx,0,-16,12);ctx.fill();
-    ctx.fillStyle='rgba(255,255,255,.16)';circle(ctx,-4,-20,3);ctx.fill();
-    // weapon
-    ctx.strokeStyle=p.equipment.weapon==='iron_sword'?'#dbe4ff':p.equipment.weapon==='crude_sword'?'#c0cadb':'rgba(255,255,255,.25)';ctx.lineWidth=5;ctx.lineCap='round';
-    ctx.beginPath();ctx.moveTo(12,2);ctx.lineTo(31,-18);ctx.stroke();
+    const speed=Math.hypot(p.vx||0,p.vy||0);
+    const moving=speed>8;
+    const t=g.time*10;
+    const step=moving?Math.sin(t)*5:0;
+    const bob=moving?Math.abs(Math.sin(t))*2:0;
+    const aimAng=p.facingAngle ?? Math.atan2((g.input?.mouse?.worldY||p.y)-p.y,(g.input?.mouse?.worldX||p.x)-p.x);
+    const attackPct=p.attackAnimMax?D.clamp(p.attackAnim/p.attackAnimMax,0,1):0;
+    const swing=(1-attackPct)*Math.PI*(p.lastAttackHeavy?1.25:.85);
+    const weaponId=p.equipment.weapon;
+    const weapon=D.ITEMS[weaponId];
+    const style=D.EQUIPMENT[weaponId]?.style || weapon?.combatStyle || 'melee';
+    const body=p.equipment.body==='iron_armor'?'#9ea7b8':p.equipment.body==='hide_armor'?'#7a5138':p.equipment.body==='ranger_tunic'?'#2f8f5d':p.equipment.body==='apprentice_robe'?'#6d55d8':'#2f6eea';
+    const headGear=p.equipment.head;
+    ctx.save();ctx.translate(p.x,p.y-bob);
+    ctx.fillStyle='rgba(0,0,0,.34)';ellipse(ctx,0,25+bob,30,9);ctx.fill();
+    const faction=D.FACTIONS[p.factionId]||{};
+    ctx.strokeStyle=faction.color||'rgba(106,167,255,.28)';ctx.globalAlpha=.34;ctx.lineWidth=3;circle(ctx,0,0,25+Math.sin(g.time*4)*1.5);ctx.stroke();ctx.globalAlpha=1;
+    ctx.save();ctx.rotate(aimAng+Math.PI/2);
+    ctx.fillStyle='#202a3c';
+    round(ctx,-14,-3+step,10,38,5);ctx.fill();
+    round(ctx,4,-3-step,10,38,5);ctx.fill();
+    ctx.fillStyle='#101015';
+    round(ctx,-18,29+step,18,11,5);ctx.fill();
+    round(ctx,0,29-step,18,11,5);ctx.fill();
+    ctx.fillStyle='rgba(247,198,91,.18)';
+    round(ctx,-17,29+step,16,3,2);ctx.fill();
+    round(ctx,1,29-step,16,3,2);ctx.fill();
+    ctx.restore();
+    ctx.fillStyle=shade(body,-34);round(ctx,-15,0,30,34,10);ctx.fill();
+    ctx.fillStyle=body;round(ctx,-14,-6,28,38,10);ctx.fill();
+    ctx.fillStyle=faction.color||'rgba(247,198,91,.5)';ctx.globalAlpha=.34;round(ctx,-15,-7,30,7,6);ctx.fill();ctx.globalAlpha=1;
+    ctx.fillStyle='rgba(255,255,255,.10)';round(ctx,-8,-2,6,29,5);ctx.fill();
+    const armSwing=attackPct>0?(p.lastAttackHeavy?Math.sin(swing)*18:Math.sin(swing)*12):0;
+    ctx.save();ctx.rotate(aimAng);
+    ctx.fillStyle='#d7a86e';
+    round(ctx,8,-8+armSwing*.04,29,8,6);ctx.fill();
+    round(ctx,-34,8-armSwing*.02,26,8,6);ctx.fill();
+    ctx.restore();
+    ctx.fillStyle='#d7a86e';circle(ctx,0,-20,12);ctx.fill();
+    ctx.fillStyle='#1b1b20';ctx.beginPath();ctx.arc(0,-25,12,Math.PI,0);ctx.lineTo(10,-18);ctx.lineTo(-10,-18);ctx.closePath();ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.92)';circle(ctx,-4,-24,2.3);ctx.fill();circle(ctx,4,-24,2.3);ctx.fill();
+    if(headGear){
+      ctx.fillStyle=headGear==='bronze_helm'?'#b87443':headGear==='leather_hood'?'#5a3824':headGear==='apprentice_hood'?'#4e3bad':'#2b3346';
+      ctx.beginPath();ctx.arc(0,-24,13,Math.PI,0);ctx.lineTo(12,-16);ctx.lineTo(-12,-16);ctx.closePath();ctx.fill();
+    }
+    ctx.save();
+    ctx.rotate(aimAng + (attackPct>0 ? -0.95 + swing : 0));
+    ctx.lineCap='round';
+    if(style==='range'){
+      ctx.strokeStyle='#b87943';ctx.lineWidth=5;ctx.beginPath();ctx.arc(29,0,22,-1.15,1.15);ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(20,-20);ctx.lineTo(20,20);ctx.stroke();
+      if(p.heavyCharging){ctx.strokeStyle='rgba(247,198,91,.78)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(20,0);ctx.lineTo(52,0);ctx.stroke();}
+    }else if(style==='mage'){
+      ctx.strokeStyle=weaponId==='ember_staff'?'#ff9b5c':'#b98cff';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(13,0);ctx.lineTo(46,0);ctx.stroke();
+      ctx.fillStyle=weaponId==='ember_staff'?'#ffcf6e':'#b98cff';circle(ctx,52,0,7);ctx.fill();
+    }else{
+      ctx.strokeStyle=weaponId==='iron_sword'?'#dbe4ff':weaponId==='crude_sword'?'#c0cadb':'rgba(255,255,255,.28)';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(12,0);ctx.lineTo(45,0);ctx.stroke();
+      ctx.strokeStyle='#5b3b24';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(9,-8);ctx.lineTo(9,8);ctx.stroke();
+    }
+    ctx.restore();
+    if(style==='range'){
+      ctx.save();ctx.rotate(aimAng);ctx.fillStyle='rgba(247,198,91,.85)';round(ctx,-18,14,12,5,3);ctx.fill();round(ctx,-18,21,12,5,3);ctx.fill();ctx.restore();
+    }
+    if(g.systems.turf?.capture){
+      const pct=D.clamp(g.systems.turf.capture.progress||0,0,1);
+      ctx.save();ctx.translate(0,-58);
+      ctx.fillStyle='rgba(7,10,17,.82)';round(ctx,-42,-9,84,18,8);ctx.fill();
+      ctx.fillStyle='#f7c65b';round(ctx,-38,-5,76*pct,10,5);ctx.fill();
+      ctx.restore();
+    }
     if(p.blocking){
-      ctx.strokeStyle='rgba(106,167,255,.9)';ctx.lineWidth=5;ctx.beginPath();ctx.arc(0,0,32,-1.35,1.35);ctx.stroke();
-      ctx.fillStyle='rgba(106,167,255,.16)';circle(ctx,0,0,34);ctx.fill();
+      ctx.strokeStyle='rgba(106,167,255,.92)';ctx.lineWidth=5;ctx.beginPath();ctx.arc(0,0,34,aimAng-1.25,aimAng+1.25);ctx.stroke();
+      ctx.fillStyle='rgba(106,167,255,.16)';circle(ctx,0,0,36);ctx.fill();
     }
     if(p.heavyCharging){
       const c=D.clamp(p.heavyCharge/.75,0,1);
-      ctx.strokeStyle='rgba(255,92,122,.75)';ctx.lineWidth=3+c*5;ctx.beginPath();ctx.arc(0,0,36+c*16,0,Math.PI*2*c);ctx.stroke();
+      ctx.strokeStyle='rgba(255,92,122,.75)';ctx.lineWidth=3+c*5;ctx.beginPath();ctx.arc(0,0,38+c*16,0,Math.PI*2*c);ctx.stroke();
     }
     if(p.attackAnim>0){
-      ctx.strokeStyle=p.lastAttackHeavy?'rgba(255,92,122,.85)':'rgba(255,207,110,.75)';ctx.lineWidth=p.lastAttackHeavy?8:5;
-      ctx.beginPath();ctx.arc(0,0,p.lastAttackHeavy?54:38,-.7,.7);ctx.stroke();
+      ctx.save();ctx.rotate(p.attackAngle||aimAng);
+      ctx.strokeStyle=p.lastAttackHeavy?'rgba(255,92,122,.85)':'rgba(255,207,110,.78)';ctx.lineWidth=p.lastAttackHeavy?8:5;
+      ctx.beginPath();ctx.arc(22,0,p.lastAttackHeavy?48:34,-.9,.9);ctx.stroke();
+      ctx.restore();
     }
     ctx.restore();
   }
@@ -1358,6 +1677,24 @@ button,input,select{font-family:inherit}
       ctx.save();ctx.globalAlpha=Math.min(1,e.t*2);ctx.translate(e.x,e.y-e.float*(1-e.t/e.maxT));
       ctx.font=`800 ${e.size||18}px ${e.font||'Inter'}`;ctx.textAlign='center';ctx.fillStyle=e.color||'#fff';ctx.strokeStyle='rgba(0,0,0,.55)';ctx.lineWidth=4;ctx.strokeText(e.text,0,0);ctx.fillText(e.text,0,0);ctx.restore();
     }
+  }
+
+  function drawAerialAtmosphere(g,ctx){
+    if(!g.world || g.settings?.cameraMode!=='iso')return;
+    const pitch=g.camera?.pitch||.62;
+    const strength=D.clamp((1-pitch)*.42,0,.22);
+    if(strength<=.01)return;
+    ctx.save();
+    const sky=ctx.createLinearGradient(0,0,0,g.viewH);
+    sky.addColorStop(0,`rgba(106,167,255,${strength*.70})`);
+    sky.addColorStop(.38,`rgba(247,198,91,${strength*.22})`);
+    sky.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=sky;ctx.fillRect(0,0,g.viewW,g.viewH);
+    const fore=ctx.createLinearGradient(0,g.viewH*.55,0,g.viewH);
+    fore.addColorStop(0,'rgba(0,0,0,0)');
+    fore.addColorStop(1,`rgba(0,0,0,${strength*.55})`);
+    ctx.fillStyle=fore;ctx.fillRect(0,0,g.viewW,g.viewH);
+    ctx.restore();
   }
 
   function drawLighting(g,ctx){
@@ -1478,8 +1815,17 @@ button,input,select{font-family:inherit}
   const D = window.Duskfall = window.Duskfall || {};
   D.createProjectile=function(x,y,tx,ty,opts={}){
     const ang=Math.atan2(ty-y,tx-x), speed=opts.speed||360;
-    return {uid:D.uid('proj'),x,y,vx:Math.cos(ang)*speed,vy:Math.sin(ang)*speed,r:opts.r||4,color:opts.color||'#ffcf6e',life:opts.life||1,dead:false,damage:opts.damage||1,source:opts.source||'player',
-      update(dt){this.x+=this.vx*dt;this.y+=this.vy*dt;this.life-=dt;if(this.life<=0)this.dead=true;}
+    return {uid:D.uid('proj'),x,y,vx:Math.cos(ang)*speed,vy:Math.sin(ang)*speed,r:opts.r||4,color:opts.color||'#ffcf6e',life:opts.life||1,dead:false,damage:opts.damage||1,source:opts.source||'player',recoverable:!!opts.recoverable,recoverChance:opts.recoverChance??.72,dropped:false,dropId:opts.dropId||'arrow',style:opts.style||null,
+      update(dt,g){
+        this.x+=this.vx*dt;this.y+=this.vy*dt;this.life-=dt;
+        if(this.life<=0){
+          this.dead=true;
+          if(g&&this.recoverable&&!this.dropped&&Math.random()<this.recoverChance){
+            this.dropped=true;
+            g.entities.drops.push({uid:D.uid('drop'),id:this.dropId,qty:1,x:this.x,y:this.y,r:10});
+          }
+        }
+      }
     };
   };
 })();
@@ -1495,8 +1841,8 @@ button,input,select{font-family:inherit}
     const faction=D.FACTIONS[chosenFaction]||D.FACTIONS.ironbound;
     const start=cls.start||{x:D.WORLD.w/2,y:D.WORLD.h/2};
     const p={
-      uid:'player',kind:'player',classId,factionId:chosenFaction,factionName:faction.name,zoneName:cls.zone||'Central Crossroads',x:start.x*D.TILE+D.TILE/2,y:start.y*D.TILE+D.TILE/2,r:16,vx:0,vy:0,dir:{x:1,y:0},
-      hp:100,maxHp:100,hunger:100,maxHunger:100,dead:false,attackCooldown:0,attackAnim:0,interactCooldown:0,blocking:false,heavyCharging:false,heavyCharge:0,
+      uid:'player',kind:'player',classId,factionId:chosenFaction,factionName:faction.name,zoneName:cls.zone||'Central Crossroads',role:D.CLASS_ROLES[classId]||'Hybrid',roleType:cls.roleType||cls.archetype||'hybrid',characterXp:0,characterLevel:1,attributePoints:3,attributes:D.defaultAttributes(cls.roleType||cls.archetype||'hybrid'),x:start.x*D.TILE+D.TILE/2,y:start.y*D.TILE+D.TILE/2,r:16,vx:0,vy:0,dir:{x:1,y:0},
+      hp:100,maxHp:100,hunger:100,maxHunger:100,dead:false,attackCooldown:0,attackAnim:0,attackAnimMax:.2,attackAngle:0,facingAngle:0,walkTime:0,interactCooldown:0,blocking:false,heavyCharging:false,heavyCharge:0,
       equipment:{head:null,weapon:null,offhand:null,body:null,tool:null}, skills:{}, perks:[], mods:{},
       update(dt){
         if(this.dead)return;
@@ -1507,7 +1853,8 @@ button,input,select{font-family:inherit}
         if(this.heavyCharging) sp*=.72;
         const tile=D.tileAt(game.world,this.x,this.y); if(tile) sp*=D.TILES[tile].speed||1;
         this.vx=axis.x*sp;this.vy=axis.y*sp;
-        if(axis.x||axis.y)this.dir={x:axis.x,y:axis.y};
+        if(axis.x||axis.y){this.dir={x:axis.x,y:axis.y};this.walkTime+=dt*Math.hypot(axis.x,axis.y)*8;}
+        if(game.input?.mouse){this.facingAngle=Math.atan2(game.input.mouse.worldY-this.y,game.input.mouse.worldX-this.x);}
         this.move(dt,game);
         this.attackCooldown=Math.max(0,this.attackCooldown-dt);
         this.attackAnim=Math.max(0,this.attackAnim-dt);
@@ -1525,6 +1872,9 @@ button,input,select{font-family:inherit}
         s.moveSpeed *= 1+(this.mods.moveSpeed||0);
         s.accuracy += this.mods.accuracy||0;
         s.attack += Math.floor((D.levelForXp(this.skills.combat?.xp||0)-1)/2);
+        s.characterLevel = this.characterLevel || D.characterLevelForXp(this.characterXp||0);
+        s.healingPower += Math.floor((this.characterLevel||1)*.4);
+        s.supportPower += Math.floor((this.characterLevel||1)*.3);
         const faction=D.FACTIONS[this.factionId];
         if(faction?.buff){
           s.attack += faction.buff.attack||0;
@@ -1579,14 +1929,11 @@ button,input,select{font-family:inherit}
     Object.entries(cls.skills||{}).forEach(([k,xp])=>{if(!p.skills[k])p.skills[k]={xp:0,level:1};p.skills[k].xp=xp;p.skills[k].level=D.levelForXp(xp||0);});
     p.equipment={...p.equipment,...(cls.equipment||{})};
     p.perks=[...(cls.perks||[])];
-    // inventory setup happens after systems exist
-    setTimeout(()=>{
-      if(game.systems?.inventory){Object.entries(cls.items||{}).forEach(([id,qty])=>game.systems.inventory.add(id,qty,true));game.systems.perks.reapply();}
-    },0);
     return p;
   };
   D.applyPlayerSave=function(p,data={}){
     p.x=data.x||p.x;p.y=data.y||p.y;p.hp=data.hp||p.hp;p.hunger=data.hunger??p.hunger;p.equipment={head:null,weapon:null,offhand:null,body:null,tool:null,...(data.equipment||p.equipment)};p.skills=data.skills||p.skills;Object.keys(D.SKILLS).forEach(k=>{if(!p.skills[k])p.skills[k]={xp:0,level:1};});p.perks=data.perks||p.perks;p.factionId=data.factionId||p.factionId;p.factionName=D.FACTIONS[p.factionId]?.name||p.factionName;
+    p.characterXp=data.characterXp||p.characterXp||0;p.characterLevel=data.characterLevel||D.characterLevelForXp(p.characterXp||0);p.attributePoints=data.attributePoints??p.attributePoints??0;p.attributes={...D.defaultAttributes(p.roleType||'hybrid'),...(data.attributes||p.attributes||{})};p.role=data.role||p.role||D.CLASS_ROLES[p.classId]||'Hybrid';
   };
 })();
 </script>
@@ -1602,21 +1949,23 @@ button,input,select{font-family:inherit}
     for(let y=0;y<h;y++){
       tiles[y]=[];noise[y]=[];
       for(let x=0;x<w;x++){
-        const n=fbm(x*.055,y*.055,rand)+fbm(x*.015+40,y*.015-22,rand)*.55;
+        const n=fbm(x*.052,y*.052,rand)+fbm(x*.014+40,y*.014-22,rand)*.55;
         noise[y][x]=(n+1)/2;
         let id='grass';
-        const dx=x-w/2,dy=y-h/2,d=Math.hypot(dx,dy)/(w*.55);
-        if(noise[y][x]<.27) id='water';
-        else if(noise[y][x]<.33) id='sand';
-        else if(noise[y][x]>.76) id='stone';
+        const dx=x-w/2,dy=y-h/2,d=Math.hypot(dx,dy)/(w*.62);
+        if(noise[y][x]<.22) id='water';
+        else if(noise[y][x]<.29) id='sand';
+        else if(noise[y][x]>.78) id='stone';
         else if(noise[y][x]>.64) id='darkgrass';
-        else if(noise[y][x]<.39) id='swamp';
-        if(d>.92) id='water';
+        else if(noise[y][x]<.36) id='swamp';
+        if(d>1.05) id='water';
         tiles[y][x]=id;
       }
     }
-    // upgraded central town: plaza, roads, fenced boundary, buildings, and farmland
     const cx=Math.floor(w/2),cy=Math.floor(h/2);
+    applyStarterZones(tiles,noise,w,h);
+    connectWorldRoads(tiles,w,h);
+    // upgraded central town: plaza, roads, fenced boundary, buildings, and farmland
     for(let y=cy-10;y<=cy+10;y++)for(let x=cx-12;x<=cx+12;x++) if(inBounds(x,y,w,h)) tiles[y][x]='dirt';
     for(let y=cy-4;y<=cy+4;y++)for(let x=cx-5;x<=cx+5;x++) if(inBounds(x,y,w,h)) tiles[y][x]='plaza';
     for(let x=0;x<w;x++) if(inBounds(x,cy,w,h) && tiles[cy][x]!=='water') tiles[cy][x]='stonepath';
@@ -1631,6 +1980,123 @@ button,input,select{font-family:inherit}
     rect(tiles,cx-18,cy-7,3,7,'farmland');rect(tiles,cx+16,cy+2,4,7,'farmland');
     return {seed,w,h,tiles,noise};
   };
+
+  function applyStarterZones(tiles,noise,w,h){
+    Object.entries(D.STARTER_ZONES||{}).forEach(([id,z])=>{
+      for(let yy=z.y-z.r-8;yy<=z.y+z.r+8;yy++)for(let xx=z.x-z.r-8;xx<=z.x+z.r+8;xx++){
+        if(!inBounds(xx,yy,w,h))continue;
+        const d=Math.hypot(xx-z.x,yy-z.y);
+        if(d<=z.r+7){
+          let tile=z.biome||'grass';
+          const ring=Math.sin((xx+yy)*.23)+Math.cos((xx-z.x)*.18)*.7;
+          if(d<5) tile=z.accent||'plaza';
+          else if(d<11) tile=(z.road||'path');
+          else if(d>z.r-4 && ring>.45) tile='stonepath';
+          else if(id==='cleric' && (d>z.r-6 || noise[yy]?.[xx]<.42)) tile='sand';
+          else if(id==='prospector' && noise[yy]?.[xx]>.42) tile='stone';
+          else if(id==='mage' && noise[yy]?.[xx]>.38) tile='stone';
+          else if(id==='brawler' && noise[yy]?.[xx]<.58) tile='dirt';
+          else if(id==='gatherer' && noise[yy]?.[xx]>.48) tile='darkgrass';
+          else if(id==='range' && noise[yy]?.[xx]>.46) tile='darkgrass';
+          else if(id==='warden' && noise[yy]?.[xx]>.40) tile='darkgrass';
+          tiles[yy][xx]=tile;
+        }
+      }
+      paintZoneElevationLayers(tiles,noise,id,z,w,h);
+      // class camp footprint
+      rect(tiles,z.x-3,z.y-3,7,7,z.accent||'plaza');
+      rect(tiles,z.x-6,z.y,13,1,z.road||'path');
+      rect(tiles,z.x,z.y-6,1,13,z.road||'path');
+      rect(tiles,z.x-5,z.y-7,4,3,'woodfloor');
+      rect(tiles,z.x+2,z.y+5,4,3,'woodfloor');
+      paintFactionSubcamps(tiles,id,z,w,h);
+      paintBossArena(tiles,id,z,w,h);
+      if(inBounds(z.x,z.y,w,h))tiles[z.y][z.x]=z.accent||'plaza';
+    });
+  }
+
+  function paintZoneElevationLayers(tiles,noise,id,z,w,h){
+    const rings=[z.r*.38,z.r*.62,z.r*.84];
+    rings.forEach((rr,idx)=>{
+      for(let a=0;a<Math.PI*2;a+=Math.PI/(28+idx*8)){
+        const wobble=Math.sin(a*3+idx)*3;
+        const x=Math.round(z.x+Math.cos(a)*(rr+wobble));
+        const y=Math.round(z.y+Math.sin(a)*(rr+wobble));
+        for(let yy=y-1;yy<=y+1;yy++)for(let xx=x-1;xx<=x+1;xx++){
+          if(!inBounds(xx,yy,w,h))continue;
+          if(tiles[yy][xx]==='water')tiles[yy][xx]='sand';
+          else if(['prospector','mage','melee'].includes(id))tiles[yy][xx]='stonepath';
+          else if(['range','gatherer','warden'].includes(id))tiles[yy][xx]=idx===0?'path':'darkgrass';
+          else tiles[yy][xx]=idx===0?'path':'dirt';
+        }
+      }
+    });
+    const landmarks=[[-Math.round(z.r*.55),0],[Math.round(z.r*.55),0],[0,-Math.round(z.r*.55)],[0,Math.round(z.r*.55)]];
+    landmarks.forEach((off,i)=>{
+      const lx=z.x+off[0], ly=z.y+off[1];
+      const tile=['prospector','mage','melee'].includes(id)?'stone':['range','gatherer','warden'].includes(id)?'darkgrass':'dirt';
+      for(let yy=ly-3;yy<=ly+3;yy++)for(let xx=lx-3;xx<=lx+3;xx++){
+        if(!inBounds(xx,yy,w,h))continue;
+        if(Math.hypot(xx-lx,yy-ly)<3.4)tiles[yy][xx]=tile;
+      }
+    });
+  }
+
+  function paintFactionSubcamps(tiles,id,z,w,h){
+    const fids=D.getClassFactions(id)||[];
+    const offsets=[[-9,-9],[9,9]];
+    fids.forEach((fid,i)=>{
+      const ox=offsets[i][0], oy=offsets[i][1];
+      const baseX=z.x+ox, baseY=z.y+oy;
+      rect(tiles,baseX-3,baseY-2,6,4,'woodfloor');
+      rect(tiles,baseX-4,baseY,9,1,z.road||'path');
+      rect(tiles,baseX,baseY-4,1,8,z.road||'path');
+      if(inBounds(baseX+Math.sign(ox)*3,baseY,w,h))tiles[baseY][baseX+Math.sign(ox)*3]='fence';
+      roadLine(tiles,z.x,z.y,baseX,baseY,z.road||'path',1);
+    });
+  }
+
+  function paintBossArena(tiles,id,z,w,h){
+    const angleMap={melee:-2.35,warden:-1.55,range:-.78,cleric:0,gatherer:.78,mage:1.55,brawler:2.35,prospector:3.14,wanderer:.35};
+    const a=angleMap[id]??0;
+    const ax=Math.round(z.x+Math.cos(a)*(z.r+9));
+    const ay=Math.round(z.y+Math.sin(a)*(z.r+9));
+    for(let yy=ay-5;yy<=ay+5;yy++)for(let xx=ax-5;xx<=ax+5;xx++){
+      if(!inBounds(xx,yy,w,h))continue;
+      const d=Math.hypot(xx-ax,yy-ay);
+      if(d<4.8)tiles[yy][xx]=z.accent||'plaza';
+      if(d>4.1&&d<5.4)tiles[yy][xx]='stonepath';
+    }
+    roadLine(tiles,z.x,z.y,ax,ay,z.road||'path',1);
+  }
+
+  function connectWorldRoads(tiles,w,h){
+    const zones=D.STARTER_ZONES||{}, hub=zones.wanderer||{x:Math.floor(w/2),y:Math.floor(h/2)};
+    Object.entries(zones).forEach(([id,z])=>{
+      if(id==='wanderer')return;
+      roadLine(tiles,z.x,z.y,hub.x,hub.y,z.road||'path',2);
+    });
+    const ring=['melee','warden','range','cleric','gatherer','mage','brawler','prospector','melee'];
+    for(let i=0;i<ring.length-1;i++){
+      const a=zones[ring[i]],b=zones[ring[i+1]];
+      if(a&&b) roadLine(tiles,a.x,a.y,b.x,b.y,'path',1);
+    }
+  }
+
+  function roadLine(tiles,x0,y0,x1,y1,id='path',width=1){
+    const steps=Math.max(Math.abs(x1-x0),Math.abs(y1-y0));
+    for(let i=0;i<=steps;i++){
+      const t=i/Math.max(1,steps);
+      const bend=Math.sin(t*Math.PI)*5;
+      const x=Math.round(D.lerp(x0,x1,t)+bend*Math.sign(y1-y0||1)*.22);
+      const y=Math.round(D.lerp(y0,y1,t)+bend*Math.sign(x0-x1||1)*.22);
+      for(let yy=y-width;yy<=y+width;yy++)for(let xx=x-width;xx<=x+width;xx++){
+        if(!tiles[yy]?.[xx])continue;
+        if(tiles[yy][xx]==='water')tiles[yy][xx]='sand';
+        else tiles[yy][xx]=id;
+      }
+    }
+  }
   function fbm(x,y,rand){
     // deterministic-ish smooth value noise via sin hashing
     let v=0,a=.5,f=1;
@@ -1671,13 +2137,53 @@ button,input,select{font-family:inherit}
       else if((tile==='swamp'||tile==='darkgrass') && r<.018) type='herb';
       if(type) game.entities.resources.push(D.createResource(type,x*t+t/2,y*t+t/2,`res_${x}_${y}`));
     }
-    // NPCs in town
+    // Class starter outposts and safe-ish resource rings
+    Object.entries(D.STARTER_ZONES||{}).forEach(([id,z])=>{
+      const zone=D.getStarterZone(id);
+      zone.resourceBias.forEach((type,idx)=>{
+        if(!D.RESOURCE_TYPES[type])return;
+        const count=idx===0?9:5;
+        for(let j=0;j<count;j++){
+          const a=(j/count)*Math.PI*2 + idx*.75;
+          const rr=(zone.r+8+idx*7+j%3)*t;
+          const x=D.clamp(zone.x*t+t/2+Math.cos(a)*rr,D.TILE*3,D.WORLD.pxW-D.TILE*3);
+          const y=D.clamp(zone.y*t+t/2+Math.sin(a)*rr,D.TILE*3,D.WORLD.pxH-D.TILE*3);
+          const tx=Math.floor(x/t),ty=Math.floor(y/t);
+          if(!D.TILES[game.world.tiles[ty]?.[tx]]?.solid) game.entities.resources.push(D.createResource(type,x,y,`starter_${id}_${type}_${j}`));
+        }
+      });
+    });
+    // Starter-zone trainers, faction emissaries, and world identity NPCs
+    Object.entries(D.STARTER_ZONES||{}).forEach(([id,z])=>{
+      const feat=D.getZoneFeature(id), cls=D.CLASSES[id]||{}, wx=z.x*t+t/2, wy=z.y*t+t/2;
+      game.entities.npcs.push({uid:D.uid('npc'),kind:'npc',id:`trainer_${id}`,x:wx+2*t,y:wy-2*t,r:22,color:'#6aa7ff',cfg:{name:feat.trainer,icon:feat.trainerIcon,role:`${cls.name||id} Trainer`,lines:[`Welcome to ${z.name}. This is your first real claim on the UNK-SCAPE map.`,`Train here, gather nearby, then follow the roads toward the Central Crossroads.`,`Soon this zone will have class quests, faction turf objectives, and boss unlocks.`]}});
+      const fids=D.getClassFactions(id)||[];
+      [[-9,-9],[9,9]].forEach((off,i)=>{
+        const fid=fids[i], f=D.FACTIONS[fid]; if(!f)return;
+        game.entities.npcs.push({uid:D.uid('npc'),kind:'npc',id:`emissary_${id}_${fid}`,x:(z.x+off[0])*t+t/2,y:(z.y+off[1])*t+t/2,r:22,color:f.color||'#f7c65b',cfg:{name:`${f.name} Emissary`,icon:f.icon,role:'Faction Claim Officer',lines:[`${f.name} wants control of ${z.name}.`,f.desc,`Future turf quests will let your faction capture roads, camps, and boss arenas for claim buffs.`]}});
+      });
+    });
+    // NPCs in central town
     game.entities.npcs.push(D.createNPC('elder',(cx-4)*t+t/2,(cy-1)*t+t/2));
     game.entities.npcs.push(D.createNPC('trader',(cx+4)*t+t/2,(cy-1)*t+t/2));
     game.entities.npcs.push(D.createNPC('banker',(cx-4)*t+t/2,(cy+4)*t+t/2));
     game.entities.portals.push(D.createPortal('dungeon',(cx+10)*t+t/2,(cy+9)*t+t/2));
+    // Starter training mobs near each zone, then broader world enemies
+    Object.entries(D.STARTER_ZONES||{}).forEach(([id,z])=>{
+      const feat=D.getZoneFeature(id), type=feat.trainingMob||'rat';
+      for(let i=0;i<6;i++){
+        const a=(i/3)*Math.PI*2+.45;
+        const tx=Math.round(z.x+Math.cos(a)*(z.r+16+(i%2)*7));
+        const ty=Math.round(z.y+Math.sin(a)*(z.r+16+(i%2)*7));
+        if(game.world.tiles[ty]?.[tx]&&!D.TILES[game.world.tiles[ty][tx]].solid){
+          const mob=D.createEnemy(type,tx*t+t/2,ty*t+t/2);
+          mob.cfg={...mob.cfg,name:`Training ${mob.cfg.name}`,hp:Math.max(10,Math.floor(mob.cfg.hp*.65)),attack:Math.max(1,Math.floor(mob.cfg.attack*.55)),xp:Math.max(8,Math.floor(mob.cfg.xp*.55)),aggro:95};
+          mob.maxHp=mob.cfg.hp;mob.hp=mob.maxHp;game.entities.enemies.push(mob);
+        }
+      }
+    });
     // enemies
-    for(let i=0;i<22;i++) spawnRandomEnemy(game, rand, false);
+    for(let i=0;i<78;i++) spawnRandomEnemy(game, rand, false);
   };
 
   function spawnRandomEnemy(game, rand, night){
@@ -1685,7 +2191,8 @@ button,input,select{font-family:inherit}
     const type=D.weightedPick(table), t=D.TILE, cx=D.WORLD.w/2,cy=D.WORLD.h/2;
     for(let tries=0;tries<80;tries++){
       const x=Math.floor(rand()*D.WORLD.w), y=Math.floor(rand()*D.WORLD.h);
-      if(Math.hypot(x-cx,y-cy)<16) continue;
+      if(Math.hypot(x-cx,y-cy)<18) continue;
+      if(Object.values(D.STARTER_ZONES||{}).some(z=>Math.hypot(x-z.x,y-z.y)<13)) continue;
       const tile=game.world.tiles[y][x]; if(D.TILES[tile].solid) continue;
       game.entities.enemies.push(D.createEnemy(type,x*t+t/2,y*t+t/2)); return;
     }
@@ -1707,7 +2214,7 @@ button,input,select{font-family:inherit}
   D.InventorySystem.prototype.add=function(id,qty=1,silent=false){
     const it=D.ITEMS[id]; if(!it) return false;
     this.items[id]=(this.items[id]||0)+qty;
-    if(!silent) {this.game.ui.floatText(this.game.player?.x||0,this.game.player?.y||0,`+${qty} ${it.name}`,'#63e6a4');this.game.systems.quests?.notify('collect',id,qty);}
+    if(!silent) {this.game.systems.audio?.play('pickup');this.game.ui.floatText(this.game.player?.x||0,this.game.player?.y||0,`+${qty} ${it.name}`,'#63e6a4');this.game.systems.quests?.notify('collect',id,qty);}
     return true;
   };
   D.InventorySystem.prototype.remove=function(id,qty=1){
@@ -1745,7 +2252,7 @@ button,input,select{font-family:inherit}
     const old=p.equipment[it.slot];
     p.equipment[it.slot]=id;
     this.remove(id,1); if(old) this.add(old,1,true);
-    this.game.ui.toast('Equipped',it.name,'good');this.game.ui.renderPanel();return true;
+    this.game.systems.audio?.play('equip');this.game.ui.toast('Equipped',it.name,'good');this.game.ui.renderPanel();return true;
   };
   D.InventorySystem.prototype.unequip=function(slot){
     const p=this.game.player,id=p.equipment[slot];if(!id)return;
@@ -1763,8 +2270,16 @@ button,input,select{font-family:inherit}
   D.SkillSystem.prototype.addXp=function(skill,xp){
     const p=this.game.player,s=p.skills[skill];if(!s)return;
     const old=D.levelForXp(s.xp);s.xp+=xp;const lvl=D.levelForXp(s.xp);s.level=lvl;
+    p.characterXp=(p.characterXp||0)+Math.max(1,Math.floor(xp*.35));
+    const oldChar=p.characterLevel||1;
+    p.characterLevel=D.characterLevelForXp(p.characterXp||0);
+    if(p.characterLevel>oldChar){
+      const gained=(p.characterLevel-oldChar)*3;
+      p.attributePoints=(p.attributePoints||0)+gained;
+      this.game.ui.toast('Character Level Up!',`Level ${p.characterLevel}. +${gained} attribute points earned. Open Character Stats with P.`, 'gold');
+    }
     this.game.ui.floatText(p.x,p.y-44,`+${xp} ${D.SKILLS[skill].name} XP`,D.SKILLS[skill].color);
-    if(lvl>old){this.game.ui.toast('Level Up!',`${D.SKILLS[skill].name} is now level ${lvl}.`,'gold');this.game.systems.perks.checkUnlocks(skill,lvl);}
+    if(lvl>old){this.game.ui.toast('Skill Level Up!',`${D.SKILLS[skill].name} is now level ${lvl}.`,'gold');this.game.systems.perks.checkUnlocks(skill,lvl);}
   };
   D.SkillSystem.prototype.gather=function(res){
     const p=this.game.player,cfg=res.cfg, level=D.levelForXp(p.skills[cfg.skill].xp), tool=p.stats()[cfg.skill]||0;
@@ -1807,11 +2322,14 @@ button,input,select{font-family:inherit}
   D.QuestSystem.prototype.init=function(){
     this.active={};this.completed={};
     Object.keys(D.QUESTS).forEach(id=>this.start(id));
+    const story=D.getClassStory?.(this.game.player?.classId);
+    if(story?.starterQuest && D.CLASS_QUESTS?.[story.starterQuest]) this.start(story.starterQuest);
   };
   D.QuestSystem.prototype.start=function(id){if(this.active[id]||this.completed[id])return;this.active[id]={progress:{}};};
   D.QuestSystem.prototype.notify=function(type,id,qty=1){
     for(const [qid,st] of Object.entries(this.active)){
-      const q=D.QUESTS[qid];
+      const q=D.QUESTS[qid] || D.CLASS_QUESTS?.[qid];
+      if(!q) return;
       q.steps.forEach((step,i)=>{if(step.type===type && (step.id==null||step.id===id)){const k=i;st.progress[k]=(st.progress[k]||0)+qty;}});
       this.check(qid);
     }
@@ -1819,12 +2337,12 @@ button,input,select{font-family:inherit}
   D.QuestSystem.prototype.update=function(){this.checkAll();};
   D.QuestSystem.prototype.checkAll=function(){Object.keys(this.active).forEach(id=>this.check(id));};
   D.QuestSystem.prototype.check=function(id){
-    const q=D.QUESTS[id], st=this.active[id]; if(!q||!st)return;
+    const q=D.QUESTS[id] || D.CLASS_QUESTS?.[id], st=this.active[id]; if(!q||!st)return;
     const done=q.steps.every((s,i)=>(st.progress[i]||0)>=s.qty);
     if(done){this.complete(id);}
   };
   D.QuestSystem.prototype.complete=function(id){
-    const q=D.QUESTS[id]; if(!this.active[id])return;
+    const q=D.QUESTS[id] || D.CLASS_QUESTS?.[id]; if(!this.active[id]||!q)return;
     delete this.active[id];this.completed[id]=true;
     Object.entries(q.rewards.xp||{}).forEach(([sk,xp])=>this.game.systems.skills.addXp(sk,xp));
     Object.entries(q.rewards.items||{}).forEach(([it,qty])=>this.game.systems.inventory.add(it,qty));
@@ -1864,28 +2382,53 @@ button,input,select{font-family:inherit}
   D.CombatSystem.prototype.playerAttack=function(heavy=false,charge=0){
     const g=this.game,p=g.player;if(!p||p.dead||p.attackCooldown>0||p.blocking)return;
     const stats=p.stats();
+    const style=this.weaponStyle(p);
+    if(style==='range' && g.systems.inventory.has('arrow',1)){
+      g.systems.inventory.remove('arrow',1);
+    }
     const chargeBonus=D.clamp(charge/this.maxCharge,0,1);
     const cooldown=heavy?stats.attackSpeed*1.55:stats.attackSpeed;
-    const range=stats.range+(heavy?22:0);
+    const range=style==='melee' ? stats.range+(heavy?22:0) : stats.range+(heavy?55:0);
     const accuracy=D.clamp(stats.accuracy-(heavy ? 0.08 : 0),.1,.96);
-    p.attackCooldown=cooldown;p.attackAnim=heavy ? .28 : .18;p.lastAttackHeavy=heavy;p.heavyCharge=0;p.heavyCharging=false;
-    let targets=g.entities.enemies.filter(e=>!e.dead&&D.dist(p,e)<range+e.r);
-    if(!targets.length){g.ui.floatText(p.x,p.y-32,heavy?'Heavy Swing':'Swing',heavy?'#ff5c7a':'#9aa8c7');return;}
     const aimX=g.input.mouse.worldX, aimY=g.input.mouse.worldY;
+    p.attackCooldown=cooldown;
+    p.attackAnim=heavy ? .34 : .22;
+    p.attackAnimMax=p.attackAnim;
+    p.lastAttackHeavy=heavy;
+    p.heavyCharge=0;
+    p.heavyCharging=false;
+    p.attackAngle=Math.atan2(aimY-p.y,aimX-p.x);
+    p.facingAngle=p.attackAngle;
+
+    let targets=g.entities.enemies.filter(e=>!e.dead&&D.dist(p,e)<range+e.r);
+    if(style!=='melee'){
+      targets=targets.filter(e=>this.isEnemyNearAimLine(p,e,aimX,aimY,range,heavy));
+    }
+    if(!targets.length){
+      g.ui.floatText(p.x,p.y-32,style==='range'?(heavy?'Heavy Shot':'Shot'):style==='mage'?(heavy?'Charged Spell':'Spell'):(heavy?'Heavy Swing':'Swing'),heavy?'#ff5c7a':'#9aa8c7');
+      if(style!=='melee') this.spawnAttackProjectile(p,aimX,aimY,0,style,heavy,null,false);
+      g.systems.audio?.play('miss');
+      return;
+    }
     targets.sort((a,b)=>{
+      const aLine=this.distanceToAimLine(p,a,aimX,aimY), bLine=this.distanceToAimLine(p,b,aimX,aimY);
       const aAim=Math.hypot(a.x-aimX,a.y-aimY), bAim=Math.hypot(b.x-aimX,b.y-aimY);
       const aPlayer=D.dist(p,a), bPlayer=D.dist(p,b);
-      return (aAim*.75+aPlayer*.25)-(bAim*.75+bPlayer*.25);
+      return style==='melee' ? (aAim*.75+aPlayer*.25)-(bAim*.75+bPlayer*.25) : (aLine*.9+aAim*.1)-(bLine*.9+bAim*.1);
     });
-    const maxTargets=heavy?Math.min(3,targets.length):1;
+    const maxTargets=style==='melee' ? (heavy?Math.min(3,targets.length):1) : 1;
+    let fired=false;
     for(const e of targets.slice(0,maxTargets)){
       const hit=Math.random()<accuracy;
+      if(style!=='melee' && !fired){this.spawnAttackProjectile(p,e.x,e.y,hit?1:0,style,heavy,e,hit);fired=true;}
+      g.systems.audio?.play(heavy?'heavyHit':'hit');
       if(hit){
         e.hitMarker=.2;
         e.hitFlash=.16;
         const lvl=D.levelForXp(p.skills.combat.xp);
         const baseMax=Math.max(3,stats.attack+Math.floor(lvl*.65));
-        const attackMult=heavy?1.45+chargeBonus*.55:1;
+        const styleMult=style==='mage'?1.08:style==='range'?1.0:1;
+        const attackMult=(heavy?1.45+chargeBonus*.55:1)*styleMult;
         const bonus=this.rollBonusHit(p,e,heavy);
         const totalMult=attackMult*bonus.mult;
         const min=Math.max(1,Math.floor(baseMax*.42*totalMult));
@@ -1893,7 +2436,8 @@ button,input,select{font-family:inherit}
         const raw=D.irand(min,max);
         const dmg=Math.max(1,Math.floor(raw-(e.cfg.defense||0)*.25));
         e.takeDamage(dmg,p);
-        const labelText=[heavy?'HEAVY':null,...bonus.tags,'-'+dmg].filter(Boolean).join(' ');
+        const verb=style==='range'?(heavy?'POWER SHOT':null):style==='mage'?(heavy?'CHARGED':null):(heavy?'HEAVY':null);
+        const labelText=[verb,...bonus.tags,'-'+dmg].filter(Boolean).join(' ');
         const color=bonus.headshot?'#63e6a4':bonus.crit?'#f7c65b':heavy?'#ff5c7a':'#ffcf6e';
         g.ui.floatText(e.x,e.y-28,labelText,color);
         if(bonus.crit||bonus.headshot) g.systems.skills.addXp('combat',1);
@@ -1901,6 +2445,35 @@ button,input,select{font-family:inherit}
         if(e.dead)this.kill(e);
       }else{e.missMarker=.2;g.ui.floatText(e.x,e.y-28,'MISS','#9aa8c7');}
     }
+  };
+  D.CombatSystem.prototype.distanceToAimLine=function(p,e,aimX,aimY){
+    const ax=p.x, ay=p.y, bx=aimX, by=aimY;
+    const dx=bx-ax, dy=by-ay, len2=dx*dx+dy*dy;
+    if(len2<1)return Math.hypot(e.x-ax,e.y-ay);
+    const t=D.clamp(((e.x-ax)*dx+(e.y-ay)*dy)/len2,0,1);
+    const px=ax+t*dx, py=ay+t*dy;
+    return Math.hypot(e.x-px,e.y-py);
+  };
+  D.CombatSystem.prototype.isEnemyNearAimLine=function(p,e,aimX,aimY,range,heavy=false){
+    const dist=D.dist(p,e); if(dist>range+e.r)return false;
+    const rayLen=Math.hypot(aimX-p.x,aimY-p.y);
+    if(rayLen<22)return Math.hypot(e.x-aimX,e.y-aimY)<e.r+34;
+    const lineDist=this.distanceToAimLine(p,e,aimX,aimY);
+    return lineDist <= e.r + (heavy?28:20);
+  };
+  D.CombatSystem.prototype.spawnAttackProjectile=function(p,tx,ty,hitPower,style,heavy,target,hit){
+    const g=this.game;
+    const startX=p.x+Math.cos(p.attackAngle||p.facingAngle||0)*26;
+    const startY=p.y+Math.sin(p.attackAngle||p.facingAngle||0)*26;
+    const color=style==='mage'?(heavy?'#ff9b5c':'#b98cff'):(heavy?'#ffcf6e':'#dbe4ff');
+    const r=style==='mage'?(heavy?8:6):(heavy?5:4);
+    const speed=style==='mage'?(heavy?430:390):(heavy?560:500);
+    const proj=D.createProjectile(startX,startY,tx,ty,{speed,r,color,life:1.0,damage:hitPower||0,source:'player',recoverable:style==='range',recoverChance:heavy?.82:.68,dropId:'arrow',style});
+    proj.visualOnly=true;
+    proj.style=style;
+    proj.targetId=target?.uid||null;
+    proj.onHit=hit;
+    g.entities.projectiles.push(proj);
   };
   D.CombatSystem.prototype.enemyAttack=function(e){
     const g=this.game,p=g.player;if(!p||p.dead||e.dead||e.attackTimer>0)return;
@@ -1948,7 +2521,7 @@ button,input,select{font-family:inherit}
     this.spawnTimer-=dt;
     if(this.spawnTimer<=0){
       this.spawnTimer=night?5.5:12;
-      const cap=night?42:26;
+      const cap=night?80:54;
       if(g.entities.enemies.length<cap) D.spawnRandomEnemy(g,Math.random,night);
     }
     for(const e of g.entities.enemies){
@@ -1993,6 +2566,56 @@ button,input,select{font-family:inherit}
     if(!this.game.flags.lastNight && is){this.game.ui.toast('Night Falls','Hostile creatures grow stronger after dusk.','bad');}
     this.game.flags.lastNight=is;
   };
+})();
+</script>
+<script>
+/* === systems/survival.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.AudioSystem=function(game){
+    this.game=game;this.ctx=null;this.master=null;this.musicGain=null;this.ambientGain=null;this.sfxGain=null;this.stepTimer=0;this.musicOsc=[];this.wind=null;this.started=false;
+  };
+  D.AudioSystem.prototype.ensure=function(userGesture=false){
+    const s=this.game.settings.audio||{};
+    if(!s.enabled)return false;
+    try{
+      if(!this.ctx){
+        const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
+        this.ctx=new AC();this.master=this.ctx.createGain();this.musicGain=this.ctx.createGain();this.ambientGain=this.ctx.createGain();this.sfxGain=this.ctx.createGain();
+        this.musicGain.connect(this.master);this.ambientGain.connect(this.master);this.sfxGain.connect(this.master);this.master.connect(this.ctx.destination);
+      }
+      if(this.ctx.state==='suspended'){
+        if(!userGesture)return false;
+        this.ctx.resume().catch(()=>{});
+      }
+      this.applyVolumes();return true;
+    }catch(err){console.warn('Audio disabled safely:',err);s.enabled=false;return false;}
+  };
+  D.AudioSystem.prototype.applyVolumes=function(){
+    const s=this.game.settings.audio||{};if(!this.master)return;
+    this.master.gain.value=s.enabled?(s.master??.55):0;this.musicGain.gain.value=s.music??.22;this.ambientGain.gain.value=s.ambient??.34;this.sfxGain.gain.value=s.sfx??.62;
+  };
+  D.AudioSystem.prototype.tone=function(freq=440,dur=.08,type='sine',gain=.08,out){
+    if(!this.ensure(true))return;const now=this.ctx.currentTime,o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=type;o.frequency.setValueAtTime(freq,now);g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(gain,now+.01);g.gain.exponentialRampToValueAtTime(.0001,now+dur);o.connect(g);g.connect(out||this.sfxGain);o.start(now);o.stop(now+dur+.02);
+  };
+  D.AudioSystem.prototype.play=function(name){
+    const map={hit:[170,.08,'square',.055],heavyHit:[105,.16,'sawtooth',.075],headshot:[780,.10,'triangle',.06],miss:[260,.06,'sine',.028],block:[340,.09,'triangle',.065],playerHit:[90,.18,'sawtooth',.07],pickup:[720,.07,'sine',.045],equip:[520,.08,'triangle',.045],chop:[150,.08,'square',.05],mine:[95,.07,'square',.06],fail:[130,.08,'sine',.035],click:[420,.05,'sine',.025],step:[82,.035,'triangle',.018]};
+    const a=map[name]||map.click;this.tone(a[0],a[1],a[2],a[3]);
+  };
+  D.AudioSystem.prototype.startMenuMusic=function(){
+    if(!this.ensure(true)||this.musicOsc.length)return;
+    [110,164.81,220].forEach((f,i)=>{const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=i===0?'sine':'triangle';o.frequency.value=f;g.gain.value=.018/(i+1);o.connect(g);g.connect(this.musicGain);o.start();this.musicOsc.push(o);});
+  };
+  D.AudioSystem.prototype.startWorldAudio=function(){this.ensure();this.startMenuMusic();};
+  D.AudioSystem.prototype.update=function(dt){
+    if(!this.game.player||!this.ensure(false))return;this.applyVolumes();
+    const p=this.game.player, moving=Math.hypot(p.vx||0,p.vy||0)>20 && !this.game.paused;
+    if(moving){this.stepTimer-=dt;if(this.stepTimer<=0){this.stepTimer=.34;this.tone(70+Math.random()*28,.028,'triangle',(this.game.settings.audio.footsteps||.32)*.04);}}
+    const night=this.game.systems.daynight?.nightAmount?.()||0;
+    if(this.musicGain)this.musicGain.gain.value=(this.game.settings.audio.music??.22)*(.75+night*.45);
+    if(this.ambientGain)this.ambientGain.gain.value=(this.game.settings.audio.ambient??.34)*(.75+night*.55);
+  };
+  D.AudioSystem.prototype.setEnabled=function(v){this.game.settings.audio.enabled=!!v;if(this.master)this.master.gain.value=v?(this.game.settings.audio.master??.55):0;if(v)this.ensure(true);};
 })();
 </script>
 <script>
@@ -2168,6 +2791,7 @@ button,input,select{font-family:inherit}
       const item=(cfg.altItem&&Math.random()<(cfg.altChance||0))?cfg.altItem:cfg.item;
       node.amount-=qty;
       g.systems.inventory.add(item,qty);
+      g.systems.audio?.play(cfg.skill==='mining'?'mine':'chop');
       if(g.systems.skills) g.systems.skills.addXp(cfg.skill,cfg.xp*qty);
       if(g.systems.quests) g.systems.quests.notify('gather',item,qty);
       g.stats.resourcesGathered+=qty;
@@ -2177,6 +2801,7 @@ button,input,select{font-family:inherit}
       node.active=false;
       node.respawn=this.respawnTime;
       g.systems.inventory.add('log',1);
+      g.systems.audio?.play('chop');
       if(g.systems.skills) g.systems.skills.addXp('woodcutting',12);
       if(g.systems.quests) g.systems.quests.notify('gather','log',1);
       g.ui.floatText(g.player.x,g.player.y-42,'+1 Wood','#38d978');
@@ -2274,6 +2899,37 @@ button,input,select{font-family:inherit}
 })();
 </script>
 <script>
+/* === systems/turf.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.TurfSystem=function(game){this.game=game;this.points=[];this.capture=null;this.seeded=false;this.owner={};};
+  D.TurfSystem.prototype.ensure=function(){
+    if(this.seeded||!this.game.world)return;this.seeded=true;
+    Object.entries(D.STARTER_ZONES||{}).forEach(([classId,z])=>{
+      const fids=D.getClassFactions(classId)||[];
+      [[-6,-4],[6,4]].forEach((off,i)=>{
+        const fid=fids[i]; if(!fid)return;
+        this.points.push({id:`${classId}_${fid}_claim`,classId,factionId:fid,x:(z.x+off[0])*D.TILE+D.TILE/2,y:(z.y+off[1])*D.TILE+D.TILE/2,r:78,progress:0,owner:null,name:`${D.FACTIONS[fid].name} Claim Stone`});
+      });
+    });
+  };
+  D.TurfSystem.prototype.update=function(dt){
+    this.ensure();
+    const g=this.game,p=g.player;if(!p||g.paused)return;
+    const near=this.points.find(pt=>Math.hypot(pt.x-p.x,pt.y-p.y)<pt.r);
+    if(!near){this.capture=null;return;}
+    if(near.factionId!==p.factionId){this.capture=null;return;}
+    near.progress=D.clamp((near.progress||0)+dt/8,0,1);
+    this.capture=near;
+    if(near.progress>=1 && near.owner!==p.factionId){
+      near.owner=p.factionId;this.owner[near.id]=p.factionId;
+      g.ui.toast('Turf Claimed',`${near.name} now belongs to ${p.factionName}. Claim buff foundation active.`, 'gold');
+      g.ui.log(`${p.factionName} claimed turf in ${D.CLASSES[near.classId]?.zone||'the wilds'}.`, 'gold');
+    }
+  };
+})();
+</script>
+<script>
 /* === systems/loot.js === */
 (function(){
   const D = window.Duskfall = window.Duskfall || {};
@@ -2298,7 +2954,7 @@ button,input,select{font-family:inherit}
   D.SaveSystem.prototype.data=function(){
     const g=this.game,p=g.player;
     return {version:1,seed:g.seed,time:g.time,flags:g.flags,stats:g.stats,classId:p.classId,factionId:p.factionId,
-      player:{x:p.x,y:p.y,hp:p.hp,hunger:p.hunger,equipment:p.equipment,skills:p.skills,perks:p.perks},
+      player:{x:p.x,y:p.y,hp:p.hp,hunger:p.hunger,equipment:p.equipment,skills:p.skills,perks:p.perks,characterXp:p.characterXp,characterLevel:p.characterLevel,attributePoints:p.attributePoints,attributes:p.attributes,role:p.role},
       inventory:g.systems.inventory.toSave(),bank:g.systems.bank.toSave(),quests:g.systems.quests.toSave(),
       resources:{depleted:g.entities.resources.filter(r=>r.amount<=0).map(r=>r.uid)}
     };
@@ -2316,7 +2972,8 @@ button,input,select{font-family:inherit}
 (function(){
   const D = window.Duskfall = window.Duskfall || {};
   D.UI=function(game){this.game=game;this.panel=null;this.dialogNpc=null;this.toastId=0;};
-  D.UI.prototype.closeAll=function(){document.getElementById('panel').classList.remove('show');document.getElementById('dialog').classList.remove('show');document.getElementById('menu').classList.remove('show');this.panel=null;this.dialogNpc=null;if(this.game.state==='play')this.game.paused=false;this.syncLayoutState();};
+  D.UI.prototype.closeAll=function(){document.getElementById('panel').classList.remove('show');document.getElementById('dialog').classList.remove('show');document.getElementById('menu').classList.remove('show');this.panel=null;this.dialogNpc=null;if(this.game.state==='play')this.game.paused=false;this.syncLayoutState();this.clearInputLocks();};
+  D.UI.prototype.clearInputLocks=function(){const g=this.game;if(!g.input||!g.input.mouse)return;g.input.mouse.leftDown=false;g.input.mouse.rightDown=false;g.input.mouse.leftHeld=0;if(g.player){g.player.blocking=false;g.player.heavyCharging=false;}};
   D.UI.prototype.syncLayoutState=function(){
     const root=document.getElementById('ui-root');
     const panel=document.getElementById('panel').classList.contains('show');
@@ -2326,8 +2983,33 @@ button,input,select{font-family:inherit}
     root.classList.toggle('dialog-open',dialog&&!panel&&!menu);
     root.classList.toggle('menu-open',menu);
   };
-  D.UI.prototype.update=function(){this.syncLayoutState();this.renderHUD();this.renderCombatUI();this.renderHotbar();};
-  D.UI.prototype.floatText=function(x,y,text,color){this.game.entities.effects.push({x,y,text,color,t:1,maxT:1,float:55,size:16});};
+  D.UI.prototype.update=function(){this.syncLayoutState();this.renderHUD();this.renderCombatUI();this.renderHotbar();this.renderActionHint();};
+  D.UI.prototype.floatText=function(x,y,text,color){if(this.game.settings?.display?.floatingText===false)return;this.game.entities.effects.push({x,y,text,color,t:1,maxT:1,float:55,size:16});};
+  D.UI.prototype.applyDisplaySettings=function(){
+    const d=this.game.settings.display||{};
+    document.documentElement.dataset.uiScale=d.uiScale||'normal';
+    document.body.classList.toggle('reduced-fx',!!d.reducedFx);
+  };
+  D.UI.prototype.renderActionHint=function(){
+    const el=document.getElementById('action-hint'), g=this.game, p=g.player;
+    if(!el||!p||g.state!=='play'||g.paused){if(el){el.classList.remove('show');el.innerHTML='';}return;}
+    const mx=g.input.mouse.worldX,my=g.input.mouse.worldY;
+    const screenX=g.input.mouse.x+18, screenY=g.input.mouse.y-18;
+    let text='';
+    const nearEnemy=g.entities.enemies.filter(e=>!e.dead&&Math.hypot(e.x-mx,e.y-my)<e.r+34&&Math.hypot(e.x-p.x,e.y-p.y)<p.stats().range+140).sort((a,b)=>Math.hypot(a.x-mx,a.y-my)-Math.hypot(b.x-mx,b.y-my))[0];
+    const nearNode=(g.systems.gathering?.nodes||[]).find(n=>n.active&&Math.hypot(n.x-mx,n.y-my)<=n.r+24&&Math.hypot(n.x-p.x,n.y-p.y)<=96);
+    const nearResource=g.entities.resources.filter(r=>r.amount>0&&Math.hypot(r.x-mx,r.y-my)<=r.r+26&&Math.hypot(r.x-p.x,r.y-p.y)<=96).sort((a,b)=>Math.hypot(a.x-mx,a.y-my)-Math.hypot(b.x-mx,b.y-my))[0];
+    const nearNpc=g.entities.npcs.find(n=>Math.hypot(n.x-mx,n.y-my)<34&&Math.hypot(n.x-p.x,n.y-p.y)<80);
+    const nearDrop=g.entities.drops.find(d=>Math.hypot(d.x-mx,d.y-my)<32&&Math.hypot(d.x-p.x,d.y-p.y)<55);
+    if(g.buildMode){text=`<span class="hint-dot"></span><b>LMB</b> Place • <b>RMB</b> Remove • <b>T</b> Cycle ${D.TILES[g.systems.build.selected()].name}`;}
+    else if(nearNpc){text=`<span class="hint-dot"></span><b>F</b> Talk to ${nearNpc.cfg.name}`;}
+    else if(nearNode){text=`<span class="hint-dot"></span><b>LMB</b> Chop Harvest Tree`;} 
+    else if(nearResource){text=`<span class="hint-dot"></span><b>LMB</b> ${nearResource.cfg.action||'Gather'} ${nearResource.cfg.name}`;}
+    else if(nearEnemy){const style=g.systems.combat.weaponStyle(p);text=`<span class="hint-dot"></span><b>LMB</b> ${style==='range'?'Shoot':style==='mage'?'Cast':'Attack'} ${nearEnemy.cfg.name} • <b>Hold</b> Heavy • <b>RMB</b> Block`;}
+    else if(nearDrop){text=`<span class="hint-dot"></span>Walk over to pick up ${D.ITEMS[nearDrop.id]?.name||nearDrop.id}`;}
+    if(!text){el.classList.remove('show');el.innerHTML='';return;}
+    el.innerHTML=text;el.style.left=D.clamp(screenX,120,g.viewW-120)+'px';el.style.top=D.clamp(screenY,60,g.viewH-100)+'px';el.classList.add('show');
+  };
 })();
 </script>
 <script>
@@ -2353,7 +3035,8 @@ button,input,select{font-family:inherit}
           <span class="pill purple"><i class="dot"></i>Zoom ${Math.round(g.camera.targetZoom*100)}%</span>
           <span class="pill orange"><i class="dot"></i>Hunger ${g.settings.hungerEnabled?'On':'Off'}</span>
           <span class="pill"><i class="dot"></i>Build ${g.buildMode?'On':'Off'}</span>
-          <span class="pill gold"><i class="dot"></i>${p.factionName||'No Faction'}</span>
+          <span class="pill gold" title="Faction choice shows here after character creation"><i class="dot"></i>${D.FACTIONS[p.factionId]?.icon||'⚑'} ${p.factionName||'No Faction'}</span>
+          <span class="pill purple" title="Class storyline"><i class="dot"></i>${D.getClassStory(p.classId).title}</span>
         </div>
       </div>
       <div class="hud-right">
@@ -2406,15 +3089,17 @@ button,input,select{font-family:inherit}
 (function(){
   const D = window.Duskfall = window.Duskfall || {};
   D.UI.prototype.togglePanel=function(name){if(this.panel===name){this.closePanel();return;}this.openPanel(name);};
-  D.UI.prototype.openPanel=function(name){this.panel=name;this.game.paused=true;document.getElementById('panel').classList.add('show');document.getElementById('dialog').classList.remove('show');this.dialogNpc=null;this.renderPanel();this.syncLayoutState();};
-  D.UI.prototype.closePanel=function(){this.panel=null;document.getElementById('panel').classList.remove('show');this.game.paused=false;this.syncLayoutState();};
+  D.UI.prototype.openPanel=function(name){this.panel=name;this.game.paused=true;this.clearInputLocks();document.getElementById('panel').classList.add('show');document.getElementById('dialog').classList.remove('show');this.dialogNpc=null;this.renderPanel();this.syncLayoutState();};
+  D.UI.prototype.closePanel=function(){this.panel=null;document.getElementById('panel').classList.remove('show');this.game.paused=false;this.clearInputLocks();this.syncLayoutState();};
   D.UI.prototype.renderPanel=function(){
     if(!this.panel)return; const el=document.getElementById('panel');
-    const title={inventory:'Inventory',skills:'Skills',crafting:'Crafting',quests:'Quests',bank:'Bank',map:'World Map'}[this.panel]||'Panel';
+    this.clearInputLocks();
+    const title={inventory:'Inventory',stats:'Character Stats',skills:'Skills',crafting:'Crafting',quests:'Quests',bank:'Bank',map:'World Map'}[this.panel]||'Panel';
     el.innerHTML=`<div class="panel-box"><div class="panel-head"><div><h2>${title}</h2><div class="sub">UNK-SCAPE survival interface</div></div><button class="close-btn" onclick="Duskfall.game.ui.closePanel()">Close</button></div><div class="panel-body">${this.panelHTML(this.panel)}</div></div>`;
   };
   D.UI.prototype.panelHTML=function(name){
     if(name==='inventory')return this.inventoryHTML();
+    if(name==='stats')return this.statsHTML();
     if(name==='skills')return this.skillsHTML();
     if(name==='crafting')return this.craftingHTML();
     if(name==='quests')return this.questsHTML();
@@ -2424,9 +3109,30 @@ button,input,select{font-family:inherit}
   };
   D.UI.prototype.inventoryHTML=function(){
     const g=this.game, inv=g.systems.inventory.items, p=g.player;
-    const eq=['head','weapon','offhand','body','tool'].map(s=>`<div class="item-card"><h3>${s.toUpperCase()}</h3><p>${p.equipment[s]?D.ITEMS[p.equipment[s]].icon+' '+D.ITEMS[p.equipment[s]].name:'Empty'}</p>${p.equipment[s]?`<button class="small-btn" onclick="Duskfall.game.systems.inventory.unequip('${s}')">Unequip</button>`:''}</div>`).join('');
-    const items=Object.entries(inv).map(([id,qty])=>{const it=D.ITEMS[id];return`<div class="item-card"><span class="qty">x${qty}</span><h3>${it.icon} ${it.name}</h3><p>${it.desc||''}</p><span class="tag">${it.type}</span><br><button class="small-btn" onclick="Duskfall.game.systems.inventory.use('${id}')">Use / Equip</button></div>`}).join('')||'<div class="help-note">Inventory empty.</div>';
+    const eq=['head','weapon','offhand','body','tool'].map(s=>`<div class="item-card"><h3>${s.toUpperCase()}</h3><p>${p.equipment[s]?D.ITEMS[p.equipment[s]].icon+' '+D.ITEMS[p.equipment[s]].name:'Empty'}</p>${p.equipment[s]?`<button class="small-btn" onclick="event.stopPropagation();Duskfall.game.systems.inventory.unequip('${s}')">Unequip</button>`:''}</div>`).join('');
+    const items=Object.entries(inv).map(([id,qty])=>{const it=D.ITEMS[id];return`<div class="item-card"><span class="qty">x${qty}</span><h3>${it.icon} ${it.name}</h3><p>${it.desc||''}</p><span class="tag">${it.type}</span><br><button class="small-btn" onclick="event.stopPropagation();Duskfall.game.systems.inventory.use('${id}')">Use / Equip</button></div>`}).join('')||'<div class="help-note">Inventory empty.</div>';
     return `<h3>Equipment</h3><div class="grid">${eq}</div><h3 style="margin-top:22px">Backpack</h3><div class="grid">${items}</div>`;
+  };
+  D.UI.prototype.statsHTML=function(){
+    const g=this.game,p=g.player,s=p.stats();
+    const weapon=p.equipment.weapon?D.ITEMS[p.equipment.weapon]:{name:'Fists',icon:'👊'};
+    const body=p.equipment.body?D.ITEMS[p.equipment.body]:null;
+    const head=p.equipment.head?D.ITEMS[p.equipment.head]:null;
+    const offhand=p.equipment.offhand?D.ITEMS[p.equipment.offhand]:null;
+    const tool=p.equipment.tool?D.ITEMS[p.equipment.tool]:null;
+    const combatLvl=D.levelForXp(p.skills.combat?.xp||0);
+    const totalLvl=Object.values(p.skills).reduce((a,sk)=>a+D.levelForXp(sk.xp||0),0);
+    const style=D.EQUIPMENT[p.equipment.weapon]?.style || D.ITEMS[p.equipment.weapon]?.combatStyle || 'melee';
+    const attr=p.attributes||D.defaultAttributes(p.roleType||'hybrid');
+    const attrRows=Object.entries(D.ATTRIBUTES).map(([id,a])=>`<div class="stat-line"><span>${a.icon} ${a.name}</span><b>${attr[id]||0} ${(p.attributePoints||0)>0?`<button class="small-btn" style="padding:3px 7px;margin-left:6px" onclick="Duskfall.game.ui.addAttribute('${id}')">+</button>`:''}</b></div>`).join('');
+    return `<div class="stat-sheet"><div class="stat-hero"><div class="paperdoll"><div class="pd-head"></div><div class="pd-body"></div><div class="pd-arm left"></div><div class="pd-arm right"></div><div class="pd-leg left"></div><div class="pd-leg right"></div><div class="pd-boot left"></div><div class="pd-boot right"></div><div class="pd-weapon">${weapon.icon||'👊'}</div><div class="pd-shield">${offhand?.icon||''}</div></div></div><div class="stat-card"><h3>${D.FACTIONS[p.factionId]?.icon||'⚑'} ${p.factionName}</h3><div class="stat-list"><div class="stat-line"><span>Class Story</span><b>${D.getClassStory(p.classId).title}</b></div><div class="stat-line"><span>Faction Buff</span><b>${Object.entries(D.FACTIONS[p.factionId]?.buff||{}).map(([k,v])=>`${k}+${v}`).join(', ')||'None'}</b></div><div class="stat-line"><span>Class / Zone</span><b>${D.CLASSES[p.classId]?.name||p.classId} • ${p.zoneName}</b></div><div class="stat-line"><span>Team Role</span><b>${p.role||D.CLASS_ROLES[p.classId]||'Hybrid'}</b></div><div class="stat-line"><span>Character Level</span><b>${p.characterLevel||1}</b></div><div class="stat-line"><span>Attribute Points</span><b>${p.attributePoints||0}</b></div><div class="stat-line"><span>Combat Style</span><b>${style.toUpperCase()}</b></div><div class="stat-line"><span>Total Skill Level</span><b>${totalLvl}</b></div><div class="stat-line"><span>Combat Level</span><b>${combatLvl}</b></div><div class="stat-line"><span>Health</span><b>${Math.ceil(p.hp)} / ${p.maxHp}</b></div><div class="stat-line"><span>Attack</span><b>${s.attack}</b></div><div class="stat-line"><span>Defense</span><b>${s.defense}</b></div><div class="stat-line"><span>Healing Power</span><b>${s.healingPower}</b></div><div class="stat-line"><span>Support Power</span><b>${s.supportPower}</b></div><div class="stat-line"><span>Crit Chance</span><b>${Math.round((s.critChance||0)*100)}%</b></div><div class="stat-line"><span>Accuracy</span><b>${Math.round(s.accuracy*100)}%</b></div><div class="stat-line"><span>Attack Speed</span><b>${s.attackSpeed.toFixed(2)}s</b></div><div class="stat-line"><span>Range</span><b>${Math.round(s.range)}</b></div><div class="stat-line"><span>Move Speed</span><b>${Math.round(s.moveSpeed)}</b></div></div></div></div><h3 style="margin-top:18px">Attributes</h3><div class="stat-card"><div class="stat-list">${attrRows}</div></div><h3 style="margin-top:18px">Equipment</h3><div class="grid"><div class="item-card"><h3>${head?.icon||'—'} Head</h3><p>${head?.name||'Empty'}</p></div><div class="item-card"><h3>${weapon.icon||'👊'} Weapon</h3><p>${weapon.name}</p></div><div class="item-card"><h3>${offhand?.icon||'—'} Offhand</h3><p>${offhand?.name||'Empty'}</p></div><div class="item-card"><h3>${body?.icon||'—'} Body</h3><p>${body?.name||'Empty'}</p></div><div class="item-card"><h3>${tool?.icon||'—'} Tool</h3><p>${tool?.name||'Empty'}</p></div></div>`;
+  };
+  D.UI.prototype.addAttribute=function(id){
+    const p=this.game.player;if(!p||!D.ATTRIBUTES[id]||(p.attributePoints||0)<=0)return;
+    p.attributes=p.attributes||D.defaultAttributes(p.roleType||'hybrid');
+    p.attributes[id]=(p.attributes[id]||0)+1;p.attributePoints--;
+    this.game.ui.toast('Attribute Added',`${D.ATTRIBUTES[id].name} increased to ${p.attributes[id]}.`, 'good');
+    this.renderPanel();
   };
   D.UI.prototype.skillsHTML=function(){
     const p=this.game.player;
@@ -2434,28 +3140,55 @@ button,input,select{font-family:inherit}
   };
   D.UI.prototype.craftingHTML=function(){
     const g=this.game;
-    return `<div class="grid">${D.RECIPES.map(r=>{const can=g.systems.crafting.canCraft(r);const req=Object.entries(r.requires||{}).map(([id,q])=>`${D.ITEMS[id]?.icon||'❔'} ${q}`).join(' ');const skill=D.SKILLS[r.skill]?.name||r.skill;return`<div class="item-card"><h3>${r.icon} ${r.name}</h3><p>${r.desc}</p><p><b>Req:</b> ${req}</p><span class="tag">${skill} Lv ${r.level}</span><br><button class="small-btn" ${can?'':'disabled'} onclick="Duskfall.game.systems.crafting.craft('${r.id}')">Craft</button></div>`}).join('')}</div>`;
+    return `<div class="grid">${D.RECIPES.map(r=>{const can=g.systems.crafting.canCraft(r);const req=Object.entries(r.requires||{}).map(([id,q])=>`${D.ITEMS[id]?.icon||'❔'} ${q}`).join(' ');const skill=D.SKILLS[r.skill]?.name||r.skill;return`<div class="item-card"><h3>${r.icon} ${r.name}</h3><p>${r.desc}</p><p><b>Req:</b> ${req}</p><span class="tag">${skill} Lv ${r.level}</span><br><button class="small-btn" ${can?'':'disabled'} onclick="event.stopPropagation();Duskfall.game.systems.crafting.craft('${r.id}')">Craft</button></div>`}).join('')}</div>`;
   };
   D.UI.prototype.questsHTML=function(){
-    const qs=this.game.systems.quests;
-    const active=Object.entries(qs.active).map(([id,st])=>{const q=D.QUESTS[id];return`<div class="item-card"><h3>${q.icon} ${q.name}</h3><p>${q.desc}</p>${q.steps.map((s,i)=>`<p>${(st.progress[i]||0)>=s.qty?'✅':'⬜'} ${s.text} <b>${st.progress[i]||0}/${s.qty}</b></p>`).join('')}</div>`}).join('')||'<div class="help-note">No active quests.</div>';
-    return `<h3>Active</h3><div class="grid">${active}</div><h3>Completed</h3><p>${Object.keys(qs.completed).map(id=>D.QUESTS[id].name).join(', ')||'None yet.'}</p>`;
+    const qs=this.game.systems.quests, p=this.game.player, story=D.getClassStory(p.classId), faction=D.FACTIONS[p.factionId]||{};
+    const starter=D.getStarterZone(p.classId);
+    const classBosses=(D.FACTION_BOSSES||[]).filter(b=>b.classId===p.classId);
+    const worldBosses=Object.entries(D.WORLD_BOSSES||{}).map(([id,b])=>({id,...b}));
+    const storyCard=`<div class="item-card" style="min-height:auto;border-color:${faction.color||'#f7c65b'}"><h3>${D.CLASSES[p.classId]?.icon||'🧭'} ${story.title}</h3><p>${story.theme}</p><p><b>Faction:</b> ${faction.icon||'⚑'} ${p.factionName}</p><p><b>Starter Region:</b> ${starter.icon} ${starter.name}</p><p><b>Trainer:</b> ${D.getZoneFeature(p.classId).trainer}</p><span class="tag">Class Storyline Active</span></div>`;
+    const active=Object.entries(qs.active).map(([id,st])=>{const q=D.QUESTS[id] || D.CLASS_QUESTS?.[id]; if(!q) return ''; return`<div class="item-card"><h3>${q.icon} ${q.name}</h3><p>${q.desc}</p>${q.steps.map((s,i)=>`<p>${(st.progress[i]||0)>=s.qty?'✅':'⬜'} ${s.text} <b>${st.progress[i]||0}/${s.qty}</b></p>`).join('')}</div>`}).join('')||'<div class="help-note">No active quests.</div>';
+    const bossCards=classBosses.map(b=>{const f=D.FACTIONS[b.factionId]||{};return`<div class="item-card"><h3>${f.icon||'⚑'} ${b.name}</h3><p><b>Zone:</b> ${b.zone}</p><p><b>Pressure:</b> ${b.rolePressure}</p><p><b>Loot:</b> ${b.lootTable.map(id=>D.ITEMS[id]?.icon||'🎁').join(' ')} ${b.lootTable.map(id=>D.ITEMS[id]?.name||id).join(', ')}</p><span class="tag">Faction Boss Foundation</span></div>`}).join('');
+    const worldCards=worldBosses.map(b=>`<div class="item-card"><h3>${b.icon} ${b.name}</h3><p><b>Zone:</b> ${b.zone}</p><p><b>HP:</b> ${b.hp} • <b>Damage:</b> ${b.damage}</p><p><b>Loot:</b> ${b.lootTable.map(id=>D.ITEMS[id]?.icon||'🎁').join(' ')} ${b.lootTable.map(id=>D.ITEMS[id]?.name||id).join(', ')}</p><span class="tag">World Boss Foundation</span></div>`).join('');
+    return `<h3>Storyline</h3><div class="grid">${storyCard}</div><h3>Active Quests</h3><div class="grid">${active}</div><h3>Your Class Faction Bosses</h3><div class="grid">${bossCards}</div><h3>Greater World Bosses</h3><div class="grid">${worldCards}</div><h3>Completed</h3><p>${Object.keys(qs.completed).map(id=>(D.QUESTS[id]||D.CLASS_QUESTS?.[id])?.name).filter(Boolean).join(', ')||'None yet.'}</p>`;
   };
   D.UI.prototype.bankHTML=function(){
     const g=this.game, inv=g.systems.inventory.items, bank=g.systems.bank.items;
-    const invRows=Object.entries(inv).filter(([id])=>id!=='coin').map(([id,q])=>`<div class="shop-row"><div>${D.ITEMS[id].icon} <b>${D.ITEMS[id].name}</b><small>Backpack x${q}</small></div><button class="small-btn" onclick="Duskfall.game.systems.bank.deposit('${id}',1)">Deposit 1</button><button class="small-btn" onclick="Duskfall.game.systems.bank.deposit('${id}',${q})">All</button></div>`).join('')||'<div class="help-note">No depositable items.</div>';
-    const bankRows=Object.entries(bank).map(([id,q])=>`<div class="shop-row"><div>${D.ITEMS[id].icon} <b>${D.ITEMS[id].name}</b><small>Bank x${q}</small></div><button class="small-btn" onclick="Duskfall.game.systems.bank.withdraw('${id}',1)">Withdraw 1</button><button class="small-btn" onclick="Duskfall.game.systems.bank.withdraw('${id}',${q})">All</button></div>`).join('')||'<div class="help-note">Bank empty.</div>';
+    const invRows=Object.entries(inv).filter(([id])=>id!=='coin').map(([id,q])=>`<div class="shop-row"><div>${D.ITEMS[id].icon} <b>${D.ITEMS[id].name}</b><small>Backpack x${q}</small></div><button class="small-btn" onclick="event.stopPropagation();Duskfall.game.systems.bank.deposit('${id}',1)">Deposit 1</button><button class="small-btn" onclick="event.stopPropagation();Duskfall.game.systems.bank.deposit('${id}',${q})">All</button></div>`).join('')||'<div class="help-note">No depositable items.</div>';
+    const bankRows=Object.entries(bank).map(([id,q])=>`<div class="shop-row"><div>${D.ITEMS[id].icon} <b>${D.ITEMS[id].name}</b><small>Bank x${q}</small></div><button class="small-btn" onclick="event.stopPropagation();Duskfall.game.systems.bank.withdraw('${id}',1)">Withdraw 1</button><button class="small-btn" onclick="event.stopPropagation();Duskfall.game.systems.bank.withdraw('${id}',${q})">All</button></div>`).join('')||'<div class="help-note">Bank empty.</div>';
     return `<div class="two-col"><div><h3>Backpack</h3>${invRows}</div><div><h3>Bank Vault</h3>${bankRows}</div></div>`;
   };
   D.UI.prototype.mapHTML=function(){
+    const p=this.game.player;
+    const faction=D.FACTIONS[p.factionId]||{};
+    const story=D.getClassStory(p.classId);
     setTimeout(()=>this.drawWorldMap(),0);
-    return `<div class="help-note">World map with camera heading marker. White = you, gold arrow = current camera direction, green = town/NPCs, red = mobs.</div><div class="map-legend"><span>🟩 grass</span><span>🟫 roads</span><span>🟦 water</span><span>⬛ walls</span><span>🟨 town</span><span>🔺 camera heading</span></div><canvas id="worldMap" class="map-canvas" width="720" height="720"></canvas>`;
+    return `<div class="help-note"><b>${faction.icon||'⚑'} Your Faction:</b> ${p.factionName||'Unknown'} • <b>Class Story:</b> ${story.title}<br>${story.theme}<br><br>The map now marks your starter zone, your faction claim flags, class trainers, faction emissaries, active turf stones, portals, mobs, resources, and your camera direction.</div><div class="map-legend"><span>⚪ you</span><span>🔺 camera heading</span><span>⭐ starter zones</span><span>🚩 faction camps</span><span>🧑‍🏫 class trainers</span><span>⚑ turf claims</span><span>🌀 dungeon</span><span>🟥 mobs</span><span>🟢 NPCs</span></div><canvas id="worldMap" class="map-canvas" width="720" height="720"></canvas>`;
   };
   D.UI.prototype.drawWorldMap=function(){
     const c=document.getElementById('worldMap'); if(!c||!this.game.world)return; const ctx=c.getContext('2d'), g=this.game, W=720,H=720;
     ctx.clearRect(0,0,W,H); const sx=W/D.WORLD.w, sy=H/D.WORLD.h;
     for(let y=0;y<D.WORLD.h;y++)for(let x=0;x<D.WORLD.w;x++){ctx.fillStyle=D.TILES[g.world.tiles[y][x]].color;ctx.fillRect(x*sx,y*sy,Math.ceil(sx),Math.ceil(sy));}
-    ctx.fillStyle='#63e6a4';g.entities.npcs.forEach(n=>ctx.fillRect(n.x/D.TILE*sx-3,n.y/D.TILE*sy-3,7,7));
+    Object.entries(D.STARTER_ZONES||{}).forEach(([id,z])=>{
+      ctx.fillStyle='#f7c65b';ctx.beginPath();ctx.arc(z.x*sx,z.y*sy,8,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#ffffff';ctx.font='700 11px Inter';ctx.textAlign='center';ctx.fillText(D.getStarterZone(id).icon,z.x*sx,z.y*sy+4);
+      const angleMap={melee:-2.35,warden:-1.55,range:-.78,cleric:0,gatherer:.78,mage:1.55,brawler:2.35,prospector:3.14,wanderer:.35};
+      const a=angleMap[id]??0;
+      ctx.fillStyle='#ff5c7a';ctx.beginPath();ctx.arc((z.x+Math.cos(a)*(z.r+9))*sx,(z.y+Math.sin(a)*(z.r+9))*sy,6,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='700 9px Inter';ctx.fillText('B',(z.x+Math.cos(a)*(z.r+9))*sx,(z.y+Math.sin(a)*(z.r+9))*sy+3);
+      (D.getClassFactions(id)||[]).forEach((fid,i)=>{const f=D.FACTIONS[fid];const ox=i===0?-9:9, oy=i===0?-9:9;ctx.fillStyle=f.color;ctx.beginPath();ctx.arc((z.x+ox)*sx,(z.y+oy)*sy,5,0,Math.PI*2);ctx.fill();});
+    });
+    ctx.fillStyle='#63e6a4';g.entities.npcs.forEach(n=>{
+      const nx=n.x/D.TILE*sx, ny=n.y/D.TILE*sy;
+      if(String(n.id).startsWith('trainer_')){ctx.fillStyle='#6aa7ff';ctx.beginPath();ctx.arc(nx,ny,5,0,Math.PI*2);ctx.fill();}
+      else if(String(n.id).startsWith('emissary_')){ctx.fillStyle='#f7c65b';ctx.fillRect(nx-4,ny-4,8,8);}
+      else {ctx.fillStyle='#63e6a4';ctx.fillRect(nx-3,ny-3,7,7);}
+    });
+    if(g.systems.turf?.points){g.systems.turf.points.forEach(pt=>{const f=D.FACTIONS[pt.factionId]||{};ctx.strokeStyle=pt.owner?f.color:'#ffffff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(pt.x/D.TILE*sx,pt.y/D.TILE*sy,6,0,Math.PI*2);ctx.stroke();});}
+    ctx.fillStyle='#b98cff';g.entities.portals.forEach(p=>{ctx.beginPath();ctx.arc(p.x/D.TILE*sx,p.y/D.TILE*sy,6,0,Math.PI*2);ctx.fill();});
+    ctx.fillStyle='#ffcf6e';
+    [{x:D.WORLD.w/2,y:D.WORLD.h/2,name:'Dusk Titan'},{x:D.WORLD.w/2+34,y:D.WORLD.h/2-42,name:'Crownless Drake'}].forEach(b=>{ctx.beginPath();ctx.arc(b.x*sx,b.y*sy,9,0,Math.PI*2);ctx.fill();ctx.fillStyle='#07090d';ctx.font='900 10px Inter';ctx.textAlign='center';ctx.fillText('WB',b.x*sx,b.y*sy+3);ctx.fillStyle='#ffcf6e';});
     ctx.fillStyle='#ff5c7a';g.entities.enemies.forEach(e=>ctx.fillRect(e.x/D.TILE*sx-1,e.y/D.TILE*sy-1,3,3));
     ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(g.player.x/D.TILE*sx,g.player.y/D.TILE*sy,5,0,Math.PI*2);ctx.fill();
     ctx.save();ctx.translate(g.player.x/D.TILE*sx,g.player.y/D.TILE*sy);ctx.rotate(g.camera.targetAngle||g.camera.angle||0);ctx.strokeStyle='#f7c65b';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(10,8);ctx.lineTo(0,2);ctx.lineTo(-10,8);ctx.closePath();ctx.stroke();ctx.restore();
@@ -2466,8 +3199,8 @@ button,input,select{font-family:inherit}
 /* === ui/dialogs.js === */
 (function(){
   const D = window.Duskfall = window.Duskfall || {};
-  D.UI.prototype.openDialog=function(npc){this.dialogNpc=npc;this.game.paused=true;document.getElementById('dialog').classList.add('show');this.renderDialog();this.syncLayoutState();};
-  D.UI.prototype.closeDialog=function(){this.dialogNpc=null;document.getElementById('dialog').classList.remove('show');this.game.paused=false;this.syncLayoutState();};
+  D.UI.prototype.openDialog=function(npc){this.dialogNpc=npc;this.game.paused=true;this.clearInputLocks();document.getElementById('dialog').classList.add('show');this.renderDialog();this.syncLayoutState();};
+  D.UI.prototype.closeDialog=function(){this.dialogNpc=null;document.getElementById('dialog').classList.remove('show');this.game.paused=false;this.clearInputLocks();this.syncLayoutState();};
   D.UI.prototype.renderDialog=function(){
     const npc=this.dialogNpc;if(!npc)return; const cfg=npc.cfg, el=document.getElementById('dialog');
     if(npc.id==='trader') return this.renderShop(npc);
@@ -2520,13 +3253,158 @@ button,input,select{font-family:inherit}
     const g=this.game;
     if(g.state==='play') return this.renderPauseMenu();
     const saved=g.systems.save?.load();
-    document.getElementById('menu').innerHTML=`<div class="menu-card"><h1>UNK-SCAPE</h1><p>A retro medieval survival sandbox/MMO prototype where UNK gaming meets base-building, class islands, faction turf wars, skilling, crafting, mobs, banking, quests, and action combat.</p><div class="help-note">Choose a class island, pick one of its two factions, then complete world quests to claim turf and unlock territory buffs.</div><h3>Choose Class + Faction</h3><div class="class-grid">${Object.entries(D.CLASSES).map(([id,c])=>`<div class="class-card"><h3>${c.icon} ${c.name}</h3><p>${c.desc}</p><p><b>Zone:</b> ${c.zone||'Central Crossroads'}</p><ul>${Object.entries(c.items||{}).slice(0,4).map(([it,q])=>`<li>${D.ITEMS[it]?.icon||''} ${D.ITEMS[it]?.name||it} x${q}</li>`).join('')}</ul><div class="menu-actions" style="justify-content:flex-start;margin-top:12px">${D.getClassFactions(id).map(fid=>`<button class="small-btn" onclick="Duskfall.game.newGame('${id}','${fid}')">${D.FACTIONS[fid].icon} ${D.FACTIONS[fid].name}</button>`).join('')}</div></div>`).join('')}</div><div class="menu-actions">${saved?`<button class="big-btn" onclick="Duskfall.game.loadGame(Duskfall.game.systems.save.load())">Continue</button>`:''}<button class="big-btn secondary" onclick="Duskfall.game.systems.save.delete();Duskfall.game.ui.renderMenu()">Delete Save</button></div></div>`;
+    document.getElementById('menu').innerHTML=`<div class="menu-card"><h1>UNK-SCAPE</h1><p>A retro medieval survival sandbox/MMO prototype where UNK gaming meets skilling, crafting, mobs, banking, quests, action combat, class islands, and faction turf wars.</p><div class="help-note">Choose a class island and one of its two factions. This window now stays inside safe screen margins and scrolls instead of touching the borders.</div><h3 style="margin:10px 0 4px">Choose Class + Faction</h3><div class="class-grid">${Object.entries(D.CLASSES).map(([id,c])=>`<div class="class-card"><h3>${c.icon} ${c.name}</h3><p>${c.desc}</p><p><b>Role:</b> ${D.CLASS_ROLES[id]||'Hybrid'}</p><p><b>Start Zone:</b> ${D.getStarterZone(id).icon} ${D.getStarterZone(id).name}</p><p><b>Story:</b> ${D.getClassStory(id).title} — ${D.getClassStory(id).theme}</p><p>${D.getStarterZone(id).desc}</p><p><b>Pick your faction:</b> the button you click below becomes your faction and shows on the HUD, Character screen, and map flags.</p><ul>${Object.entries(c.items||{}).slice(0,4).map(([it,q])=>`<li>${D.ITEMS[it]?.icon||''} ${D.ITEMS[it]?.name||it} x${q}</li>`).join('')}</ul><div class="menu-actions" style="justify-content:flex-start;margin-top:12px">${D.getClassFactions(id).map(fid=>`<button class="small-btn" title="${D.FACTIONS[fid].desc}" style="border-color:${D.FACTIONS[fid].color};box-shadow:0 0 18px ${D.FACTIONS[fid].color}22" onclick="Duskfall.game.newGame('${id}','${fid}')">${D.FACTIONS[fid].icon} Choose ${D.FACTIONS[fid].name}</button>`).join('')}</div></div>`).join('')}</div><div class="menu-actions">${saved?`<button class="big-btn" onclick="Duskfall.game.loadGame(Duskfall.game.systems.save.load())">Continue</button>`:''}<button class="big-btn secondary" onclick="Duskfall.game.systems.save.delete();Duskfall.game.ui.renderMenu()">Delete Save</button></div></div>`;
   };
   D.UI.prototype.renderPauseMenu=function(){
     const g=this.game, binds=g.settings.keybinds;
-    const actions=[['inventory','Inventory'],['skills','Skills'],['crafting','Crafting'],['quests','Quests'],['bank','Bank'],['map','Map'],['interact','Interact / Use'],['attack','Keyboard Attack'],['buildToggle','Build Mode'],['buildCycle','Cycle Build Tile'],['zoomIn','Zoom In'],['zoomOut','Zoom Out'],['cameraToggle','Toggle Camera'],['cameraOverhead','Overhead Reset'],['rotateLeft','Rotate Left'],['rotateRight','Rotate Right'],['save','Save'],['pause','Pause']];
-    document.getElementById('menu').innerHTML=`<div class="menu-card"><h1>Paused</h1><p>Settings, controls, camera, survival toggles, and sandbox building. Combat: LMB attack/heavy, RMB block. Build Mode: LMB place, RMB remove.</p><div class="menu-actions"><button class="big-btn" onclick="Duskfall.game.ui.toggleMenu()">Resume</button><button class="big-btn secondary" onclick="Duskfall.game.systems.save.save()">Save Game</button><button class="big-btn secondary" onclick="Duskfall.game.camera.toggleMode();Duskfall.game.ui.renderMenu()">Camera: ${g.camera.modeLabel()}</button><button class="big-btn secondary" onclick="Duskfall.game.camera.setOverhead();Duskfall.game.ui.renderMenu()">Overhead Reset</button><button class="big-btn secondary" onclick="Duskfall.game.settings.hungerEnabled=!Duskfall.game.settings.hungerEnabled;Duskfall.game.ui.renderMenu()">Hunger: ${g.settings.hungerEnabled?'On':'Off'}</button><button class="big-btn secondary" onclick="Duskfall.game.systems.build.toggle();Duskfall.game.ui.renderMenu()">Build Mode: ${g.buildMode?'On':'Off'}</button></div><div class="setting-grid"><div class="setting-card"><h3>Camera</h3><p>Use mouse wheel or keybinds. Current zoom: ${Math.round(g.camera.targetZoom*100)}%. Current view: ${g.camera.modeLabel()}.</p><button class="small-btn" onclick="Duskfall.game.camera.setZoom(.12);Duskfall.game.ui.renderMenu()">Zoom In</button> <button class="small-btn" onclick="Duskfall.game.camera.setZoom(-.12);Duskfall.game.ui.renderMenu()">Zoom Out</button> <button class="small-btn" onclick="Duskfall.game.camera.rotate(-Math.PI/12);Duskfall.game.ui.renderMenu()">Rotate Left</button> <button class="small-btn" onclick="Duskfall.game.camera.rotate(Math.PI/12);Duskfall.game.ui.renderMenu()">Rotate Right</button> <button class="small-btn" onclick="Duskfall.game.camera.setOverhead();Duskfall.game.ui.renderMenu()">Overhead</button></div><div class="setting-card"><h3>Combat + Build</h3><p>LMB press = regular attack. Hold/release = heavy attack. RMB hold = block. In Build Mode, LMB places and RMB removes. Current build tile: <b>${D.TILES[g.systems.build.selected()].name}</b>.</p><p>${g.input.waitingForBind?'Press a key for: <b>'+g.input.waitingForBind+'</b>':'Keybinds ready.'}</p></div>${actions.map(([a,label])=>`<div class="setting-card"><h3>${label}</h3><button class="small-btn rebind-btn" onclick="Duskfall.game.input.startRebind('${a}')"><span>Current</span><b>${D.displayKey(binds[a])}</b></button></div>`).join('')}</div></div>`;
+    const audio=g.settings.audio, display=g.settings.display;
+    const pct=v=>Math.round((v??0)*100);
+    const actions=[['inventory','Inventory'],['stats','Character Stats'],['skills','Skills'],['crafting','Crafting'],['quests','Quests'],['bank','Bank'],['map','Map'],['interact','Interact / Use'],['attack','Keyboard Attack'],['buildToggle','Build Mode'],['buildCycle','Cycle Build Tile'],['zoomIn','Zoom In'],['zoomOut','Zoom Out'],['cameraToggle','Toggle Camera'],['cameraOverhead','Overhead Reset'],['rotateLeft','Rotate Left'],['rotateRight','Rotate Right'],['save','Save'],['pause','Pause']];
+    document.getElementById('menu').innerHTML=`<div class="menu-card"><h1>Paused</h1><p>Settings, controls, camera, survival toggles, and sandbox building. Combat: LMB attack/heavy, RMB block. Build Mode: LMB place, RMB remove.</p><div class="menu-actions"><button class="big-btn" onclick="Duskfall.game.ui.toggleMenu()">Resume</button><button class="big-btn secondary" onclick="Duskfall.game.systems.save.save()">Save Game</button><button class="big-btn secondary" onclick="Duskfall.game.camera.toggleMode();Duskfall.game.ui.renderMenu()">Camera: ${g.camera.modeLabel()}</button><button class="big-btn secondary" onclick="Duskfall.game.camera.setOverhead();Duskfall.game.ui.renderMenu()">Overhead Reset</button><button class="big-btn secondary" onclick="Duskfall.game.settings.hungerEnabled=!Duskfall.game.settings.hungerEnabled;Duskfall.game.ui.renderMenu()">Hunger: ${g.settings.hungerEnabled?'On':'Off'}</button><button class="big-btn secondary" onclick="Duskfall.game.systems.build.toggle();Duskfall.game.ui.renderMenu()">Build Mode: ${g.buildMode?'On':'Off'}</button></div><div class="setting-grid"><div class="setting-card"><h3>Audio</h3><p>Procedural prototype sound is now live: footsteps, hits, blocking, chopping/mining, pickup sounds, ambient/menu bed, and volume sliders.</p><label>Master ${pct(audio.master)}% <input type="range" min="0" max="1" step="0.01" value="${audio.master}" onchange="Duskfall.game.settings.audio.master=Number(this.value);Duskfall.game.systems.audio.applyVolumes();Duskfall.game.ui.renderMenu()"></label><br><label>Music ${pct(audio.music)}% <input type="range" min="0" max="1" step="0.01" value="${audio.music}" onchange="Duskfall.game.settings.audio.music=Number(this.value);Duskfall.game.systems.audio.applyVolumes();Duskfall.game.ui.renderMenu()"></label><br><label>Ambient ${pct(audio.ambient)}% <input type="range" min="0" max="1" step="0.01" value="${audio.ambient}" onchange="Duskfall.game.settings.audio.ambient=Number(this.value);Duskfall.game.systems.audio.applyVolumes();Duskfall.game.ui.renderMenu()"></label><br><label>SFX ${pct(audio.sfx)}% <input type="range" min="0" max="1" step="0.01" value="${audio.sfx}" onchange="Duskfall.game.settings.audio.sfx=Number(this.value);Duskfall.game.systems.audio.applyVolumes();Duskfall.game.ui.renderMenu()"></label><br><button class="small-btn" onclick="Duskfall.game.systems.audio.setEnabled(!Duskfall.game.settings.audio.enabled);Duskfall.game.ui.renderMenu()">Audio: ${audio.enabled?'On':'Off'}</button> <button class="small-btn" onclick="Duskfall.game.systems.audio.play('hit')">Test Sound</button></div><div class="setting-card"><h3>Display</h3><p>Core display options are in place so this can scale into a real settings screen instead of hacked-on toggles.</p><button class="small-btn" onclick="Duskfall.game.settings.display.uiScale=Duskfall.game.settings.display.uiScale==='normal'?'large':Duskfall.game.settings.display.uiScale==='large'?'small':'normal';Duskfall.game.ui.applyDisplaySettings();Duskfall.game.ui.renderMenu()">UI Scale: ${display.uiScale}</button> <button class="small-btn" onclick="Duskfall.game.settings.display.floatingText=!Duskfall.game.settings.display.floatingText;Duskfall.game.ui.renderMenu()">Floating Text: ${display.floatingText?'On':'Off'}</button> <button class="small-btn" onclick="Duskfall.game.settings.display.screenShake=!Duskfall.game.settings.display.screenShake;Duskfall.game.ui.renderMenu()">Screen Shake: ${display.screenShake?'On':'Off'}</button> <button class="small-btn" onclick="Duskfall.game.settings.display.reducedFx=!Duskfall.game.settings.display.reducedFx;Duskfall.game.ui.applyDisplaySettings();Duskfall.game.ui.renderMenu()">Reduced FX: ${display.reducedFx?'On':'Off'}</button></div><div class="setting-card"><h3>Camera</h3><p>Use mouse wheel or keybinds. Current zoom: ${Math.round(g.camera.targetZoom*100)}%. Current view: ${g.camera.modeLabel()}.</p><button class="small-btn" onclick="Duskfall.game.camera.setZoom(.12);Duskfall.game.ui.renderMenu()">Zoom In</button> <button class="small-btn" onclick="Duskfall.game.camera.setZoom(-.12);Duskfall.game.ui.renderMenu()">Zoom Out</button> <button class="small-btn" onclick="Duskfall.game.camera.rotate(-Math.PI/12);Duskfall.game.ui.renderMenu()">Rotate Left</button> <button class="small-btn" onclick="Duskfall.game.camera.rotate(Math.PI/12);Duskfall.game.ui.renderMenu()">Rotate Right</button> <button class="small-btn" onclick="Duskfall.game.camera.setOverhead();Duskfall.game.ui.renderMenu()">Overhead</button></div><div class="setting-card"><h3>Combat + Build</h3><p>LMB press = regular attack. Hold/release = heavy attack. RMB hold = block. In Build Mode, LMB places and RMB removes. Current build tile: <b>${D.TILES[g.systems.build.selected()].name}</b>.</p><p>${g.input.waitingForBind?'Press a key for: <b>'+g.input.waitingForBind+'</b>':'Keybinds ready.'}</p></div>${actions.map(([a,label])=>`<div class="setting-card"><h3>${label}</h3><button class="small-btn rebind-btn" onclick="Duskfall.game.input.startRebind('${a}')"><span>Current</span><b>${D.displayKey(binds[a])}</b></button></div>`).join('')}</div></div>`;
   };
+})();
+</script>
+
+<script>
+/* === phase3/camera-polish-3a.js ===
+   Surgical overlay: keeps the single-file build intact while upgrading the current 2.5D camera into a deeper 3D-feeling aerial camera.
+*/
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  if(!D.Camera || D.__phase3aCameraPolish) return;
+  D.__phase3aCameraPolish = true;
+  D.PHASE3A = {name:'Phase 3A', camera:'3D Aerial', safePatch:true};
+
+  const BaseCamera = D.Camera;
+  D.Camera = function(game){
+    BaseCamera.call(this,game);
+    this.zoom=1.16;this.targetZoom=1.16;this.minZoom=.52;this.maxZoom=2.45;
+    this.pitch=.62;this.targetPitch=.62;
+    this.focusYBias=68;this.targetFocusYBias=68;
+    this.deadzone=20;this.lookAhead=42;
+  };
+  D.Camera.prototype = BaseCamera.prototype;
+  D.Camera.prototype.constructor = D.Camera;
+
+  D.Camera.prototype.modeLabel=function(){return this.game.settings.cameraMode==='top'?'Overhead':'3D Aerial';};
+  D.Camera.prototype.snapTo=function(x,y){
+    const bias=this.game.settings?.cameraMode==='top'?0:(this.focusYBias||0);
+    this.x=x-this.game.viewW/2;this.y=y-this.game.viewH/2-bias;this.clamp();
+  };
+  D.Camera.prototype.update=function(dt){
+    const p=this.game.player;if(!p)return;
+    const isAerial=this.game.settings.cameraMode!=='top';
+    this.targetPitch=isAerial?(this.targetPitch||.62):1;
+    this.targetFocusYBias=isAerial?Math.max(52,Math.min(110,this.game.viewH*.095)):0;
+    const leadX=(p.dir?.x||0)*this.lookAhead;
+    const leadY=(p.dir?.y||0)*this.lookAhead;
+    const targetX=p.x+leadX-this.game.viewW/2;
+    const targetY=p.y+leadY-this.game.viewH/2-this.targetFocusYBias;
+    const dx=targetX-this.x, dy=targetY-this.y;
+    if(Math.hypot(dx,dy)>this.deadzone){
+      this.x=D.lerp(this.x,targetX,1-Math.pow(.006,dt));
+      this.y=D.lerp(this.y,targetY,1-Math.pow(.006,dt));
+    }
+    this.zoom=D.lerp(this.zoom,this.targetZoom,1-Math.pow(.018,dt));
+    this.angle=D.lerp(this.angle,this.targetAngle,1-Math.pow(.018,dt));
+    this.pitch=D.lerp(this.pitch,this.targetPitch,1-Math.pow(.018,dt));
+    this.focusYBias=D.lerp(this.focusYBias||0,this.targetFocusYBias||0,1-Math.pow(.018,dt));
+    if(this.shake>0) this.shake=Math.max(0,this.shake-dt*12);
+    this.clamp();
+  };
+  D.Camera.prototype.setIso=function(){
+    this.game.settings.cameraMode='iso';
+    this.targetAngle=0;
+    this.targetPitch=.62;
+    this.targetZoom=Math.max(this.targetZoom,1.16);
+    this.targetFocusYBias=Math.max(52,Math.min(110,this.game.viewH*.095));
+    this.game.ui?.toast('Camera Mode','3D aerial view enabled. Q/E rotates, O resets overhead.', 'gold');
+  };
+  D.Camera.prototype.setOverhead=function(){
+    this.game.settings.cameraMode='top';
+    this.targetAngle=0;
+    this.targetPitch=1;
+    this.targetFocusYBias=0;
+    this.game.ui?.toast('Camera Mode','Overhead view enabled for precise building and map reading.', 'good');
+  };
+  D.Camera.prototype.toggleMode=function(){
+    if(this.game.settings.cameraMode==='top') this.setIso();
+    else this.setOverhead();
+  };
+  D.Camera.prototype.rotate=function(delta){
+    this.targetAngle+=delta;
+    if(this.targetAngle>Math.PI)this.targetAngle-=Math.PI*2;
+    if(this.targetAngle<-Math.PI)this.targetAngle+=Math.PI*2;
+    this.game.settings.cameraMode='iso';
+    this.targetPitch=.64;
+    this.targetFocusYBias=Math.max(52,Math.min(110,this.game.viewH*.095));
+  };
+  D.Camera.prototype.apply=function(ctx){
+    let sx=0,sy=0;
+    if(this.shake>0){sx=(Math.random()-.5)*this.shake*6;sy=(Math.random()-.5)*this.shake*6;}
+    const cx=this.x+this.game.viewW/2, cy=this.y+this.game.viewH/2;
+    ctx.translate(this.game.viewW/2+sx,this.game.viewH/2+sy);
+    const pitch=this.game.settings.cameraMode==='iso'?this.pitch:1;
+    ctx.scale(this.zoom,this.zoom*pitch);
+    if(Math.abs(this.angle)>0.001) ctx.rotate(this.angle);
+    ctx.translate(-cx,-cy);
+  };
+  D.Camera.prototype.worldToScreen=function(wx,wy){
+    const cx=this.x+this.game.viewW/2, cy=this.y+this.game.viewH/2;
+    let dx=wx-cx, dy=wy-cy, rx=dx, ry=dy;
+    const pitch=this.game.settings.cameraMode==='iso'?this.pitch:1;
+    if(Math.abs(this.angle)>0.001){
+      const c=Math.cos(this.angle),s=Math.sin(this.angle);
+      rx=dx*c-dy*s; ry=dx*s+dy*c;
+    }
+    return {x:this.game.viewW/2+rx*this.zoom,y:this.game.viewH/2+ry*this.zoom*pitch};
+  };
+  D.Camera.prototype.screenToWorld=function(sx,sy){
+    const cx=this.x+this.game.viewW/2, cy=this.y+this.game.viewH/2;
+    let rx=(sx-this.game.viewW/2)/this.zoom;
+    const pitch=this.game.settings.cameraMode==='iso'?this.pitch:1;
+    let ry=(sy-this.game.viewH/2)/(this.zoom*pitch);
+    if(Math.abs(this.angle)>0.001){
+      const c=Math.cos(-this.angle),s=Math.sin(-this.angle);
+      const dx=rx*c-ry*s, dy=rx*s+ry*c;
+      return {x:cx+dx,y:cy+dy};
+    }
+    return {x:cx+rx,y:cy+ry};
+  };
+
+  const baseRenderMenu = D.UI?.prototype?.renderMenu;
+  if(baseRenderMenu){
+    D.UI.prototype.renderMenu=function(){
+      baseRenderMenu.call(this);
+      const menu=document.getElementById('menu');
+      if(!menu || this.game.state==='play')return;
+      const card=menu.querySelector('.menu-card');
+      if(card && !card.querySelector('.phase-strip')){
+        const strip=document.createElement('div');
+        strip.className='phase-strip';
+        strip.innerHTML='<span class="phase-chip">Phase 3A Build</span><span class="phase-chip">Camera: 3D Aerial</span><span class="phase-chip">Safe Single-File Patch</span><span class="phase-chip">Class + Faction Ready</span>';
+        const h1=card.querySelector('h1');
+        if(h1) h1.insertAdjacentElement('afterend',strip);
+      }
+      menu.querySelectorAll('.class-card .menu-actions').forEach(row=>row.classList.add('faction-row'));
+      menu.querySelectorAll('.class-card .small-btn').forEach(btn=>{
+        btn.classList.add('faction-choice');
+        if(!btn.querySelector('small')) btn.insertAdjacentHTML('beforeend','<small>Locks story path, HUD faction, map flags</small>');
+      });
+    };
+  }
+
+  const basePause = D.UI?.prototype?.renderPauseMenu;
+  if(basePause){
+    D.UI.prototype.renderPauseMenu=function(){
+      basePause.call(this);
+      const menu=document.getElementById('menu');
+      const camCard=[...menu.querySelectorAll('.setting-card')].find(el=>el.querySelector('h3')?.textContent==='Camera');
+      if(camCard && !camCard.querySelector('.camera-readout')){
+        camCard.insertAdjacentHTML('beforeend',`<div class="camera-readout"><b>3D Aerial polish:</b> camera is pitched lower, player sits slightly lower on screen, visible bounds are widened, and targeting still uses inverse screen-to-world math.</div>`);
+      }
+    };
+  }
 })();
 </script>
 
@@ -2538,8 +3416,16 @@ window.addEventListener('DOMContentLoaded',()=>{
   D.runSmokeTests = function(){
     const testWorld = D.generateWorld(12345);
     console.assert(testWorld && testWorld.tiles && testWorld.tiles.length === D.WORLD.h, 'Smoke test failed: world generation did not create tiles.');
+    console.assert(D.WORLD.w>=300 && D.WORLD.h>=300 && D.TILE<=36, 'Smoke test failed: map should use a larger tile-grid with smaller visual tiles.');
     const cx=Math.floor(D.WORLD.w/2), cy=Math.floor(D.WORLD.h/2);
     console.assert(['plaza','stonepath'].includes(testWorld.tiles[cy][cx]), 'Smoke test failed: town center was not generated correctly.');
+    console.assert(D.STARTER_ZONES && Object.keys(D.STARTER_ZONES).length===9, 'Smoke test failed: 9 starter zone definitions missing.');
+    console.assert(Object.values(D.STARTER_ZONES).every(z=>z.r>=28), 'Smoke test failed: Phase 1 starter zones must be 2x+ larger.');
+    console.assert(D.ZONE_FEATURES && Object.keys(D.ZONE_FEATURES).length===9, 'Smoke test failed: zone feature definitions missing.');
+    Object.entries(D.CLASSES).forEach(([id,c])=>{
+      const z=D.getStarterZone(id), tile=testWorld.tiles[z.y]?.[z.x];
+      console.assert(z && tile && !D.TILES[tile].solid, `Smoke test failed: ${id} starter zone is blocked.`);
+    });
     console.assert(typeof D.CombatSystem === 'function', 'Smoke test failed: combat system missing.');
     console.assert(D.ENEMIES.rat.attack<=2 && D.ENEMIES.goblin.attack<=4, 'Smoke test failed: early mob balance too strong.');
     console.assert(typeof D.Camera === 'function', 'Smoke test failed: camera system missing.');
@@ -2547,10 +3433,12 @@ window.addEventListener('DOMContentLoaded',()=>{
     console.assert(typeof D.Camera.prototype.rotate === 'function', 'Smoke test failed: camera rotate control missing.');
     const camSmoke={viewW:1280,viewH:720,settings:{cameraMode:'iso'},ui:{toast(){}}};
     const cam=new D.Camera(camSmoke);
-    console.assert(cam.targetAngle===0, 'Smoke test failed: default camera should not start sideways.');
+    console.assert(cam.targetAngle===0 && cam.targetPitch>=.58, 'Smoke test failed: default camera should start centered in 3D aerial mode.');
     cam.rotate(Math.PI/12);
     console.assert(typeof cam.targetAngle==='number' && typeof cam.targetPitch==='number', 'Smoke test failed: smooth camera targets missing.');
     console.assert(typeof D.BuildSystem === 'function', 'Smoke test failed: build system missing.');
+    console.assert(typeof D.AudioSystem === 'function', 'Smoke test failed: audio system missing.');
+    console.assert(typeof D.TurfSystem === 'function', 'Smoke test failed: turf system missing.');
     console.assert(typeof D.GatheringSystem === 'function', 'Smoke test failed: gathering system missing.');
     console.assert(D.RESOURCE_TYPES.pine && D.RESOURCE_TYPES.yew && D.RESOURCE_TYPES.copper && D.RESOURCE_TYPES.gold && D.RESOURCE_TYPES.fish && D.RESOURCE_TYPES.gem, 'Smoke test failed: tier resource foundation missing.');
     console.assert(typeof D.UI.prototype.syncLayoutState === 'function', 'Smoke test failed: UI layout state manager missing.');
@@ -2558,14 +3446,29 @@ window.addEventListener('DOMContentLoaded',()=>{
     const build=new D.BuildSystem(tmpGame);
     console.assert(build.selected()==='woodfloor', 'Smoke test failed: default build tile incorrect.');
     console.assert(D.CLASSES.melee && D.CLASSES.range && D.CLASSES.mage, 'Smoke test failed: core combat classes missing.');
+    console.assert(Object.keys(D.CLASSES).length===9, 'Smoke test failed: UNK-SCAPE should have 9 playable classes.');
     console.assert(D.getClassFactions('melee').length===2, 'Smoke test failed: class faction choices missing.');
+    console.assert(D.FACTION_BOSSES && D.FACTION_BOSSES.length===18, 'Smoke test failed: 18 faction boss foundations missing.');
+    const popSmoke={seed:999,world:testWorld,entities:{resources:[],enemies:[],npcs:[],portals:[],projectiles:[],drops:[],effects:[]}};
+    D.populateWorld(popSmoke);
+    console.assert(popSmoke.entities.npcs.filter(n=>String(n.id).startsWith('trainer_')).length===9, 'Smoke test failed: 9 class trainers not spawned.');
+    console.assert(popSmoke.entities.npcs.filter(n=>String(n.id).startsWith('emissary_')).length===18, 'Smoke test failed: 18 faction emissaries not spawned.');
+    console.assert(D.WORLD_BOSSES && Object.keys(D.WORLD_BOSSES).length===2, 'Smoke test failed: 2 world boss foundations missing.');
+    console.assert(typeof D.UI.prototype.questsHTML === 'function', 'Smoke test failed: Phase 3 story journal missing.');
+    console.assert(D.MOUNTS && D.PETS, 'Smoke test failed: mount/pet foundations missing.');
+    console.assert(typeof D.characterLevelForXp === 'function' && typeof D.defaultAttributes === 'function', 'Smoke test failed: character level / attribute foundations missing.');
     console.assert(D.ITEMS.training_bow && D.ITEMS.oak_staff && D.ITEMS.bronze_helm, 'Smoke test failed: expanded class gear missing.');
+    console.assert(typeof D.UI.prototype.statsHTML === 'function', 'Smoke test failed: character stat panel missing.');
     const combatSmoke=new D.CombatSystem({input:{mouse:{worldX:0,worldY:0}}});
     console.assert(typeof combatSmoke.rollBonusHit === 'function' && typeof combatSmoke.weaponStyle === 'function', 'Smoke test failed: crit/headshot combat helpers missing.');
     console.assert(combatSmoke.heavyThreshold >= .7, 'Smoke test failed: heavy attack threshold too low.');
+    console.assert(typeof combatSmoke.isEnemyNearAimLine === 'function', 'Smoke test failed: ranged aim-line targeting helper missing.');
+    console.assert(typeof combatSmoke.spawnAttackProjectile === 'function', 'Smoke test failed: ranged projectile helper missing.');
     console.assert(D.getRecipe('training_bow') && D.getRecipe('leather_hood') && D.getRecipe('ranger_tunic'), 'Smoke test failed: craftable starter gear missing.');
+    console.assert(typeof D.UI.prototype.clearInputLocks === 'function', 'Smoke test failed: UI input lock cleanup missing.');
+    console.assert(D.TILE===32, 'Smoke test failed: tile size should be reduced from chunky 48px tiles.');
   };
-  D.runSmokeTests();
+  try{D.runSmokeTests();}catch(err){console.error('Smoke test crash prevented:',err);}
   console.assert(typeof D.createPlayer === 'function', 'Smoke test failed: player factory missing.');
   const smokeGame={
     input:{axis(){return{x:0,y:0}},mouse:{}},
@@ -2579,8 +3482,14 @@ window.addEventListener('DOMContentLoaded',()=>{
   const smokePlayer=D.createPlayer(smokeGame,'melee','ironbound');
   console.assert(smokePlayer && smokePlayer.equipment.head === 'bronze_helm', 'Smoke test failed: class/faction player creation failed.');
   console.assert(smokePlayer.factionName === D.FACTIONS.ironbound.name, 'Smoke test failed: faction assignment failed.');
-  D.game = new D.Game();
-  D.game.init();
+  console.assert(smokePlayer.attributes && smokePlayer.attributePoints >= 0, 'Smoke test failed: player attributes missing.');
+  try{
+    D.game = new D.Game();
+    D.game.init();
+  }catch(err){
+    console.error('UNK-SCAPE boot crash:',err);
+    document.body.innerHTML='<div style="min-height:100vh;display:grid;place-items:center;background:#07090d;color:#e9f0ff;font-family:Inter,Arial;padding:30px"><div style="max-width:760px;border:1px solid rgba(255,255,255,.16);border-radius:22px;background:rgba(18,24,38,.94);padding:24px;box-shadow:0 22px 70px rgba(0,0,0,.45)"><h1 style="margin:0 0 10px">UNK-SCAPE Preview Boot Guard</h1><p>The game hit a startup error, but the page is no longer hard-crashing. Open the browser console for the exact stack.</p><pre style="white-space:pre-wrap;color:#ff9b5c;background:rgba(0,0,0,.28);padding:14px;border-radius:14px">'+String(err&&err.stack||err)+'</pre></div></div>';
+  }
 });
 </script>
 
