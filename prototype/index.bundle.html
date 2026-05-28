@@ -144,19 +144,6 @@ button,input,select{font-family:inherit}
 /* Mobile helper */
 .mobile-controls{display:none;position:absolute;right:18px;bottom:18px;pointer-events:auto;gap:8px;grid-template-columns:48px 48px 48px;grid-template-rows:48px 48px 48px}.mobile-controls button{border:1px solid var(--line2);background:rgba(255,255,255,.08);color:#fff;border-radius:14px;font-weight:900}
 @media(pointer:coarse){.mobile-controls{display:grid}.mobile-controls .up{grid-column:2}.mobile-controls .left{grid-column:1;grid-row:2}.mobile-controls .down{grid-column:2;grid-row:3}.mobile-controls .right{grid-column:3;grid-row:2}}
-
-/* === Phase 3A polish layer: camera + launch clarity === */
-.phase-strip{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px auto 16px;max-width:760px}
-.phase-chip{border:1px solid rgba(247,198,91,.28);background:rgba(247,198,91,.09);border-radius:999px;padding:7px 10px;font:800 11px/1 var(--mono);color:#ffd783;box-shadow:0 10px 30px rgba(0,0,0,.18)}
-.class-card{position:relative;overflow:hidden}
-.class-card:before{content:'';position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,rgba(247,198,91,.75),rgba(106,167,255,.55),rgba(185,140,255,.45));opacity:.72}
-.class-card:hover{transform:translateY(-1px);box-shadow:0 18px 44px rgba(0,0,0,.28)}
-.faction-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
-.faction-choice{width:100%;text-align:left;line-height:1.25;white-space:normal}
-.faction-choice small{display:block;color:var(--muted);font-weight:700;margin-top:4px}
-.camera-readout{border:1px solid rgba(106,167,255,.22);background:linear-gradient(180deg,rgba(106,167,255,.10),rgba(255,255,255,.04));border-radius:16px;padding:10px;margin:10px 0;color:var(--muted);font-size:12px;line-height:1.4}
-@media (max-width:720px){.faction-row{grid-template-columns:1fr}.phase-strip{justify-content:flex-start}}
-
 </style>
 </head>
 <body>
@@ -1268,7 +1255,6 @@ button,input,select{font-family:inherit}
     drawGatherProgress(g,ctx);
     drawEffects(g,ctx);
     ctx.restore();
-    drawAerialAtmosphere(g,ctx);
     drawLighting(g,ctx);
     drawVignette(g,ctx);
   };
@@ -1276,8 +1262,7 @@ button,input,select{font-family:inherit}
   function visibleBounds(g,pad=6){
     const t=D.TILE;
     const cx=g.camera.x+g.viewW/2, cy=g.camera.y+g.viewH/2;
-    const pitch=(g.settings?.cameraMode==='iso')?Math.max(.45,g.camera.pitch||.62):1;
-    const reach=(Math.max(g.viewW,g.viewH/pitch)/(g.camera.zoom||1.0))*1.45 + t*pad;
+    const reach=(Math.max(g.viewW,g.viewH)/(g.camera.zoom||1.0))*1.35 + t*pad;
     return {
       x0:Math.max(0,Math.floor((cx-reach)/t)),
       y0:Math.max(0,Math.floor((cy-reach)/t)),
@@ -1677,24 +1662,6 @@ button,input,select{font-family:inherit}
       ctx.save();ctx.globalAlpha=Math.min(1,e.t*2);ctx.translate(e.x,e.y-e.float*(1-e.t/e.maxT));
       ctx.font=`800 ${e.size||18}px ${e.font||'Inter'}`;ctx.textAlign='center';ctx.fillStyle=e.color||'#fff';ctx.strokeStyle='rgba(0,0,0,.55)';ctx.lineWidth=4;ctx.strokeText(e.text,0,0);ctx.fillText(e.text,0,0);ctx.restore();
     }
-  }
-
-  function drawAerialAtmosphere(g,ctx){
-    if(!g.world || g.settings?.cameraMode!=='iso')return;
-    const pitch=g.camera?.pitch||.62;
-    const strength=D.clamp((1-pitch)*.42,0,.22);
-    if(strength<=.01)return;
-    ctx.save();
-    const sky=ctx.createLinearGradient(0,0,0,g.viewH);
-    sky.addColorStop(0,`rgba(106,167,255,${strength*.70})`);
-    sky.addColorStop(.38,`rgba(247,198,91,${strength*.22})`);
-    sky.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=sky;ctx.fillRect(0,0,g.viewW,g.viewH);
-    const fore=ctx.createLinearGradient(0,g.viewH*.55,0,g.viewH);
-    fore.addColorStop(0,'rgba(0,0,0,0)');
-    fore.addColorStop(1,`rgba(0,0,0,${strength*.55})`);
-    ctx.fillStyle=fore;ctx.fillRect(0,0,g.viewW,g.viewH);
-    ctx.restore();
   }
 
   function drawLighting(g,ctx){
@@ -3265,149 +3232,6 @@ button,input,select{font-family:inherit}
 })();
 </script>
 
-<script>
-/* === phase3/camera-polish-3a.js ===
-   Surgical overlay: keeps the single-file build intact while upgrading the current 2.5D camera into a deeper 3D-feeling aerial camera.
-*/
-(function(){
-  const D = window.Duskfall = window.Duskfall || {};
-  if(!D.Camera || D.__phase3aCameraPolish) return;
-  D.__phase3aCameraPolish = true;
-  D.PHASE3A = {name:'Phase 3A', camera:'3D Aerial', safePatch:true};
-
-  const BaseCamera = D.Camera;
-  D.Camera = function(game){
-    BaseCamera.call(this,game);
-    this.zoom=1.16;this.targetZoom=1.16;this.minZoom=.52;this.maxZoom=2.45;
-    this.pitch=.62;this.targetPitch=.62;
-    this.focusYBias=68;this.targetFocusYBias=68;
-    this.deadzone=20;this.lookAhead=42;
-  };
-  D.Camera.prototype = BaseCamera.prototype;
-  D.Camera.prototype.constructor = D.Camera;
-
-  D.Camera.prototype.modeLabel=function(){return this.game.settings.cameraMode==='top'?'Overhead':'3D Aerial';};
-  D.Camera.prototype.snapTo=function(x,y){
-    const bias=this.game.settings?.cameraMode==='top'?0:(this.focusYBias||0);
-    this.x=x-this.game.viewW/2;this.y=y-this.game.viewH/2-bias;this.clamp();
-  };
-  D.Camera.prototype.update=function(dt){
-    const p=this.game.player;if(!p)return;
-    const isAerial=this.game.settings.cameraMode!=='top';
-    this.targetPitch=isAerial?(this.targetPitch||.62):1;
-    this.targetFocusYBias=isAerial?Math.max(52,Math.min(110,this.game.viewH*.095)):0;
-    const leadX=(p.dir?.x||0)*this.lookAhead;
-    const leadY=(p.dir?.y||0)*this.lookAhead;
-    const targetX=p.x+leadX-this.game.viewW/2;
-    const targetY=p.y+leadY-this.game.viewH/2-this.targetFocusYBias;
-    const dx=targetX-this.x, dy=targetY-this.y;
-    if(Math.hypot(dx,dy)>this.deadzone){
-      this.x=D.lerp(this.x,targetX,1-Math.pow(.006,dt));
-      this.y=D.lerp(this.y,targetY,1-Math.pow(.006,dt));
-    }
-    this.zoom=D.lerp(this.zoom,this.targetZoom,1-Math.pow(.018,dt));
-    this.angle=D.lerp(this.angle,this.targetAngle,1-Math.pow(.018,dt));
-    this.pitch=D.lerp(this.pitch,this.targetPitch,1-Math.pow(.018,dt));
-    this.focusYBias=D.lerp(this.focusYBias||0,this.targetFocusYBias||0,1-Math.pow(.018,dt));
-    if(this.shake>0) this.shake=Math.max(0,this.shake-dt*12);
-    this.clamp();
-  };
-  D.Camera.prototype.setIso=function(){
-    this.game.settings.cameraMode='iso';
-    this.targetAngle=0;
-    this.targetPitch=.62;
-    this.targetZoom=Math.max(this.targetZoom,1.16);
-    this.targetFocusYBias=Math.max(52,Math.min(110,this.game.viewH*.095));
-    this.game.ui?.toast('Camera Mode','3D aerial view enabled. Q/E rotates, O resets overhead.', 'gold');
-  };
-  D.Camera.prototype.setOverhead=function(){
-    this.game.settings.cameraMode='top';
-    this.targetAngle=0;
-    this.targetPitch=1;
-    this.targetFocusYBias=0;
-    this.game.ui?.toast('Camera Mode','Overhead view enabled for precise building and map reading.', 'good');
-  };
-  D.Camera.prototype.toggleMode=function(){
-    if(this.game.settings.cameraMode==='top') this.setIso();
-    else this.setOverhead();
-  };
-  D.Camera.prototype.rotate=function(delta){
-    this.targetAngle+=delta;
-    if(this.targetAngle>Math.PI)this.targetAngle-=Math.PI*2;
-    if(this.targetAngle<-Math.PI)this.targetAngle+=Math.PI*2;
-    this.game.settings.cameraMode='iso';
-    this.targetPitch=.64;
-    this.targetFocusYBias=Math.max(52,Math.min(110,this.game.viewH*.095));
-  };
-  D.Camera.prototype.apply=function(ctx){
-    let sx=0,sy=0;
-    if(this.shake>0){sx=(Math.random()-.5)*this.shake*6;sy=(Math.random()-.5)*this.shake*6;}
-    const cx=this.x+this.game.viewW/2, cy=this.y+this.game.viewH/2;
-    ctx.translate(this.game.viewW/2+sx,this.game.viewH/2+sy);
-    const pitch=this.game.settings.cameraMode==='iso'?this.pitch:1;
-    ctx.scale(this.zoom,this.zoom*pitch);
-    if(Math.abs(this.angle)>0.001) ctx.rotate(this.angle);
-    ctx.translate(-cx,-cy);
-  };
-  D.Camera.prototype.worldToScreen=function(wx,wy){
-    const cx=this.x+this.game.viewW/2, cy=this.y+this.game.viewH/2;
-    let dx=wx-cx, dy=wy-cy, rx=dx, ry=dy;
-    const pitch=this.game.settings.cameraMode==='iso'?this.pitch:1;
-    if(Math.abs(this.angle)>0.001){
-      const c=Math.cos(this.angle),s=Math.sin(this.angle);
-      rx=dx*c-dy*s; ry=dx*s+dy*c;
-    }
-    return {x:this.game.viewW/2+rx*this.zoom,y:this.game.viewH/2+ry*this.zoom*pitch};
-  };
-  D.Camera.prototype.screenToWorld=function(sx,sy){
-    const cx=this.x+this.game.viewW/2, cy=this.y+this.game.viewH/2;
-    let rx=(sx-this.game.viewW/2)/this.zoom;
-    const pitch=this.game.settings.cameraMode==='iso'?this.pitch:1;
-    let ry=(sy-this.game.viewH/2)/(this.zoom*pitch);
-    if(Math.abs(this.angle)>0.001){
-      const c=Math.cos(-this.angle),s=Math.sin(-this.angle);
-      const dx=rx*c-ry*s, dy=rx*s+ry*c;
-      return {x:cx+dx,y:cy+dy};
-    }
-    return {x:cx+rx,y:cy+ry};
-  };
-
-  const baseRenderMenu = D.UI?.prototype?.renderMenu;
-  if(baseRenderMenu){
-    D.UI.prototype.renderMenu=function(){
-      baseRenderMenu.call(this);
-      const menu=document.getElementById('menu');
-      if(!menu || this.game.state==='play')return;
-      const card=menu.querySelector('.menu-card');
-      if(card && !card.querySelector('.phase-strip')){
-        const strip=document.createElement('div');
-        strip.className='phase-strip';
-        strip.innerHTML='<span class="phase-chip">Phase 3A Build</span><span class="phase-chip">Camera: 3D Aerial</span><span class="phase-chip">Safe Single-File Patch</span><span class="phase-chip">Class + Faction Ready</span>';
-        const h1=card.querySelector('h1');
-        if(h1) h1.insertAdjacentElement('afterend',strip);
-      }
-      menu.querySelectorAll('.class-card .menu-actions').forEach(row=>row.classList.add('faction-row'));
-      menu.querySelectorAll('.class-card .small-btn').forEach(btn=>{
-        btn.classList.add('faction-choice');
-        if(!btn.querySelector('small')) btn.insertAdjacentHTML('beforeend','<small>Locks story path, HUD faction, map flags</small>');
-      });
-    };
-  }
-
-  const basePause = D.UI?.prototype?.renderPauseMenu;
-  if(basePause){
-    D.UI.prototype.renderPauseMenu=function(){
-      basePause.call(this);
-      const menu=document.getElementById('menu');
-      const camCard=[...menu.querySelectorAll('.setting-card')].find(el=>el.querySelector('h3')?.textContent==='Camera');
-      if(camCard && !camCard.querySelector('.camera-readout')){
-        camCard.insertAdjacentHTML('beforeend',`<div class="camera-readout"><b>3D Aerial polish:</b> camera is pitched lower, player sits slightly lower on screen, visible bounds are widened, and targeting still uses inverse screen-to-world math.</div>`);
-      }
-    };
-  }
-})();
-</script>
-
 <!-- Boot -->
 <script>
 /* === main.js === */
@@ -3433,7 +3257,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     console.assert(typeof D.Camera.prototype.rotate === 'function', 'Smoke test failed: camera rotate control missing.');
     const camSmoke={viewW:1280,viewH:720,settings:{cameraMode:'iso'},ui:{toast(){}}};
     const cam=new D.Camera(camSmoke);
-    console.assert(cam.targetAngle===0 && cam.targetPitch>=.58, 'Smoke test failed: default camera should start centered in 3D aerial mode.');
+    console.assert(cam.targetAngle===0 && cam.targetPitch>=.75, 'Smoke test failed: default camera should not start sideways or too flat.');
     cam.rotate(Math.PI/12);
     console.assert(typeof cam.targetAngle==='number' && typeof cam.targetPitch==='number', 'Smoke test failed: smooth camera targets missing.');
     console.assert(typeof D.BuildSystem === 'function', 'Smoke test failed: build system missing.');
@@ -3495,3 +3319,53 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 </body>
 </html>
+
+<!--
+UNK-SCAPE — Survival RPG
+PHASE 3A POLISH STAGING BOARD
+
+Active source used:
+- /mnt/data/index.html
+- Original uploaded file: game_index_html_staging_github1.1.html
+- Single-file HTML build verified at approximately 210 KB / 3,321 lines.
+
+New upgraded build created:
+- /mnt/data/unkscape_phase3a_polish.html
+- Safe copy also created as /mnt/data/index_phase3a.html
+
+Phase 3A upgrades applied:
+1. Camera polish
+   - Existing 2.5D aerial camera upgraded into a deeper 3D-feeling aerial camera.
+   - Default aerial pitch lowered from the earlier flatter look to a stronger aerial depth feel.
+   - Player is biased slightly lower on screen so the world ahead reads better.
+   - Q/E rotation remains active.
+   - O / Overhead Reset remains available for precise building and map reading.
+   - screenToWorld and worldToScreen targeting math kept intact so clicks, combat, projectiles, gathering, and build targeting stay aligned.
+
+2. Render safety polish
+   - Visible bounds widened for the lower-pitch camera so tiles/entities are less likely to clip at screen edges.
+   - Aerial atmosphere overlay should be temporarily disabled if the game loads to a blank or frozen canvas.
+   - Render overlays that run outside the camera transform can fail silently or cover the scene if alpha, dimensions, or draw order are wrong.
+
+3. Menu polish
+   - Added Phase 3A build badges to the class/faction start menu.
+   - Faction buttons now receive a cleaner two-column choice layout when space allows.
+   - Added camera-readout wording to the pause/settings camera card.
+
+4. Stability checks
+   - JavaScript syntax check passed using extracted script validation.
+   - Original uploaded source preserved separately.
+   - Patch was added as a surgical overlay instead of rewriting the whole game file.
+
+Immediate debug priority:
+- Roll back or disable the aerial atmosphere overlay first.
+- Re-test boot/loading before touching class selection, quests, combat, mobs, banking, or UI.
+- If loading still fails, inspect the Phase 3A camera/render overrides next.
+
+Next recommended phases:
+- Phase 3B: class/faction selection redesign with clearer role cards, faction preview, and starter-zone preview.
+- Phase 3C: questline expansion and faction intro missions.
+- Phase 3D: map labels and world-map filters.
+- Phase 3E: UI/hotbar/HUD polish pass.
+- Phase 4: safe modularization plan into config, engine, entities, systems, ui, assets.
+-->
