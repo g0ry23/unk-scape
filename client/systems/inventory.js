@@ -51,5 +51,3 @@
   D.InventorySystem.prototype.toSave=function(){return {...this.items};};
   D.InventorySystem.prototype.fromSave=function(data){this.items={...(data||{})};};
 })();
-</script>
-<script>
