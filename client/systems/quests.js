@@ -11,7 +11,7 @@
   D.QuestSystem.prototype.notify=function(type,id,qty=1){
     for(const [qid,st] of Object.entries(this.active)){
       const q=D.QUESTS[qid] || D.CLASS_QUESTS?.[qid];
-      if(!q) return;
+      if(!q) continue;
       q.steps.forEach((step,i)=>{if(step.type===type && (step.id==null||step.id===id)){const k=i;st.progress[k]=(st.progress[k]||0)+qty;}});
       this.check(qid);
     }
