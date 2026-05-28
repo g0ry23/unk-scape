@@ -16,11 +16,16 @@
         const stats=this.stats();
         let sp=stats.moveSpeed;
         if(this.blocking) sp*=.58;
-        if(this.heavyCharging) sp*=.72;
-        const tile=D.tileAt(game.world,this.x,this.y); if(tile) sp*=D.TILES[tile].speed||1;
-        this.vx=axis.x*sp;this.vy=axis.y*sp;
-        if(axis.x||axis.y){this.dir={x:axis.x,y:axis.y};this.walkTime+=dt*Math.hypot(axis.x,axis.y)*8;}
-        if(game.input?.mouse){this.facingAngle=Math.atan2(game.input.mouse.worldY-this.y,game.input.mouse.worldX-this.x);}
+if(this.heavyCharging) sp*=.72;
+const tile=D.tileAt(game.world,this.x,this.y); if(tile) sp*=D.TILES[tile].speed||1;
+if(axis.x!==0||axis.y!==0){
+const camAngle=game.camera.angle||0;
+const cos=Math.cos(camAngle);const sin=Math.sin(camAngle);
+this.vx=(axis.x*cos-axis.y*sin)*sp;
+this.vy=(axis.x*sin+axis.y*cos)*sp;
+this.dir={x:axis.x,y:axis.y};this.walkTime+=dt*Math.hypot(axis.x,axis.y)*8;
+}else{this.vx=0;this.vy=0;}
+if(game.input?.mouse){this.facingAngle=Math.atan2(game.input.mouse.worldY-this.y,game.input.mouse.worldX-this.x);}
         this.move(dt,game);
         this.attackCooldown=Math.max(0,this.attackCooldown-dt);
         this.attackAnim=Math.max(0,this.attackAnim-dt);
