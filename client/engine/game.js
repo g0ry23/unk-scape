@@ -175,5 +175,3 @@
   D.lerp = (a,b,t)=>a+(b-a)*t;
   D.uid = (()=>{let i=1; return p=>(p||'id')+'_'+(i++).toString(36);})();
 })();
-</script>
-<script>
