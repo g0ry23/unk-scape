@@ -109,5 +109,3 @@
     class_warden_watch:{name:'Verdant Watch',icon:'🌿',classId:'warden',desc:'Your warden path begins by gathering defensive materials and pushing threats away from the northern wall.',steps:[{type:'collect',id:'log',qty:3,text:'Collect 3 Oak Logs for barricades'},{type:'kill',id:'goblin',qty:1,text:'Defeat 1 Goblin Raider near Verdant Bulwark'}],rewards:{xp:{combat:65,woodcutting:55,survival:35},items:{coin:55,health_salve:1}}}
   };
 })();
-</script>
-<script>
