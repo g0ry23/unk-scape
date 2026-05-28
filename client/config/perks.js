@@ -22,7 +22,3 @@
     {skill:'woodcutting',level:4,perk:'lumberjack'}
   ];
 })();
-</script>
-
-<!-- Engine (rendering / input / timing) -->
-<script>
