@@ -29,5 +29,3 @@
     }else{this.game.ui.floatText(p.x,p.y-35,'Failed','#9aa8c7');this.addXp(cfg.skill,Math.max(1,Math.floor(cfg.xp*.15)));}
   };
 })();
-</script>
-<script>
