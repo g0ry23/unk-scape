@@ -54,5 +54,3 @@
     return list[list.length-1].id;
   };
 })();
-</script>
-<script>
