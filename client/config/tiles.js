@@ -21,5 +21,3 @@
     farmland:{name:'Farmland',solid:false,color:'#5d4524',variant:'#725730',speed:.95}
   };
 })();
-</script>
-<script>
