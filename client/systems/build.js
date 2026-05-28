@@ -48,5 +48,3 @@
     g.ui.log(`Removed ${D.TILES[current].name}.`,'good');
   };
 })();
-</script>
-<script>
