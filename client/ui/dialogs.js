@@ -15,5 +15,3 @@
     el.innerHTML=`<div class="dialog-box"><div class="dialog-top"><div class="portrait">${npc.cfg.icon}</div><div><h3>${npc.cfg.name}</h3><small style="color:var(--muted)">Coins: ${inv.count('coin')}</small></div></div><div class="dialog-text"><div class="two-col"><div><h3>Buy</h3>${buy}</div><div><h3>Sell</h3>${sell}</div></div></div><div class="dialog-actions"><button class="action-btn" onclick="Duskfall.game.ui.closeDialog()">Leave</button></div></div>`;
   };
 })();
-</script>
-<script>
