@@ -26,7 +26,8 @@ D.UI.prototype.drawMinimap=function(){
 const c=document.getElementById('minimap'); if(!c||!this.game.world)return; const ctx=c.getContext('2d'), g=this.game;
 const W=164,H=164;ctx.clearRect(0,0,W,H);
 const sx=W/D.WORLD.w, sy=H/D.WORLD.h;
-for(let y=0;y<D.WORLD.h;y+=2)for(let x=0;x<D.WORLD.w;x+=2){ctx.fillStyle=D.TILES[g.world.tiles[y][x]].color;ctx.fillRect(x*sx,y*sy,Math.ceil(sx*2),Math.ceil(sy*2));}
+const step=Math.max(2,Math.ceil(D.WORLD.w/164));
+for(let y=0;y<D.WORLD.h;y+=step)for(let x=0;x<D.WORLD.w;x+=step){ctx.fillStyle=D.TILES[g.world.tiles[y][x]].color;ctx.fillRect(x*sx,y*sy,Math.ceil(sx*step),Math.ceil(sy*step));}
 ctx.fillStyle='#63e6a4';g.entities.npcs.forEach(n=>ctx.fillRect(n.x/D.TILE*sx-1,n.y/D.TILE*sy-1,3,3));
 ctx.fillStyle='#ff5c7a';g.entities.enemies.slice(0,90).forEach(e=>ctx.fillRect(e.x/D.TILE*sx,e.y/D.TILE*sy,2,2));
 ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(g.player.x/D.TILE*sx,g.player.y/D.TILE*sy,3,0,Math.PI*2);ctx.fill();
