@@ -1,0 +1,11 @@
+{
+    "name": "unk-scape",
+    "version": "0.1.0",
+    "description": "AI-built survival sandbox RPG inspired by RuneScape, ARK, Minecraft, World of Warcraft, and retro medieval MMO gameplay.",
+    "main": "src/main.js",
+    "scripts": {
+          "start": "echo No build system yet"
+    },
+    "author": "",
+    "license": "UNLICENSED"
+}
