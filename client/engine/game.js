@@ -79,52 +79,86 @@
     requestAnimationFrame(t=>this.loop(t));
   };
 
-  D.Game.prototype.newGame = function(classId='wanderer', factionId=null){
-    this.seed = Math.floor(Math.random()*9999999);
-    this.time = 0; this.tick = 0; this.flags = {survivedNights:0,lastNight:false,bankDeposits:0};
-    this.stats = {kills:{},deaths:0,resourcesGathered:0,crafted:0};
-    this.world = D.generateWorld(this.seed);
-    this.entities = {resources:[], enemies:[], npcs:[], portals:[], projectiles:[], drops:[], effects:[]};
-    D.populateWorld(this);
-    this.player = D.createPlayer(this, classId, factionId);
-    const cls=D.CLASSES[classId]||D.CLASSES.wanderer;
-    Object.entries(cls.items||{}).forEach(([id,qty])=>this.systems.inventory.add(id,qty,true));
-    this.systems.perks.reapply();
-    this.camera.setIso();
-    this.camera.snapTo(this.player.x,this.player.y);
-    this.systems.quests.init();
-    this.paused = false;
-    this.state = 'play';
-    this.ui.closeAll();
-    this.ui.toast('Welcome to UNK-SCAPE', `${this.player.zoneName} • ${this.player.factionName}`, 'gold');
-    this.systems.audio.startWorldAudio();
-    this.ui.log('Your boots hit the dirt. Dusk will come soon.', 'gold');
-  };
+  D.Game.prototype.newGame = function(classId, factionId){
+  classId = classId || 'wanderer'; factionId = factionId || null;
+  var game = this;
+  game.seed = Math.floor(Math.random()*9999999);
+  game.time = 0; game.tick = 0;
+  game.flags = {survivedNights:0,lastNight:false,bankDeposits:0};
+  game.stats = {kills:{},deaths:0,resourcesGathered:0,crafted:0};
+  game.entities = {resources:[],enemies:[],npcs:[],portals:[],projectiles:[],drops:[],effects:[]};
+  game.state = 'loading';
+  game.ui.showLoader('Generating World...');
+  D.generateWorldAsync(game.seed, function(pct, label){
+    game.ui.updateLoader(pct * .65, label);
+  }).then(function(world){
+    game.world = world;
+    game.ui.updateLoader(.65, 'Placing entities...');
+    return D.populateWorldAsync(game, function(pct, label){
+      game.ui.updateLoader(.65 + pct * .30, label);
+    });
+  }).then(function(){
+    game.player = D.createPlayer(game, classId, factionId);
+    const cls = D.CLASSES[classId] || D.CLASSES.wanderer;
+    Object.entries(cls.items||{}).forEach(([id,qty])=>game.systems.inventory.add(id,qty,true));
+    game.systems.perks.reapply();
+    game.camera.setIso();
+    game.camera.snapTo(game.player.x, game.player.y);
+    game.systems.quests.init();
+    game.ui.updateLoader(1, 'Ready!');
+    setTimeout(function(){
+      game.ui.hideLoader();
+      game.paused = false;
+      game.state = 'play';
+      game.ui.closeAll();
+      game.ui.toast('Welcome to UNK-SCAPE', game.player.zoneName+' • '+game.player.factionName, 'gold');
+      game.systems.audio.startWorldAudio();
+      game.ui.log('Your boots hit the dirt. Dusk will come soon.', 'gold');
+    }, 200);
+  });
+};
 
-  D.Game.prototype.loadGame = function(data){
-    this.seed = data.seed || 1;
-    this.time = data.time || 0;
-    this.flags = data.flags || {survivedNights:0,lastNight:false,bankDeposits:0};
-    this.stats = data.stats || {kills:{},deaths:0,resourcesGathered:0,crafted:0};
-    this.world = D.generateWorld(this.seed);
-    this.entities = {resources:[], enemies:[], npcs:[], portals:[], projectiles:[], drops:[], effects:[]};
-    D.populateWorld(this);
-    this.player = D.createPlayer(this, data.classId || 'wanderer', data.factionId || null);
-    D.applyPlayerSave(this.player, data.player);
+D.Game.prototype.loadGame = function(data){
+  var game = this;
+  game.seed = data.seed || 1;
+  game.time = data.time || 0;
+  game.flags = data.flags || {survivedNights:0,lastNight:false,bankDeposits:0};
+  game.stats = data.stats || {kills:{},deaths:0,resourcesGathered:0,crafted:0};
+  game.entities = {resources:[],enemies:[],npcs:[],portals:[],projectiles:[],drops:[],effects:[]};
+  game.state = 'loading';
+  game.ui.showLoader('Loading World...');
+  D.generateWorldAsync(game.seed, function(pct, label){
+    game.ui.updateLoader(pct * .65, label);
+  }).then(function(world){
+    game.world = world;
+    game.ui.updateLoader(.65, 'Placing entities...');
+    return D.populateWorldAsync(game, function(pct, label){
+      game.ui.updateLoader(.65 + pct * .30, label);
+    });
+  }).then(function(){
+    game.player = D.createPlayer(game, data.classId || 'wanderer', data.factionId || null);
+    D.applyPlayerSave(game.player, data.player);
     if(data.resources){
       const depleted = new Set(data.resources.depleted||[]);
-      this.entities.resources.forEach(r=>{ if(depleted.has(r.uid)) r.amount=0; });
+      game.entities.resources.forEach(r=>{ if(depleted.has(r.uid)) r.amount=0; });
     }
-    this.systems.inventory.fromSave(data.inventory);
-    this.systems.bank.fromSave(data.bank);
-    this.systems.quests.fromSave(data.quests);
-    this.systems.perks.reapply();
-    this.camera.snapTo(this.player.x,this.player.y);
-    this.paused=false; this.state='play'; this.ui.closeAll();
-    this.ui.toast('Game Loaded', 'Welcome back to the dusk.', 'good');
-  };
+    game.systems.inventory.fromSave(data.inventory);
+    game.systems.bank.fromSave(data.bank);
+    game.systems.quests.fromSave(data.quests);
+    game.systems.perks.reapply();
+    game.camera.snapTo(game.player.x, game.player.y);
+    game.ui.updateLoader(1, 'Ready!');
+    setTimeout(function(){
+      game.ui.hideLoader();
+      game.paused = false;
+      game.state = 'play';
+      game.ui.closeAll();
+      game.ui.toast('Game Loaded', 'Welcome back to the dusk.', 'good');
+    }, 200);
+  });
+};
 
-  D.Game.prototype.loop = function(now){
+D.Game.prototype.loop = function(now){
     if(!this.running) return;
     const dt = Math.min(.05, (now-this.last)/1000);
     this.last = now;
