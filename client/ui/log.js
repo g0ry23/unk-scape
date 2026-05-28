@@ -7,5 +7,3 @@
     while(box.children.length>4)box.removeChild(box.firstChild);
   };
 })();
-</script>
-<script>
