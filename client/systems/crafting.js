@@ -25,5 +25,3 @@
     g.ui.toast('Crafted',`${r.icon} ${r.name}`,'good');g.ui.renderPanel();
   };
 })();
-</script>
-<script>
