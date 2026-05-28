@@ -58,5 +58,3 @@
     return Math.random() < chance;
   };
 })();
-</script>
-<script>
