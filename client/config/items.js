@@ -55,5 +55,3 @@
     ember_sprite:{name:'Ember Sprite',icon:'✨',stack:false,type:'pet',rarity:'epic',desc:'A tiny support pet that hums with warm energy.',bonus:{wisdom:1},value:700}
   };
 })();
-</script>
-<script>
