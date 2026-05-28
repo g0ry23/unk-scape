@@ -188,3 +188,48 @@ body.theme-iron-crown {
   border-color: var(--faction-primary) !important;
   background: linear-gradient(180deg, var(--faction-glow), rgba(0,0,0,0.3)) !important;
 }
+
+
+/* ===== WORLD LOADING SCREEN ===== */
+#world-loader{
+  position:fixed;inset:0;z-index:9999;
+  display:none;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 40%, rgba(73,91,126,.28), rgba(0,0,0,.96) 62%, rgba(0,0,0,.99));
+  flex-direction:column;
+}
+.loader-inner{
+  text-align:center;width:min(520px,82vw);
+  padding:clamp(24px,4vw,44px);
+  background:linear-gradient(180deg,rgba(15,20,34,.97),rgba(7,10,17,.97));
+  border:1px solid rgba(247,198,91,.28);
+  border-radius:24px;
+  box-shadow:0 30px 90px rgba(0,0,0,.65);
+}
+.loader-title{
+  font:900 clamp(22px,3.5vw,36px)/1 var(--display,Inter,sans-serif);
+  color:#fff;
+  margin-bottom:8px;
+  background:linear-gradient(90deg,#fff,#ffd783,#ff9b5c);
+  -webkit-background-clip:text;color:transparent;
+}
+.loader-bar-wrap{
+  width:100%;height:12px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:999px;
+  overflow:hidden;
+  margin:18px 0 12px;
+}
+#loader-bar{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,#f7c65b,#ff9b5c,#ff5c7a);
+  border-radius:999px;
+  box-shadow:0 0 18px rgba(247,198,91,.45);
+  transition:width 0.18s ease;
+}
+.loader-label{
+  font:700 13px/1 var(--mono,"JetBrains Mono",monospace);
+  color:rgba(233,240,255,.60);
+  letter-spacing:.04em;
+  min-height:1.4em;
+}
