@@ -106,5 +106,3 @@
   D.Input.prototype.startRebind=function(action){this.waitingForBind=action;this.game.ui.renderMenu();};
   D.displayKey=function(k){return k===' '?'SPACE':k==='escape'?'ESC':k==='tab'?'TAB':String(k).toUpperCase();};
 })();
-</script>
-<script>
