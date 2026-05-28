@@ -1,7 +1,7 @@
 (function(){
   const D = window.Duskfall = window.Duskfall || {};
   D.TILE = 32;
-  D.WORLD = { w: 300, h: 300, pxW:300*32, pxH:300*32 }; // Smaller tiles + larger tile-grid map for better scale and less chunky visuals. // Phase 1: expanded open-world scale for larger starter regions.
+  D.WORLD = { w: 2000, h: 2000, pxW: 2000*32, pxH: 2000*32 }; // Smaller tiles + larger tile-grid map for better scale and less chunky visuals. // Phase 1: expanded open-world scale for larger starter regions.
 
   D.TILES = {
     grass:{name:'Grass',solid:false,color:'#25472d',variant:'#2f5a39',speed:1},
