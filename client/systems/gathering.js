@@ -114,5 +114,3 @@
     if(this.timer>=this.duration)this.finish();
   };
 })();
-</script>
-<script>
