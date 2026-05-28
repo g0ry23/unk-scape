@@ -13,5 +13,3 @@
     inv.remove(id,1);inv.add('coin',price,true);this.game.ui.toast('Sold',`${D.ITEMS[id].name} for ${price} coins.`,'gold');this.game.ui.renderDialog();
   };
 })();
-</script>
-<script>
