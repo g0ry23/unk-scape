@@ -22,5 +22,3 @@
   };
   D.irand=(a,b)=>Math.floor(a+Math.random()*(b-a+1));
 })();
-</script>
-<script>
