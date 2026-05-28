@@ -101,6 +101,21 @@
     game.player = D.createPlayer(game, classId, factionId);
     const cls = D.CLASSES[classId] || D.CLASSES.wanderer;
     Object.entries(cls.items||{}).forEach(([id,qty])=>game.systems.inventory.add(id,qty,true));
+    // Apply pending character setup from wizard (name, faction, race overrides)
+    if(game._pendingCharacterSetup){
+      const ps = game._pendingCharacterSetup;
+      game.player.characterName = ps.charName || game.player.characterName;
+      game.player.characterId = 'char_' + Math.random().toString(36).slice(2,8);
+      if(ps.factionId && D.FACTIONS[ps.factionId]){
+        game.player.factionId = ps.factionId;
+        game.player.factionName = D.FACTIONS[ps.factionId].name;
+        const fc = D.FACTIONS[ps.factionId].primaryColor || D.FACTIONS[ps.factionId].color || '#6aa7ff';
+        document.documentElement.style.setProperty('--faction-primary', fc);
+        document.documentElement.style.setProperty('--faction-glow', fc+'33');
+      }
+      if(ps.raceId) game.player.raceId = ps.raceId;
+      game._pendingCharacterSetup = null;
+    }
     game.systems.perks.reapply();
     game.camera.setIso();
     game.camera.snapTo(game.player.x, game.player.y);
