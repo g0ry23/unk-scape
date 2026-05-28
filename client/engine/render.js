@@ -106,28 +106,57 @@
   }
 
   function drawTileDepth(g,ctx){
-    const b=visibleBounds(g), t=D.TILE;
-    const heightMap={wall:34,roof:28,fence:18,woodfloor:8,stonepath:5,plaza:6};
-    for(let y=b.y0;y<b.y1;y++) for(let x=b.x0;x<b.x1;x++){
-      const id=g.world.tiles[y][x], tile=D.TILES[id], h=heightMap[id]||0;
-      if(!h) continue;
-      const px=x*t, py=y*t;
-      ctx.save();
-      ctx.globalAlpha=.88;
-      ctx.fillStyle='rgba(0,0,0,.18)';
-      ctx.fillRect(px+6,py+t-3,t-10,Math.max(4,h*.28));
-      ctx.fillStyle=shade(tile.color,-28);
-      ctx.fillRect(px,py+t-h,t,h);
-      ctx.fillStyle=shade(tile.color,-42);
-      ctx.fillRect(px+t-h*.22,py+h*.15,h*.22,t-h*.15);
-      ctx.strokeStyle='rgba(255,255,255,.07)';
-      ctx.lineWidth=1;
-      ctx.strokeRect(px+2,py+2,t-4,t-4);
-      ctx.restore();
-    }
-  }
-
-  function drawZoneOverlays(g,ctx){
+const b=visibleBounds(g), t=D.TILE;
+const wallHeight=44;
+const px0=g.player?g.player.x:0, py0=g.player?g.player.y:0;
+const playerTileX=Math.floor(px0/t);
+const playerTileY=Math.floor(py0/t);
+const heightMap={wall:34,roof:28,fence:18,woodfloor:8,stonepath:5,plaza:6};
+for(let y=b.y0;y<b.y1;y++) for(let x=b.x0;x<b.x1;x++){
+if(!g.world.tiles[y]||!g.world.tiles[y][x]) continue;
+const id=g.world.tiles[y][x], tile=D.TILES[id], h=heightMap[id]||0;
+const tilePx=x*t, tilePy=y*t;
+if(id==='wall'){
+ctx.save();
+ctx.fillStyle=shade(tile.color,-25);
+ctx.fillRect(tilePx,tilePy-wallHeight,t,wallHeight);
+ctx.fillStyle=tile.color;
+ctx.fillRect(tilePx,tilePy-wallHeight,t,6);
+ctx.fillStyle='rgba(0,0,0,.18)';
+ctx.fillRect(tilePx+t-h*.22,tilePy-wallHeight+6,h*.22,wallHeight-6);
+ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1;
+ctx.strokeRect(tilePx+2,tilePy-wallHeight+2,t-4,t+wallHeight-4);
+ctx.restore();
+} else if(id==='roof'){
+ctx.save();
+const insideBuilding=(Math.abs(playerTileX-x)<5&&Math.abs(playerTileY-y)<5);
+ctx.globalAlpha=insideBuilding?0.15:1.0;
+ctx.fillStyle=tile.color;
+ctx.fillRect(tilePx,tilePy,t,t);
+if(!insideBuilding){
+ctx.globalAlpha=0.88;
+ctx.fillStyle='rgba(0,0,0,.18)';
+ctx.fillRect(tilePx+6,tilePy+t-3,t-10,Math.max(4,h*.28));
+ctx.fillStyle=shade(tile.color,-28);
+ctx.fillRect(tilePx,tilePy+t-h,t,h);
+}
+ctx.restore();
+} else if(h){
+ctx.save();
+ctx.globalAlpha=.88;
+ctx.fillStyle='rgba(0,0,0,.18)';
+ctx.fillRect(tilePx+6,tilePy+t-3,t-10,Math.max(4,h*.28));
+ctx.fillStyle=shade(tile.color,-28);
+ctx.fillRect(tilePx,tilePy+t-h,t,h);
+ctx.fillStyle=shade(tile.color,-42);
+ctx.fillRect(tilePx+t-h*.22,tilePy+h*.15,h*.22,t-h*.15);
+ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1;
+ctx.strokeRect(tilePx+2,tilePy+2,t-4,t-4);
+ctx.restore();
+}
+}
+}
+function drawZoneOverlays(g,ctx){
     if(!g.world)return;
     Object.entries(D.STARTER_ZONES||{}).forEach(([id,z])=>{
       const wx=z.x*D.TILE+D.TILE/2, wy=z.y*D.TILE+D.TILE/2;
