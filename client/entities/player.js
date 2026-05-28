@@ -102,7 +102,3 @@
     p.characterXp=data.characterXp||p.characterXp||0;p.characterLevel=data.characterLevel||D.characterLevelForXp(p.characterXp||0);p.attributePoints=data.attributePoints??p.attributePoints??0;p.attributes={...D.defaultAttributes(p.roleType||'hybrid'),...(data.attributes||p.attributes||{})};p.role=data.role||p.role||D.CLASS_ROLES[p.classId]||'Hybrid';
   };
 })();
-</script>
-
-<!-- Systems (game logic — depend on entities + config) -->
-<script>
