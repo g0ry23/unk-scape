@@ -13,5 +13,3 @@
     D.PERK_LEVELS.filter(x=>x.skill===skill&&x.level<=level).forEach(x=>this.unlock(x.perk));
   };
 })();
-</script>
-<script>
