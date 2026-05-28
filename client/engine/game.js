@@ -74,6 +74,12 @@
     this.systems.save = new D.SaveSystem(this);
     this.ui.applyDisplaySettings();
     this.ui.showMenu();
+    // ── UnkScape module initialization ──────────────────────────────────────
+    const U = window.UnkScape || {};
+    if (U.Engine && U.Engine.Input)    { U.Engine.Input.init(); }
+    if (U.Engine && U.Engine.Renderer) { U.Engine.Renderer.init('game'); }
+    if (U.UI)                          { U.UI.init(); }
+    // ────────────────────────────────────────────────────────────────────────
     this.ui.log('Preview booted. Audio starts after your first click/key press.', 'gold');
     this.running = true;
     requestAnimationFrame(t=>this.loop(t));
@@ -185,6 +191,12 @@ this.accum -= this.fixedDt;
 }
 }
 D.render(this);
+    // ── UnkScape secondary render pass ─────────────────────────────────────
+    const _U = window.UnkScape || {};
+    if (_U.Engine && _U.Engine.Renderer && this.world && this.player) {
+        _U.Engine.Renderer.renderFrame(this.world, this.player, this.camera);
+    }
+    // ───────────────────────────────────────────────────────────────────────
 if(this.state !== 'loading') this.ui.update();
 requestAnimationFrame(t=>this.loop(t));
 };
