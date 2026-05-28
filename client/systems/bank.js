@@ -12,5 +12,3 @@
   D.BankSystem.prototype.toSave=function(){return{...this.items};};
   D.BankSystem.prototype.fromSave=function(data){this.items={...(data||{})};};
 })();
-</script>
-<script>
