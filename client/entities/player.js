@@ -11,33 +11,36 @@
       hp:100,maxHp:100,hunger:100,maxHunger:100,dead:false,attackCooldown:0,attackAnim:0,attackAnimMax:.2,attackAngle:0,facingAngle:0,walkTime:0,interactCooldown:0,blocking:false,heavyCharging:false,heavyCharge:0,
       equipment:{head:null,weapon:null,offhand:null,body:null,tool:null}, skills:{}, perks:[], mods:{},
       update(dt){
-        if(this.dead)return;
-        const axis=game.input.axis();
-        const stats=this.stats();
-        let sp=stats.moveSpeed;
-        if(this.blocking) sp*=.58;
-if(this.heavyCharging) sp*=.72;
-const tile=D.tileAt(game.world,this.x,this.y); if(tile) sp*=D.TILES[tile].speed||1;
+if(this.dead)return;
+this.stamina=this.stamina||100;
+this.maxStamina=100;
+const axis=game.input.axis();
+const stats=this.stats();
+let sp=stats.moveSpeed;
+const isSprinting=game.input.keys['shift']&&(axis.x!==0||axis.y!==0)&&this.stamina>5;
+if(isSprinting){
+  sp*=1.55;
+  this.stamina=Math.max(0,this.stamina-dt*22);
+}else{
+  this.stamina=Math.min(this.maxStamina,this.stamina+dt*12);
+}
+if(this.blocking)sp*=.58;
+if(this.heavyCharging)sp*=.72;
+const tile=D.tileAt(game.world,this.x,this.y);if(tile)sp*=D.TILES[tile].speed||1;
 if(axis.x!==0||axis.y!==0){
 const camAngle=game.camera.angle||0;
 const cos=Math.cos(camAngle);const sin=Math.sin(camAngle);
 this.vx=(axis.x*cos-axis.y*sin)*sp;
 this.vy=(axis.x*sin+axis.y*cos)*sp;
-this.dir={x:axis.x,y:axis.y};this.walkTime+=dt*Math.hypot(axis.x,axis.y)*8;
+this.dir={x:axis.x,y:axis.y};this.walkTime+=dt*Math.hypot(axis.x,axis.y)*(isSprinting?12:8);
 }else{this.vx=0;this.vy=0;}
 if(game.input?.mouse){this.facingAngle=Math.atan2(game.input.mouse.worldY-this.y,game.input.mouse.worldX-this.x);}
-        this.move(dt,game);
-        this.attackCooldown=Math.max(0,this.attackCooldown-dt);
-        this.attackAnim=Math.max(0,this.attackAnim-dt);
-        this.interactCooldown=Math.max(0,this.interactCooldown-dt);
-        this.pickupNearby();
-      },
-      move(dt,g){
-        const nx=this.x+this.vx*dt, ny=this.y+this.vy*dt;
-        if(!D.solidAt(g.world,nx,this.y,this.r)){this.x=D.clamp(nx,this.r,D.WORLD.pxW-this.r);} 
-        if(!D.solidAt(g.world,this.x,ny,this.r)){this.y=D.clamp(ny,this.r,D.WORLD.pxH-this.r);} 
-      },
-      stats(){
+this.move(dt,game);
+this.attackCooldown=Math.max(0,this.attackCooldown-dt);
+this.attackAnim=Math.max(0,this.attackAnim-dt);
+this.interactCooldown=Math.max(0,this.interactCooldown-dt);
+this.pickupNearby();
+},    stats(){
         const s=D.getEquipmentStats(this);
         s.defense += this.mods.defense||0;
         s.moveSpeed *= 1+(this.mods.moveSpeed||0);
