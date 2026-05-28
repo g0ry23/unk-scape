@@ -159,23 +159,24 @@ D.Game.prototype.loadGame = function(data){
 };
 
 D.Game.prototype.loop = function(now){
-    if(!this.running) return;
-    const dt = Math.min(.05, (now-this.last)/1000);
-    this.last = now;
-    if(!this.paused){
-      this.accum += dt;
-      while(this.accum >= this.fixedDt){
-        this.update(this.fixedDt);
-        this.accum -= this.fixedDt;
-      }
-    }
-    D.render(this);
-    this.ui.update();
-    requestAnimationFrame(t=>this.loop(t));
-  };
+if(!this.running) return;
+const dt = Math.min(.05, (now-this.last)/1000);
+this.last = now;
+if(this.state !== 'loading' && !this.paused){
+this.accum += dt;
+while(this.accum >= this.fixedDt){
+this.update(this.fixedDt);
+this.accum -= this.fixedDt;
+}
+}
+D.render(this);
+if(this.state !== 'loading') this.ui.update();
+requestAnimationFrame(t=>this.loop(t));
+};
 
-  D.Game.prototype.update = function(dt){
-    this.time += dt;
+D.Game.prototype.update = function(dt){
+    if(!this.player || this.state === 'loading') return;
+this.time += dt;
     this.tick++;
     this.input.update(dt);
     this.systems.daynight.update(dt);
