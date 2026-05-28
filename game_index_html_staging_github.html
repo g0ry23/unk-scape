@@ -1,0 +1,2588 @@
+<!doctype html>
+<!-- Bundled single-file Canvas build generated from uploaded ZIP. Original file order preserved. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UNK-SCAPE — Survival RPG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* === styles.css === */
+:root{
+  --bg:#07090d;
+  --panel:rgba(11,15,24,.92);
+  --panel2:rgba(18,24,38,.94);
+  --line:rgba(255,255,255,.10);
+  --line2:rgba(255,255,255,.16);
+  --text:#e9f0ff;
+  --muted:#9aa8c7;
+  --muted2:#65708b;
+  --gold:#f7c65b;
+  --red:#ff5c7a;
+  --green:#63e6a4;
+  --blue:#6aa7ff;
+  --purple:#b98cff;
+  --orange:#ff9b5c;
+  --shadow:0 18px 60px rgba(0,0,0,.45);
+  --radius:18px;
+  --font:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  --display:"Space Grotesk",Inter,system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--text);user-select:none}
+canvas#game{display:block;width:100vw;height:100vh;background:#0b111a;image-rendering:auto}
+#ui-root{position:fixed;inset:0;pointer-events:none}
+#ui-root.menu-open #hud,#ui-root.menu-open #toasts,#ui-root.menu-open #panel,#ui-root.menu-open #dialog,#ui-root.menu-open #log,#ui-root.menu-open #combat-ui{display:none!important}
+#ui-root.panel-open #hud,#ui-root.panel-open #dialog,#ui-root.panel-open #log,#ui-root.panel-open #combat-ui{display:none!important}
+#ui-root.dialog-open #hud,#ui-root.dialog-open #log,#ui-root.dialog-open #combat-ui{display:none!important}
+button,input,select{font-family:inherit}
+
+/* HUD */
+#hud{position:absolute;left:18px;top:18px;right:18px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;pointer-events:none}
+.hud-left,.hud-right{display:flex;flex-direction:column;gap:10px;max-width:min(440px,44vw)}
+.hud-card{background:linear-gradient(180deg,rgba(13,18,31,.92),rgba(9,12,20,.88));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(12px);padding:12px}
+.brand{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.brand-mark{width:38px;height:38px;border-radius:12px;background:radial-gradient(circle at 30% 25%,#ffd873,#b86b22 46%,#341b11 100%);box-shadow:0 0 26px rgba(247,198,91,.18)}
+.brand h1{font:800 18px/1 var(--display);letter-spacing:.2px;margin:0}
+.brand small{display:block;margin-top:4px;color:var(--muted);font-size:12px}
+.stat-row{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:999px;padding:8px 10px;font-weight:700;font-size:12px;color:var(--text)}
+.pill .dot{width:8px;height:8px;border-radius:99px;background:var(--blue);box-shadow:0 0 16px currentColor}
+.pill.red .dot{background:var(--red)}.pill.green .dot{background:var(--green)}.pill.gold .dot{background:var(--gold)}.pill.purple .dot{background:var(--purple)}.pill.orange .dot{background:var(--orange)}
+.bars{display:grid;gap:8px;min-width:300px}
+.bar-wrap{display:grid;grid-template-columns:62px 1fr 48px;align-items:center;gap:9px;font-size:12px;color:var(--muted);font-weight:700}
+.bar{height:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:999px;overflow:hidden}
+.bar>i{display:block;height:100%;width:50%;border-radius:999px;background:linear-gradient(90deg,#63e6a4,#35b977)}
+.bar.hp>i{background:linear-gradient(90deg,#ff6b84,#d9355b)}
+.bar.xp>i{background:linear-gradient(90deg,#6aa7ff,#b98cff)}
+.bar.hunger>i{background:linear-gradient(90deg,#ffcf6e,#ff9b5c)}
+.minimap{width:184px;height:184px;position:relative;padding:10px}
+.minimap canvas{width:164px;height:164px;border-radius:14px;background:rgba(0,0,0,.22);border:1px solid var(--line)}
+.keys{font-size:12px;color:var(--muted);line-height:1.55;max-width:340px}
+.keys b{color:var(--text)}
+
+/* Combat / Interface Upgrade */
+#combat-ui{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);pointer-events:none;z-index:4}
+#hotbar{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);pointer-events:none;z-index:5}
+.hotbar-card{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:20px;background:linear-gradient(180deg,rgba(13,18,31,.88),rgba(7,10,17,.82));border:1px solid rgba(255,255,255,.14);box-shadow:var(--shadow);backdrop-filter:blur(12px)}
+.hotbar-slot{width:58px;height:58px;border-radius:16px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.055);display:grid;place-items:center;position:relative;color:var(--text);font-weight:900}
+.hotbar-slot.selected{border-color:rgba(247,198,91,.72);background:rgba(247,198,91,.16);box-shadow:0 0 24px rgba(247,198,91,.16)}
+.hotbar-slot.missing{opacity:.42;filter:saturate(.55)}
+.hotbar-slot .num{position:absolute;left:6px;top:5px;font:800 10px var(--mono);color:var(--muted)}
+.hotbar-slot .ico{font-size:24px;line-height:1}
+.hotbar-slot .qty{position:absolute;right:5px;bottom:4px;font:800 10px var(--mono);color:var(--gold);background:rgba(0,0,0,.28);border-radius:999px;padding:1px 5px}
+.hotbar-slot .name{position:absolute;left:50%;bottom:-17px;transform:translateX(-50%);font:700 9px var(--mono);white-space:nowrap;color:rgba(233,240,255,.72);display:none}
+.hotbar-slot.selected .name{display:block}
+.combat-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:18px;background:linear-gradient(180deg,rgba(13,18,31,.82),rgba(7,10,17,.76));border:1px solid rgba(255,255,255,.14);box-shadow:var(--shadow);backdrop-filter:blur(12px)}
+.combat-chip{display:flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);border-radius:999px;padding:8px 10px;font-size:12px;font-weight:900;color:var(--text)}
+.combat-chip.active{border-color:rgba(247,198,91,.45);background:rgba(247,198,91,.14);color:#fff}
+.combat-chip.blocking{border-color:rgba(106,167,255,.48);background:rgba(106,167,255,.16)}
+.charge-meter{width:92px;height:8px;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden;border:1px solid rgba(255,255,255,.10)}
+.charge-meter i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#ffcf6e,#ff5c7a);border-radius:999px}
+.setting-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:14px;text-align:left}
+.setting-card{border:1px solid var(--line);background:rgba(255,255,255,.045);border-radius:18px;padding:14px}
+.setting-card h3{margin:0 0 7px;font:900 15px/1 var(--display)}
+.setting-card p{margin:0 0 10px;color:var(--muted);font-size:12px;line-height:1.4}
+.rebind-btn{width:100%;margin-top:7px;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.map-canvas{width:100%;max-width:720px;aspect-ratio:1/1;border-radius:20px;border:1px solid var(--line2);background:rgba(0,0,0,.25);box-shadow:var(--shadow)}
+.map-legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;color:var(--muted);font-size:12px}
+
+/* Toasts */
+#toasts{position:absolute;top:225px;right:18px;width:330px;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{background:linear-gradient(180deg,rgba(17,24,39,.95),rgba(9,13,22,.93));border:1px solid var(--line2);border-radius:16px;padding:12px 13px;box-shadow:var(--shadow);animation:toastIn .22s ease-out;color:var(--text);font-size:13px;line-height:1.35}
+.toast b{display:block;font:800 13px/1.2 var(--display);margin-bottom:3px}
+.toast.good{border-color:rgba(99,230,164,.28)}.toast.bad{border-color:rgba(255,92,122,.3)}.toast.gold{border-color:rgba(247,198,91,.32)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
+
+/* Panels */
+#panel{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:28px;pointer-events:auto;background:rgba(0,0,0,.22);backdrop-filter:blur(3px)}
+#panel.show{display:flex}
+.panel-box{width:min(1040px,96vw);max-height:min(780px,92vh);overflow:hidden;display:grid;grid-template-rows:auto 1fr;background:linear-gradient(180deg,rgba(15,20,34,.98),rgba(8,11,19,.97));border:1px solid var(--line2);border-radius:24px;box-shadow:0 28px 90px rgba(0,0,0,.6)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px;border-bottom:1px solid var(--line)}
+.panel-head h2{margin:0;font:800 22px/1 var(--display)}
+.panel-head .sub{color:var(--muted);font-size:12px;margin-top:5px}
+.close-btn,.tab-btn,.action-btn,.small-btn{pointer-events:auto;cursor:pointer;border:1px solid var(--line2);background:rgba(255,255,255,.065);color:var(--text);border-radius:12px;padding:10px 12px;font-weight:800;font-size:12px;transition:.15s ease}
+.close-btn:hover,.tab-btn:hover,.action-btn:hover,.small-btn:hover{background:rgba(255,255,255,.11);transform:translateY(-1px)}
+.panel-body{overflow:auto;padding:18px 20px}.panel-body::-webkit-scrollbar{width:10px}.panel-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:99px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab-btn.active{background:rgba(106,167,255,.18);border-color:rgba(106,167,255,.35)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.item-card{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:16px;padding:12px;min-height:118px;position:relative;overflow:hidden}
+.item-card h3{font:800 14px/1.2 var(--display);margin:0 0 7px}.item-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.35}.item-card .qty{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:999px;padding:4px 7px;font:700 11px var(--mono)}
+.item-card .tag{display:inline-block;margin-top:9px;color:var(--gold);font:700 11px var(--mono)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:850px){.two-col{grid-template-columns:1fr}.hud-right{display:none}.hud-left{max-width:94vw}.bars{min-width:260px}}
+.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{text-align:left;padding:10px;border-bottom:1px solid var(--line)}.table th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}.table td strong{font-family:var(--display)}
+.shop-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:14px;margin-bottom:8px;background:rgba(255,255,255,.035)}
+.shop-row small{color:var(--muted);display:block;margin-top:3px}.coin{color:var(--gold);font-weight:900;font-family:var(--mono)}
+
+/* Dialog */
+#dialog{position:absolute;left:50%;top:50%;bottom:auto;transform:translate(-50%,-50%);width:min(920px,92vw);max-height:min(760px,84vh);display:none;pointer-events:auto;z-index:8}
+#dialog.show{display:block}.dialog-box{background:linear-gradient(180deg,rgba(15,20,34,.98),rgba(8,11,19,.98));border:1px solid var(--line2);border-radius:22px;box-shadow:var(--shadow);overflow:auto;max-height:min(760px,84vh)}.dialog-top{display:flex;gap:13px;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line)}.portrait{width:46px;height:46px;border-radius:16px;background:linear-gradient(135deg,#303b55,#111827);display:grid;place-items:center;font-size:24px}.dialog-top h3{margin:0;font:800 18px/1 var(--display)}.dialog-text{padding:16px 18px;color:#d8e1f7;line-height:1.55}.dialog-actions{display:flex;gap:10px;flex-wrap:wrap;padding:0 18px 18px}
+
+/* Log */
+#log{position:absolute;left:14px;bottom:14px;width:min(320px,28vw);height:86px;pointer-events:none;z-index:3}.log-box{height:100%;overflow:hidden;background:rgba(7,10,17,.52);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:7px 9px;box-shadow:0 10px 34px rgba(0,0,0,.34);backdrop-filter:blur(8px)}.log-line{font:500 10px/1.34 var(--mono);color:rgba(233,240,255,.70);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.log-line.good{color:var(--green)}.log-line.bad{color:var(--red)}.log-line.gold{color:var(--gold)}
+
+/* Menu overlay */
+#menu{position:absolute;inset:0;display:none;align-items:center;justify-content:center;pointer-events:auto;background:radial-gradient(circle at 50% 30%,rgba(73,91,126,.35),rgba(0,0,0,.8) 58%,rgba(0,0,0,.92));backdrop-filter:blur(6px)}
+#menu.show{display:flex}.menu-card{width:min(760px,92vw);background:linear-gradient(180deg,rgba(15,20,34,.97),rgba(7,10,17,.97));border:1px solid var(--line2);border-radius:28px;box-shadow:0 30px 110px rgba(0,0,0,.65);padding:32px;text-align:center}.menu-card h1{font:900 54px/1 var(--display);margin:0 0 10px;letter-spacing:-1.5px;background:linear-gradient(90deg,#fff,#ffd783,#ff9b5c);-webkit-background-clip:text;color:transparent}.menu-card p{color:var(--muted);line-height:1.55;margin:0 auto 22px;max-width:600px}.menu-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}.big-btn{cursor:pointer;border:1px solid rgba(247,198,91,.32);background:linear-gradient(180deg,rgba(247,198,91,.20),rgba(255,155,92,.12));color:var(--text);border-radius:16px;padding:14px 18px;font-weight:900;font-size:14px;box-shadow:0 14px 40px rgba(0,0,0,.22)}.big-btn.secondary{border-color:var(--line2);background:rgba(255,255,255,.06)}
+.class-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:22px 0}.class-card{cursor:pointer;text-align:left;border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:18px;padding:14px}.class-card:hover{background:rgba(255,255,255,.09);border-color:rgba(106,167,255,.34)}.class-card h3{margin:0 0 6px;font:900 16px/1 var(--display)}.class-card p{font-size:12px;margin:0 0 10px}.class-card ul{margin:0;padding-left:18px;color:var(--muted);font-size:12px;line-height:1.55}
+
+.help-note{border:1px solid var(--line);background:rgba(106,167,255,.07);border-radius:16px;padding:12px;color:var(--muted);font-size:12px;line-height:1.45;margin-bottom:14px}
+.kbd{font-family:var(--mono);font-weight:800;border:1px solid var(--line2);background:rgba(255,255,255,.08);border-radius:6px;padding:1px 5px;color:#fff}
+
+/* Mobile helper */
+.mobile-controls{display:none;position:absolute;right:18px;bottom:18px;pointer-events:auto;gap:8px;grid-template-columns:48px 48px 48px;grid-template-rows:48px 48px 48px}.mobile-controls button{border:1px solid var(--line2);background:rgba(255,255,255,.08);color:#fff;border-radius:14px;font-weight:900}
+@media(pointer:coarse){.mobile-controls{display:grid}.mobile-controls .up{grid-column:2}.mobile-controls .left{grid-column:1;grid-row:2}.mobile-controls .down{grid-column:2;grid-row:3}.mobile-controls .right{grid-column:3;grid-row:2}}
+</style>
+</head>
+<body>
+
+<canvas id="game"></canvas>
+
+<div id="ui-root">
+  <div id="hud"></div>
+  <div id="toasts"></div>
+  <div id="panel"></div>
+  <div id="dialog"></div>
+  <div id="log"></div>
+  <div id="combat-ui"></div>
+  <div id="hotbar"></div>
+  <div id="menu"></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- LOAD ORDER MATTERS. Each file attaches to window.Duskfall.    -->
+<!-- ============================================================ -->
+
+<!-- Config (pure data) -->
+<script>
+/* === config/skills.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.SKILLS = {
+    combat: {
+      name:'Combat', icon:'⚔️', color:'#ff5c7a',
+      desc:'Melee fighting, damage, and survivability.',
+      milestones: {2:'Power Strike unlocked',4:'Iron focus',7:'Veteran stance',10:'Duskbreaker'}
+    },
+    woodcutting: {
+      name:'Woodcutting', icon:'🪓', color:'#63e6a4',
+      desc:'Chop trees faster and harvest better wood.',
+      milestones: {2:'Better hatchet grip',5:'Hardwood chance',8:'Tree sense'}
+    },
+    mining: {
+      name:'Mining', icon:'⛏️', color:'#b8c0d8',
+      desc:'Mine ore and stone resources.',
+      milestones: {2:'Sharper swings',5:'Iron vein mastery',8:'Gem chance'}
+    },
+    cooking: {
+      name:'Cooking', icon:'🍲', color:'#ffcf6e',
+      desc:'Prepare food and reduce burn chance.',
+      milestones: {2:'Less burning',5:'Hearty meals',8:'Feast prep'}
+    },
+    crafting: {
+      name:'Crafting', icon:'🧰', color:'#6aa7ff',
+      desc:'Create tools, armor, and utility items.',
+      milestones: {2:'Basic gear',5:'Iron gear',8:'Reinforced kits'}
+    },
+    foraging: {
+      name:'Foraging', icon:'🍄', color:'#b98cff',
+      desc:'Gather berries, herbs, and wild supplies.',
+      milestones: {2:'Extra berries',5:'Herb spotting',8:'Rare finds'}
+    },
+    survival: {
+      name:'Survival', icon:'🔥', color:'#ff9b5c',
+      desc:'Endure hunger, night, and the wilds.',
+      milestones: {2:'Slower hunger',5:'Night resilience',8:'Wilderness veteran'}
+    }
+  };
+
+  D.xpForLevel = function(level){
+    // RuneScape-ish exponential, but tuned for prototype.
+    if(level <= 1) return 0;
+    let points = 0;
+    for(let i=1;i<level;i++) points += Math.floor(i + 300 * Math.pow(2, i/7));
+    return Math.floor(points / 4);
+  };
+
+  D.levelForXp = function(xp){
+    let lvl=1;
+    while(lvl < 99 && xp >= D.xpForLevel(lvl+1)) lvl++;
+    return lvl;
+  };
+
+  D.rollSkillSuccess = function(level, difficulty){
+    // difficulty 1..100. Higher level improves odds.
+    const chance = Math.max(.08, Math.min(.95, .45 + (level*0.035) - (difficulty*0.008)));
+    return Math.random() < chance;
+  };
+})();
+</script>
+<script>
+/* === config/items.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.ITEMS = {
+    coin:{name:'Gold Coin',icon:'🪙',stack:true,type:'currency',desc:'The old world still loves shiny things.',value:1},
+
+    log:{name:'Oak Log',icon:'🪵',stack:true,type:'material',tier:1,desc:'Useful for crafting and campfires.',value:3},
+    pine_log:{name:'Pine Log',icon:'🪵',stack:true,type:'material',tier:2,desc:'Better wood for stronger early builds.',value:7},
+    yew_log:{name:'Yew Log',icon:'🪵',stack:true,type:'material',tier:3,desc:'Rare flexible wood for bows and upgraded structures.',value:18},
+    copper_ore:{name:'Copper Ore',icon:'🟠',stack:true,type:'material',tier:1,desc:'Starter ore for early smithing.',value:8},
+    silver_ore:{name:'Silver Ore',icon:'⚪',stack:true,type:'material',tier:2,desc:'Useful for jewelry and enchantment bases.',value:18},
+    gold_ore:{name:'Gold Ore',icon:'🟡',stack:true,type:'material',tier:3,desc:'Valuable ore used for jewelry and trading.',value:35},
+    raw_fish:{name:'Raw Fish',icon:'🐟',stack:true,type:'food',tier:1,desc:'Can be cooked later into better food.',hunger:8,value:6},
+    raw_trout:{name:'Raw Trout',icon:'🐟',stack:true,type:'food',tier:2,desc:'Better fish from richer waters.',hunger:14,value:13},
+    emerald:{name:'Emerald',icon:'💚',stack:true,type:'gem',tier:2,desc:'Gem used for jewelry and enchantments.',value:55},
+    ruby:{name:'Ruby',icon:'❤️',stack:true,type:'gem',tier:3,desc:'Rare gem used for stronger enchantments.',value:95},
+    stone:{name:'Stone',icon:'🪨',stack:true,type:'material',desc:'A basic building and crafting material.',value:2},
+    berry:{name:'Wild Berry',icon:'🫐',stack:true,type:'food',desc:'Restores a little hunger.',hunger:10,value:2},
+    cooked_berry:{name:'Berry Stew',icon:'🥣',stack:true,type:'food',desc:'Warm, sweet, and safer than raw berries.',hunger:24,value:8},
+    herb:{name:'Bitter Herb',icon:'🌿',stack:true,type:'material',desc:'Used for simple healing salves.',value:7},
+    iron_ore:{name:'Iron Ore',icon:'⛓️',stack:true,type:'material',tier:2,desc:'Ore for better tools and weapons.',value:12},
+    hide:{name:'Torn Hide',icon:'🥾',stack:true,type:'material',desc:'Rough monster hide.',value:5},
+    bone:{name:'Bone Shard',icon:'🦴',stack:true,type:'material',desc:'Sharp, grim crafting material.',value:4},
+    dusk_essence:{name:'Dusk Essence',icon:'🟣',stack:true,type:'material',desc:'Strange energy from night creatures.',value:25},
+
+    crude_sword:{name:'Crude Sword',icon:'🗡️',stack:false,type:'weapon',slot:'weapon',desc:'Better than punching shadows.',value:35},
+    iron_sword:{name:'Iron Sword',icon:'⚔️',stack:false,type:'weapon',slot:'weapon',desc:'A reliable blade.',value:120},
+    wooden_shield:{name:'Wooden Shield',icon:'🛡️',stack:false,type:'armor',slot:'offhand',desc:'Blocks a bit of pain.',value:32},
+    hide_armor:{name:'Hide Armor',icon:'🥋',stack:false,type:'armor',slot:'body',desc:'Light protection from claws.',value:60},
+    iron_armor:{name:'Iron Armor',icon:'🛡️',stack:false,type:'armor',slot:'body',desc:'Heavy, but dependable.',value:210},
+
+    training_bow:{name:'Training Bow',icon:'🏹',stack:false,type:'weapon',slot:'weapon',combatStyle:'range',desc:'A simple bow for ranged survival.',value:45},
+    hunter_bow:{name:'Hunter Bow',icon:'🏹',stack:false,type:'weapon',slot:'weapon',combatStyle:'range',desc:'A stronger bow for island skirmishes.',value:140},
+    oak_staff:{name:'Oak Staff',icon:'🪄',stack:false,type:'weapon',slot:'weapon',combatStyle:'mage',desc:'A basic channeling staff for magic attacks.',value:50},
+    ember_staff:{name:'Ember Staff',icon:'🔥',stack:false,type:'weapon',slot:'weapon',combatStyle:'mage',desc:'A staff humming with warm ember energy.',value:165},
+    leather_hood:{name:'Leather Hood',icon:'🧢',stack:false,type:'armor',slot:'head',desc:'Light ranged headgear.',value:55},
+    ranger_tunic:{name:'Ranger Tunic',icon:'🥋',stack:false,type:'armor',slot:'body',desc:'Light armor made for movement and aim.',value:125},
+    apprentice_hood:{name:'Apprentice Hood',icon:'🧙',stack:false,type:'armor',slot:'head',desc:'Simple mage headwear stitched with old symbols.',value:60},
+    apprentice_robe:{name:'Apprentice Robe',icon:'🥻',stack:false,type:'armor',slot:'body',desc:'Light magical robes for early spellcasters.',value:135},
+    bronze_helm:{name:'Bronze Helm',icon:'🪖',stack:false,type:'armor',slot:'head',desc:'A basic melee helm.',value:70},
+
+    stone_hatchet:{name:'Stone Hatchet',icon:'🪓',stack:false,type:'tool',slot:'tool',skill:'woodcutting',desc:'Chops trees a little faster.',value:25},
+    iron_pickaxe:{name:'Iron Pickaxe',icon:'⛏️',stack:false,type:'tool',slot:'tool',skill:'mining',desc:'Bites deeper into stone and ore.',value:80},
+
+    torch:{name:'Torch',icon:'🔥',stack:true,type:'utility',desc:'A little comfort when dusk arrives.',value:6},
+    health_salve:{name:'Health Salve',icon:'🧪',stack:true,type:'consumable',desc:'Restores health.',heal:28,value:18},
+    campfire:{name:'Campfire Kit',icon:'🏕️',stack:true,type:'utility',desc:'Can cook food and keep the dark away.',value:15}
+  };
+})();
+</script>
+<script>
+/* === config/equipment.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.EQUIPMENT = {
+    fists:{name:'Fists',slot:'weapon',attack:1,accuracy:.62,speed:1.15,range:42},
+    crude_sword:{name:'Crude Sword',slot:'weapon',attack:4,accuracy:.72,speed:1.0,range:50},
+    iron_sword:{name:'Iron Sword',slot:'weapon',attack:8,accuracy:.78,speed:.92,range:54},
+    wooden_shield:{name:'Wooden Shield',slot:'offhand',defense:3,block:.08},
+    hide_armor:{name:'Hide Armor',slot:'body',defense:4,block:.03},
+    iron_armor:{name:'Iron Armor',slot:'body',defense:9,block:.07,movePenalty:.04},
+    bronze_helm:{name:'Bronze Helm',slot:'head',defense:3,block:.02},
+    training_bow:{name:'Training Bow',slot:'weapon',attack:4,accuracy:.74,speed:1.05,range:165,style:'range'},
+    hunter_bow:{name:'Hunter Bow',slot:'weapon',attack:8,accuracy:.80,speed:.96,range:195,style:'range'},
+    oak_staff:{name:'Oak Staff',slot:'weapon',attack:5,accuracy:.70,speed:1.12,range:145,style:'mage'},
+    ember_staff:{name:'Ember Staff',slot:'weapon',attack:10,accuracy:.76,speed:1.02,range:170,style:'mage'},
+    leather_hood:{name:'Leather Hood',slot:'head',defense:1,accuracy:.02},
+    ranger_tunic:{name:'Ranger Tunic',slot:'body',defense:3,accuracy:.03,movePenalty:-.02},
+    apprentice_hood:{name:'Apprentice Hood',slot:'head',defense:1,accuracy:.03},
+    apprentice_robe:{name:'Apprentice Robe',slot:'body',defense:2,accuracy:.04},
+    stone_hatchet:{name:'Stone Hatchet',slot:'tool',woodcutting:2},
+    iron_pickaxe:{name:'Iron Pickaxe',slot:'tool',mining:3}
+  };
+
+  D.STAT_BASE = {
+    hp:100,
+    attack:1,
+    defense:0,
+    accuracy:.62,
+    attackSpeed:1.15,
+    range:42,
+    moveSpeed:180,
+    hungerMax:100
+  };
+
+  D.getEquipmentStats = function(player){
+    const out = {...D.STAT_BASE};
+    const eq = player.equipment || {};
+    const weapon = D.EQUIPMENT[eq.weapon] || D.EQUIPMENT.fists;
+    out.attack += weapon.attack || 0;
+    out.accuracy = weapon.accuracy || out.accuracy;
+    out.attackSpeed = weapon.speed || out.attackSpeed;
+    out.range = weapon.range || out.range;
+
+    ['head','offhand','body','tool'].forEach(slot=>{
+      const item = eq[slot] && D.EQUIPMENT[eq[slot]];
+      if(!item) return;
+      out.defense += item.defense || 0;
+      out.block = (out.block||0) + (item.block||0);
+      out.moveSpeed -= out.moveSpeed * (item.movePenalty||0);
+      if(item.accuracy) out.accuracy += item.accuracy;
+      if(item.woodcutting) out.woodcutting = (out.woodcutting||0)+item.woodcutting;
+      if(item.mining) out.mining = (out.mining||0)+item.mining;
+    });
+    return out;
+  };
+
+  D.CLASSES = D.CLASSES || {
+    wanderer:{
+      name:'Wanderer', icon:'🧭',
+      desc:'Balanced survivor with extra supplies.',
+      items:{log:3,berry:4,torch:2,coin:25},
+      skills:{survival:30,foraging:20},
+      perks:['Light Footed']
+    },
+    brawler:{
+      name:'Brawler', icon:'🥊',
+      desc:'Starts tougher and ready to fight.',
+      items:{crude_sword:1,health_salve:2,coin:10},
+      skills:{combat:60,survival:15},
+      equipment:{weapon:'crude_sword'},
+      perks:['Thick Skin']
+    },
+    gatherer:{
+      name:'Gatherer', icon:'🌲',
+      desc:'Best start for skilling and crafting.',
+      items:{stone_hatchet:1,log:5,stone:5,berry:3,coin:15},
+      skills:{woodcutting:45,mining:25,crafting:20},
+      equipment:{tool:'stone_hatchet'},
+      perks:['Keen Eye']
+    }
+  };
+})();
+</script>
+<script>
+/* === config/enemies.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.ENEMIES = {
+    rat:{
+      name:'Giant Rat', icon:'🐀', color:'#8b6f5a',
+      hp:18, attack:2, defense:0, accuracy:.48, speed:54, aggro:105, attackRange:32, attackCooldown:1.45,
+      xp:18, coins:[1,6], loot:[{id:'hide',min:1,max:1,chance:.25},{id:'bone',min:1,max:1,chance:.2}],
+      day:true, night:true
+    },
+    husk:{
+      name:'Husk', icon:'☠️', color:'#9da6b8',
+      hp:34, attack:4, defense:1, accuracy:.56, speed:66, aggro:165, attackRange:36, attackCooldown:1.55,
+      xp:35, coins:[3,12], loot:[{id:'bone',min:1,max:3,chance:.65},{id:'hide',min:1,max:2,chance:.35},{id:'hide_armor',min:1,max:1,chance:.05},{id:'oak_staff',min:1,max:1,chance:.04}],
+      day:false, night:true
+    },
+    lurker:{
+      name:'Lurker', icon:'👁️', color:'#7b61ff',
+      hp:56, attack:6, defense:2, accuracy:.60, speed:78, aggro:205, attackRange:40, attackCooldown:1.35,
+      xp:68, coins:[8,24], loot:[{id:'dusk_essence',min:1,max:2,chance:.45},{id:'bone',min:2,max:4,chance:.6},{id:'hunter_bow',min:1,max:1,chance:.05},{id:'apprentice_hood',min:1,max:1,chance:.05}],
+      day:false, night:true
+    },
+    nightstalker:{
+      name:'Nightstalker', icon:'🦇', color:'#34204f',
+      hp:95, attack:9, defense:4, accuracy:.64, speed:92, aggro:260, attackRange:44, attackCooldown:1.2,
+      xp:130, coins:[18,55], loot:[{id:'dusk_essence',min:2,max:5,chance:.8},{id:'health_salve',min:1,max:1,chance:.22},{id:'iron_sword',min:1,max:1,chance:.08},{id:'iron_armor',min:1,max:1,chance:.045},{id:'ember_staff',min:1,max:1,chance:.05}],
+      day:false, night:true, elite:true
+    },
+    goblin:{
+      name:'Goblin Raider', icon:'🧌', color:'#5aa35f',
+      hp:44, attack:4, defense:1, accuracy:.57, speed:68, aggro:175, attackRange:38, attackCooldown:1.45,
+      xp:52, coins:[6,18], loot:[{id:'hide',min:1,max:2,chance:.55},{id:'bone',min:1,max:2,chance:.35},{id:'crude_sword',min:1,max:1,chance:.10},{id:'wooden_shield',min:1,max:1,chance:.06},{id:'leather_hood',min:1,max:1,chance:.05}],
+      day:true, night:true
+    }
+  };
+
+  D.SPAWN_TABLES = {
+    day:[
+      {id:'rat',w:82},
+      {id:'goblin',w:18}
+    ],
+    night:[
+      {id:'rat',w:20},
+      {id:'goblin',w:24},
+      {id:'husk',w:34},
+      {id:'lurker',w:17},
+      {id:'nightstalker',w:2}
+    ]
+  };
+
+  D.weightedPick = function(list){
+    const total = list.reduce((a,b)=>a+b.w,0);
+    let r = Math.random()*total;
+    for(const it of list){ r -= it.w; if(r<=0) return it.id; }
+    return list[list.length-1].id;
+  };
+})();
+</script>
+<script>
+/* === config/recipes.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.RECIPES = [
+    {
+      id:'campfire', name:'Campfire Kit', icon:'🏕️', skill:'survival', level:1, xp:12,
+      requires:{log:2,stone:1}, produces:{campfire:1}, station:null,
+      desc:'Craft a portable campfire kit.'
+    },
+    {
+      id:'cooked_berry', name:'Berry Stew', icon:'🥣', skill:'cooking', level:1, xp:16,
+      requires:{berry:2,log:1}, produces:{cooked_berry:1}, station:null,
+      desc:'Cook berries into a better meal.'
+    },
+    {
+      id:'health_salve', name:'Health Salve', icon:'🧪', skill:'crafting', level:2, xp:26,
+      requires:{herb:2,berry:1}, produces:{health_salve:1}, station:null,
+      desc:'A simple restorative salve.'
+    },
+    {
+      id:'crude_sword', name:'Crude Sword', icon:'🗡️', skill:'crafting', level:2, xp:38,
+      requires:{log:1,stone:3}, produces:{crude_sword:1}, station:null,
+      desc:'Basic melee weapon.'
+    },
+    {
+      id:'wooden_shield', name:'Wooden Shield', icon:'🛡️', skill:'crafting', level:2, xp:32,
+      requires:{log:4,hide:1}, produces:{wooden_shield:1}, station:null,
+      desc:'Basic offhand defense.'
+    },
+    {
+      id:'stone_hatchet', name:'Stone Hatchet', icon:'🪓', skill:'crafting', level:2, xp:30,
+      requires:{log:1,stone:2}, produces:{stone_hatchet:1}, station:null,
+      desc:'Improves woodcutting.'
+    },
+    {
+      id:'leather_hood', name:'Leather Hood', icon:'🧢', skill:'crafting', level:2, xp:42,
+      requires:{hide:3,log:1}, produces:{leather_hood:1}, station:null,
+      desc:'Light ranged headgear with a small accuracy bonus.'
+    },
+    {
+      id:'hide_armor', name:'Hide Armor', icon:'🥋', skill:'crafting', level:3, xp:60,
+      requires:{hide:5,bone:2}, produces:{hide_armor:1}, station:null,
+      desc:'Light body armor.'
+    },
+    {
+      id:'ranger_tunic', name:'Ranger Tunic', icon:'🥋', skill:'crafting', level:4, xp:88,
+      requires:{hide:6,log:2,bone:2}, produces:{ranger_tunic:1}, station:null,
+      desc:'Light armor for range builds. Adds accuracy and movement.'
+    },
+    {
+      id:'iron_pickaxe', name:'Iron Pickaxe', icon:'⛏️', skill:'crafting', level:4, xp:80,
+      requires:{iron_ore:4,log:1}, produces:{iron_pickaxe:1}, station:null,
+      desc:'Improves mining.'
+    },
+    {
+      id:'training_bow', name:'Training Bow', icon:'🏹', skill:'crafting', level:3, xp:70,
+      requires:{log:4,hide:1}, produces:{training_bow:1}, station:null,
+      desc:'Basic ranged weapon for safer kiting.'
+    },
+    {
+      id:'oak_staff', name:'Oak Staff', icon:'🪄', skill:'crafting', level:3, xp:72,
+      requires:{log:3,herb:2}, produces:{oak_staff:1}, station:null,
+      desc:'Basic magic weapon for distance attacks.'
+    },
+    {
+      id:'iron_sword', name:'Iron Sword', icon:'⚔️', skill:'crafting', level:5, xp:115,
+      requires:{iron_ore:6,log:1}, produces:{iron_sword:1}, station:null,
+      desc:'Reliable combat weapon.'
+    },
+    {
+      id:'iron_armor', name:'Iron Armor', icon:'🛡️', skill:'crafting', level:6, xp:165,
+      requires:{iron_ore:12,hide:3}, produces:{iron_armor:1}, station:null,
+      desc:'Strong body armor.'
+    },
+    {
+      id:'torch', name:'Torch', icon:'🔥', skill:'survival', level:1, xp:8,
+      requires:{log:1,herb:1}, produces:{torch:2}, station:null,
+      desc:'Useful light source and vendor item.'
+    }
+  ];
+
+  D.getRecipe = id => D.RECIPES.find(r=>r.id===id);
+})();
+</script>
+<script>
+/* === config/tiles.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.TILE = 48;
+  D.WORLD = { w: 96, h: 96, pxW:96*48, pxH:96*48 };
+
+  D.TILES = {
+    grass:{name:'Grass',solid:false,color:'#25472d',variant:'#2f5a39',speed:1},
+    darkgrass:{name:'Dark Grass',solid:false,color:'#1d3427',variant:'#284634',speed:1},
+    dirt:{name:'Dirt',solid:false,color:'#4b3825',variant:'#5d432c',speed:1},
+    path:{name:'Path',solid:false,color:'#6b563b',variant:'#7b6547',speed:1.08},
+    water:{name:'Water',solid:true,color:'#143e5a',variant:'#1b587c',speed:.5},
+    stone:{name:'Stone Floor',solid:false,color:'#424856',variant:'#505867',speed:.96},
+    wall:{name:'Wall',solid:true,color:'#1a202c',variant:'#252d3b',speed:1},
+    sand:{name:'Sand',solid:false,color:'#76633e',variant:'#887347',speed:.92},
+    swamp:{name:'Swamp',solid:false,color:'#263822',variant:'#31452b',speed:.82},
+    plaza:{name:'Town Plaza',solid:false,color:'#7d6a48',variant:'#9a835a',speed:1.08},
+    stonepath:{name:'Stone Path',solid:false,color:'#5f6674',variant:'#737c8c',speed:1.1},
+    woodfloor:{name:'Wood Floor',solid:false,color:'#6b4328',variant:'#805238',speed:1},
+    roof:{name:'Town Roof',solid:true,color:'#2a1820',variant:'#422333',speed:1},
+    fence:{name:'Fence',solid:true,color:'#3b2818',variant:'#5a3a22',speed:1},
+    farmland:{name:'Farmland',solid:false,color:'#5d4524',variant:'#725730',speed:.95}
+  };
+})();
+</script>
+<script>
+/* === config/npcs.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.NPCS = {
+    elder:{
+      name:'Elder Rowan', icon:'🧙', role:'Guide',
+      lines:[
+        'Dusk is not just a time here. It is a hunger.',
+        'Gather by day. Survive by night. That is the first law.',
+        'The old bank still stands. Use it before greed gets you killed.'
+      ],
+      options:[
+        {label:'Any advice?', action:'advice'},
+        {label:'Open quests', action:'quests'}
+      ]
+    },
+    trader:{
+      name:'Mira the Trader', icon:'🧺', role:'Shop',
+      lines:['Coin still talks. Monsters listen too, but coin is friendlier.'],
+      shop:{
+        buy:['berry','cooked_berry','health_salve','torch','stone_hatchet','crude_sword','wooden_shield'],
+        sellMultiplier:.55
+      },
+      options:[{label:'Trade', action:'shop'}]
+    },
+    banker:{
+      name:'Vaultkeeper Ivo', icon:'🏦', role:'Bank',
+      lines:['Deposit what you value. The night charges interest.'],
+      options:[{label:'Open bank', action:'bank'}]
+    }
+  };
+})();
+</script>
+<script>
+/* === config/prices.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.PRICES = {
+    berry:5,cooked_berry:16,health_salve:35,torch:12,
+    log:4,pine_log:9,yew_log:24,stone:3,herb:12,copper_ore:12,iron_ore:22,silver_ore:30,gold_ore:55,raw_fish:8,raw_trout:18,emerald:75,ruby:125,hide:10,bone:8,dusk_essence:55,
+    stone_hatchet:55,iron_pickaxe:155,crude_sword:75,iron_sword:265,wooden_shield:70,hide_armor:130,iron_armor:430,
+    campfire:30
+  };
+  D.priceOf = id => D.PRICES[id] ?? (D.ITEMS[id]?.value || 1);
+})();
+</script>
+<script>
+/* === config/quests.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.QUESTS = {
+    first_night:{
+      name:'Survive the First Night', icon:'🌙',
+      desc:'Prepare supplies and live through your first dusk.',
+      steps:[
+        {type:'collect', id:'log', qty:3, text:'Collect 3 Oak Logs'},
+        {type:'collect', id:'berry', qty:3, text:'Collect 3 Wild Berries'},
+        {type:'surviveNight', qty:1, text:'Survive until dawn'}
+      ],
+      rewards:{xp:{survival:80,foraging:35}, items:{coin:45,health_salve:1}}
+    },
+    bank_run:{
+      name:'A Safer Pocket', icon:'🏦',
+      desc:'Use the bank to store supplies.',
+      steps:[
+        {type:'bankDeposit', qty:1, text:'Deposit any item into the bank'}
+      ],
+      rewards:{xp:{survival:30}, items:{coin:20}}
+    },
+    dusk_hunter:{
+      name:'Dusk Hunter', icon:'⚔️',
+      desc:'Defeat creatures that emerge after dark.',
+      steps:[
+        {type:'kill', id:'husk', qty:3, text:'Defeat 3 Husks'},
+        {type:'collect', id:'dusk_essence', qty:2, text:'Collect 2 Dusk Essence'}
+      ],
+      rewards:{xp:{combat:140,survival:70}, items:{coin:90,iron_ore:4}}
+    }
+  };
+})();
+</script>
+<script>
+/* === config/classes.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.FACTIONS = {
+    ironbound:{name:'Ironbound Order',icon:'🛡️',color:'#9ea7b8',desc:'Fortify land, hold roads, and win through discipline.',buff:{defense:2}},
+    bloodoak:{name:'Bloodoak Clan',icon:'🪓',color:'#ff5c7a',desc:'Aggressive melee raiders who claim turf by force.',buff:{attack:1}},
+    thornwatch:{name:'Thornwatch Rangers',icon:'🏹',color:'#63e6a4',desc:'Scouts and hunters who control forests and crossings.',buff:{accuracy:.03}},
+    ashveil:{name:'Ashveil Stalkers',icon:'🦊',color:'#ff9b5c',desc:'Ambush fighters built around speed, range, and survival.',buff:{moveSpeed:.04}},
+    embercourt:{name:'Ember Court',icon:'🔥',color:'#ffcf6e',desc:'Battle mages who dominate ruins with fire and claim magic.',buff:{attack:1,accuracy:.02}},
+    moonveil:{name:'Moonveil Circle',icon:'🌙',color:'#b98cff',desc:'Mystic defenders who grow stronger around claimed territory.',buff:{defense:1,accuracy:.02}}
+  };
+  D.CLASS_FACTIONS = {
+    melee:['ironbound','bloodoak'],
+    range:['thornwatch','ashveil'],
+    mage:['embercourt','moonveil'],
+    wanderer:['ironbound','thornwatch'],
+    brawler:['ironbound','bloodoak'],
+    gatherer:['thornwatch','ashveil'],
+    prospector:['embercourt','moonveil']
+  };
+  D.getClassFactions = id => D.CLASS_FACTIONS[id] || ['ironbound','thornwatch'];
+
+  D.CLASSES = {
+    melee:{
+      name:'Melee', icon:'⚔️', archetype:'melee',
+      desc:'Sword-and-shield survivor built for close combat and holding territory.',
+      items:{crude_sword:1,wooden_shield:1,bronze_helm:1,health_salve:2,coin:20},
+      skills:{combat:80,survival:25,crafting:10},
+      equipment:{weapon:'crude_sword',offhand:'wooden_shield',head:'bronze_helm'},
+      perks:['thick_skin'],
+      start:{x:18,y:20}, zone:'Ironwake Island'
+    },
+    range:{
+      name:'Range', icon:'🏹', archetype:'range',
+      desc:'Bow-focused scout built for kiting mobs, hunting resources, and controlling forests.',
+      items:{training_bow:1,leather_hood:1,ranger_tunic:1,berry:4,coin:20},
+      skills:{combat:55,foraging:40,survival:25},
+      equipment:{weapon:'training_bow',head:'leather_hood',body:'ranger_tunic'},
+      perks:['keen_eye'],
+      start:{x:78,y:21}, zone:'Thornfall Wilds'
+    },
+    mage:{
+      name:'Mage', icon:'🔮', archetype:'mage',
+      desc:'Staff-wielding caster built around distance, burst damage, and ancient ruins.',
+      items:{oak_staff:1,apprentice_hood:1,apprentice_robe:1,herb:3,torch:2,coin:20},
+      skills:{combat:55,crafting:35,survival:20,foraging:20},
+      equipment:{weapon:'oak_staff',head:'apprentice_hood',body:'apprentice_robe'},
+      perks:['herbalist'],
+      start:{x:50,y:80}, zone:'Moonspire Ruins'
+    },
+    wanderer:{name:'Wanderer', icon:'🧭',archetype:'hybrid',desc:'Balanced survivor with supplies and flexible growth.',items:{log:3,berry:4,torch:2,coin:25},skills:{survival:30,foraging:20},equipment:{},perks:['light_footed'],start:{x:48,y:48},zone:'Central Crossroads'},
+    brawler:{name:'Brawler', icon:'🥊',archetype:'melee',desc:'Tougher start with a crude sword and salves.',items:{crude_sword:1,health_salve:2,coin:10},skills:{combat:60,survival:15},equipment:{weapon:'crude_sword'},perks:['thick_skin'],start:{x:18,y:20},zone:'Ironwake Island'},
+    gatherer:{name:'Gatherer', icon:'🌲',archetype:'range',desc:'Skilling-heavy start for crafting and resource progress.',items:{stone_hatchet:1,log:5,stone:5,berry:3,coin:15},skills:{woodcutting:45,mining:25,crafting:20},equipment:{tool:'stone_hatchet'},perks:['keen_eye'],start:{x:78,y:21},zone:'Thornfall Wilds'},
+    prospector:{name:'Prospector', icon:'⛏️',archetype:'mage',desc:'Mining and money-focused start near ancient stone routes.',items:{stone:8,iron_ore:2,berry:2,coin:35},skills:{mining:55,crafting:15},equipment:{},perks:['coin_sense'],start:{x:50,y:80},zone:'Moonspire Ruins'}
+  };
+})();
+</script>
+<script>
+/* === config/perks.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.PERKS = {
+    light_footed:{name:'Light Footed',icon:'👟',desc:'+5% movement speed.', apply:p=>p.mods.moveSpeed=(p.mods.moveSpeed||0)+.05},
+    thick_skin:{name:'Thick Skin',icon:'💪',desc:'+3 defense.', apply:p=>p.mods.defense=(p.mods.defense||0)+3},
+    keen_eye:{name:'Keen Eye',icon:'👁️',desc:'+10% chance for extra gathered resources.', apply:p=>p.mods.extraGather=(p.mods.extraGather||0)+.10},
+    coin_sense:{name:'Coin Sense',icon:'🪙',desc:'+15% coins from enemies.', apply:p=>p.mods.coinBonus=(p.mods.coinBonus||0)+.15},
+    night_owl:{name:'Night Owl',icon:'🦉',desc:'Reduced night hunger drain.', apply:p=>p.mods.nightHunger=(p.mods.nightHunger||0)+.25},
+    iron_grip:{name:'Iron Grip',icon:'✊',desc:'+5% melee accuracy.', apply:p=>p.mods.accuracy=(p.mods.accuracy||0)+.05},
+    efficient_crafter:{name:'Efficient Crafter',icon:'🧵',desc:'10% chance not to consume one material.', apply:p=>p.mods.craftSave=(p.mods.craftSave||0)+.10},
+    herbalist:{name:'Herbalist',icon:'🌿',desc:'Healing items restore +20%.', apply:p=>p.mods.healBonus=(p.mods.healBonus||0)+.20},
+    lumberjack:{name:'Lumberjack',icon:'🪓',desc:'+1 woodcutting tool power.', apply:p=>p.mods.woodcutting=(p.mods.woodcutting||0)+1},
+    stoneblood:{name:'Stoneblood',icon:'🪨',desc:'+1 mining tool power and +1 defense.', apply:p=>{p.mods.mining=(p.mods.mining||0)+1;p.mods.defense=(p.mods.defense||0)+1}}
+  };
+
+  D.PERK_LEVELS = [
+    {skill:'combat',level:3,perk:'iron_grip'},
+    {skill:'combat',level:5,perk:'stoneblood'},
+    {skill:'survival',level:3,perk:'night_owl'},
+    {skill:'crafting',level:4,perk:'efficient_crafter'},
+    {skill:'foraging',level:4,perk:'herbalist'},
+    {skill:'woodcutting',level:4,perk:'lumberjack'}
+  ];
+})();
+</script>
+
+<!-- Engine (rendering / input / timing) -->
+<script>
+/* === engine/game.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.Game = function(){
+    this.canvas = document.getElementById('game');
+    this.ctx = this.canvas.getContext('2d');
+    this.w = 0; this.h = 0; this.dpr = 1;
+    this.last = performance.now();
+    this.accum = 0;
+    this.fixedDt = 1/60;
+    this.running = false;
+    this.paused = true;
+    this.state = 'menu';
+    this.time = 0;
+    this.tick = 0;
+    this.seed = Math.floor(Math.random()*9999999);
+    this.entities = {resources:[], enemies:[], npcs:[], portals:[], projectiles:[], drops:[], effects:[]};
+    this.world = null;
+    this.player = null;
+    this.camera = null;
+    this.input = null;
+    this.ui = null;
+    this.systems = {};
+    this.flags = {survivedNights:0, lastNight:false, bankDeposits:0};
+    this.stats = {kills:{}, deaths:0, resourcesGathered:0, crafted:0};
+    this.hotbar={selected:0,slots:['crude_sword','training_bow','oak_staff','stone_hatchet','iron_pickaxe','health_salve','berry','campfire']};
+    this.settings = {
+      hungerEnabled:false,
+      cameraMode:'iso',
+      keybinds:{
+        inventory:'tab', skills:'k', crafting:'c', quests:'v', bank:'b', map:'m', interact:'f', attack:' ', pause:'escape', zoomIn:'=', zoomOut:'-', save:'f5', cameraToggle:'r', cameraOverhead:'o', rotateLeft:'q', rotateRight:'e', buildToggle:'g', buildCycle:'t'
+      }
+    };
+    this.menuMode = 'main';
+    this.buildMode = false;
+  };
+
+  D.Game.prototype.resize = function(){
+    this.dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    this.w = Math.floor(innerWidth * this.dpr);
+    this.h = Math.floor(innerHeight * this.dpr);
+    this.canvas.width = this.w;
+    this.canvas.height = this.h;
+    this.canvas.style.width = innerWidth+'px';
+    this.canvas.style.height = innerHeight+'px';
+    this.ctx.setTransform(this.dpr,0,0,this.dpr,0,0);
+    this.viewW = innerWidth; this.viewH = innerHeight;
+  };
+
+  D.Game.prototype.init = function(){
+    this.resize();
+    addEventListener('resize',()=>this.resize());
+    this.input = new D.Input(this);
+    this.camera = new D.Camera(this);
+    this.ui = new D.UI(this);
+    this.systems.inventory = new D.InventorySystem(this);
+    this.systems.skills = new D.SkillSystem(this);
+    this.systems.perks = new D.PerkSystem(this);
+    this.systems.quests = new D.QuestSystem(this);
+    this.systems.combat = new D.CombatSystem(this);
+    this.systems.ai = new D.AISystem(this);
+    this.systems.daynight = new D.DayNightSystem(this);
+    this.systems.survival = new D.SurvivalSystem(this);
+    this.systems.crafting = new D.CraftingSystem(this);
+    this.systems.economy = new D.EconomySystem(this);
+    this.systems.bank = new D.BankSystem(this);
+    this.systems.build = new D.BuildSystem(this);
+    this.systems.gathering = new D.GatheringSystem(this);
+    this.systems.dungeon = new D.DungeonSystem(this);
+    this.systems.loot = new D.LootSystem(this);
+    this.systems.save = new D.SaveSystem(this);
+    this.ui.showMenu();
+    this.running = true;
+    requestAnimationFrame(t=>this.loop(t));
+  };
+
+  D.Game.prototype.newGame = function(classId='wanderer', factionId=null){
+    this.seed = Math.floor(Math.random()*9999999);
+    this.time = 0; this.tick = 0; this.flags = {survivedNights:0,lastNight:false,bankDeposits:0};
+    this.stats = {kills:{},deaths:0,resourcesGathered:0,crafted:0};
+    this.world = D.generateWorld(this.seed);
+    this.entities = {resources:[], enemies:[], npcs:[], portals:[], projectiles:[], drops:[], effects:[]};
+    D.populateWorld(this);
+    this.player = D.createPlayer(this, classId, factionId);
+    this.camera.setIso();
+    this.camera.snapTo(this.player.x,this.player.y);
+    this.systems.quests.init();
+    this.paused = false;
+    this.state = 'play';
+    this.ui.closeAll();
+    this.ui.toast('Welcome to UNK-SCAPE', `${this.player.zoneName} • ${this.player.factionName}`, 'gold');
+    this.ui.log('Your boots hit the dirt. Dusk will come soon.', 'gold');
+  };
+
+  D.Game.prototype.loadGame = function(data){
+    this.seed = data.seed || 1;
+    this.time = data.time || 0;
+    this.flags = data.flags || {survivedNights:0,lastNight:false,bankDeposits:0};
+    this.stats = data.stats || {kills:{},deaths:0,resourcesGathered:0,crafted:0};
+    this.world = D.generateWorld(this.seed);
+    this.entities = {resources:[], enemies:[], npcs:[], portals:[], projectiles:[], drops:[], effects:[]};
+    D.populateWorld(this);
+    this.player = D.createPlayer(this, data.classId || 'wanderer', data.factionId || null);
+    D.applyPlayerSave(this.player, data.player);
+    if(data.resources){
+      const depleted = new Set(data.resources.depleted||[]);
+      this.entities.resources.forEach(r=>{ if(depleted.has(r.uid)) r.amount=0; });
+    }
+    this.systems.inventory.fromSave(data.inventory);
+    this.systems.bank.fromSave(data.bank);
+    this.systems.quests.fromSave(data.quests);
+    this.systems.perks.reapply();
+    this.camera.snapTo(this.player.x,this.player.y);
+    this.paused=false; this.state='play'; this.ui.closeAll();
+    this.ui.toast('Game Loaded', 'Welcome back to the dusk.', 'good');
+  };
+
+  D.Game.prototype.loop = function(now){
+    if(!this.running) return;
+    const dt = Math.min(.05, (now-this.last)/1000);
+    this.last = now;
+    if(!this.paused){
+      this.accum += dt;
+      while(this.accum >= this.fixedDt){
+        this.update(this.fixedDt);
+        this.accum -= this.fixedDt;
+      }
+    }
+    D.render(this);
+    this.ui.update();
+    requestAnimationFrame(t=>this.loop(t));
+  };
+
+  D.Game.prototype.update = function(dt){
+    this.time += dt;
+    this.tick++;
+    this.input.update(dt);
+    this.systems.daynight.update(dt);
+    if(this.settings.hungerEnabled) this.systems.survival.update(dt); else if(this.player) this.player.hunger = this.player.maxHunger;
+    this.player.update(dt);
+    this.systems.ai.update(dt);
+    if(this.systems.gathering) this.systems.gathering.update(dt);
+    this.systems.combat.update(dt);
+    this.systems.dungeon.update(dt);
+    this.entities.projectiles.forEach(p=>p.update(dt));
+    this.entities.projectiles = this.entities.projectiles.filter(p=>!p.dead);
+    this.entities.effects.forEach(e=>e.t-=dt);
+    this.entities.effects = this.entities.effects.filter(e=>e.t>0);
+    this.camera.update(dt);
+    this.systems.quests.update(dt);
+    if(this.tick % 300 === 0) this.systems.save.autosave();
+  };
+
+  D.rand = function(seed){
+    let s = seed >>> 0;
+    return function(){
+      s = (s * 1664525 + 1013904223) >>> 0;
+      return s / 4294967296;
+    };
+  };
+
+  D.dist = (a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+  D.clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
+  D.lerp = (a,b,t)=>a+(b-a)*t;
+  D.uid = (()=>{let i=1; return p=>(p||'id')+'_'+(i++).toString(36);})();
+})();
+</script>
+<script>
+/* === engine/input.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.Input = function(game){
+    this.game=game;
+    this.keys={}; this.pressed={}; this.waitingForBind=null;
+    this.mouse={x:0,y:0,worldX:0,worldY:0,leftDown:false,rightDown:false,leftStarted:0,leftHeld:0,rightStarted:0};
+    addEventListener('keydown',e=>this.onKey(e,true));
+    addEventListener('keyup',e=>this.onKey(e,false));
+    game.canvas.addEventListener('mousemove',e=>this.onMouseMove(e));
+    game.canvas.addEventListener('mousedown',e=>this.onMouseDown(e));
+    addEventListener('mouseup',e=>this.onMouseUp(e));
+    game.canvas.addEventListener('wheel',e=>{e.preventDefault(); game.camera.setZoom(e.deltaY < 0 ? 0.12 : -0.12, true);},{passive:false});
+    game.canvas.addEventListener('contextmenu',e=>e.preventDefault());
+  };
+  D.Input.prototype.cleanKey=function(k){return k===' '?' ':String(k||'').toLowerCase();};
+  D.Input.prototype.onKey=function(e,down){
+    const k=this.cleanKey(e.key);
+    if(this.waitingForBind && down){
+      this.game.settings.keybinds[this.waitingForBind]=k;
+      this.game.ui.toast('Keybind Updated', `${this.waitingForBind} is now ${D.displayKey(k)}.`, 'good');
+      this.waitingForBind=null;
+      this.game.ui.renderMenu();
+      e.preventDefault();
+      return;
+    }
+    if(down && !this.keys[k]) this.pressed[k]=true;
+    this.keys[k]=down;
+    const binds=Object.values(this.game.settings.keybinds||{});
+    if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright','tab',' ','escape','1','2','3','4',...binds].includes(k)) e.preventDefault();
+    if(down) this.handleHotkey(k);
+  };
+  D.Input.prototype.actionForKey=function(k){
+    const binds=this.game.settings.keybinds||{};
+    for(const [action,key] of Object.entries(binds)) if(key===k) return action;
+    return null;
+  };
+  D.Input.prototype.handleHotkey=function(k){
+    const g=this.game, action=this.actionForKey(k);
+    if(action==='pause'){ g.ui.toggleMenu(); return; }
+    if(g.state==='menu') return;
+    if(action==='zoomIn'){g.camera.setZoom(.12);return;}
+    if(action==='zoomOut'){g.camera.setZoom(-.12);return;}
+    if(action==='cameraToggle'){g.camera.toggleMode();return;}
+    if(action==='cameraOverhead'){g.camera.setOverhead();return;}
+    if(action==='rotateLeft'){g.camera.rotate(-Math.PI/12);return;}
+    if(action==='rotateRight'){g.camera.rotate(Math.PI/12);return;}
+    if(action==='buildToggle'){g.systems.build.toggle();return;}
+    if(action==='buildCycle'){g.systems.build.cycle();return;}
+    if(action==='save'){g.systems.save.save();return;}
+    if(g.paused && !['inventory','skills','crafting','quests','bank','map'].includes(action)) return;
+    if(action==='inventory') g.ui.togglePanel('inventory');
+    if(action==='skills') g.ui.togglePanel('skills');
+    if(action==='crafting') g.ui.togglePanel('crafting');
+    if(action==='quests') g.ui.togglePanel('quests');
+    if(action==='bank') g.ui.togglePanel('bank');
+    if(action==='map') g.ui.togglePanel('map');
+    if(action==='interact') g.player.tryInteract();
+    if(action==='attack') g.systems.combat.playerAttack(false);
+    if(['1','2','3','4','5','6','7','8'].includes(k)){g.systems.inventory.useHotbar(Number(k)-1);return;}
+  };
+  D.Input.prototype.onMouseMove=function(e){
+    const rect=this.game.canvas.getBoundingClientRect();
+    this.mouse.x=e.clientX-rect.left;
+    this.mouse.y=e.clientY-rect.top;
+  };
+  D.Input.prototype.onMouseDown=function(e){
+    if(this.game.state!=='play'||this.game.paused) return;
+    const world=this.game.camera.screenToWorld(this.mouse.x,this.mouse.y);
+    this.mouse.worldX=world.x;this.mouse.worldY=world.y;
+    if(this.game.buildMode){
+      if(e.button===0) this.game.systems.build.placeAt(this.mouse.worldX,this.mouse.worldY);
+      if(e.button===2) this.game.systems.build.removeAt(this.mouse.worldX,this.mouse.worldY);
+      return;
+    }
+    if(e.button===0 && this.game.systems.gathering && this.game.systems.gathering.tryStartAt(this.mouse.worldX,this.mouse.worldY)) return;
+    if(e.button===0){this.mouse.leftDown=true;this.mouse.leftStarted=performance.now();this.mouse.leftHeld=0;}
+    if(e.button===2){this.mouse.rightDown=true;this.mouse.rightStarted=performance.now();if(this.game.player)this.game.player.blocking=true;}
+  };
+  D.Input.prototype.onMouseUp=function(e){
+    if(e.button===0 && this.mouse.leftDown){
+      const held=(performance.now()-this.mouse.leftStarted)/1000;
+      this.mouse.leftDown=false;this.mouse.leftHeld=0;
+      if(this.game.state==='play'&&!this.game.paused)this.game.systems.combat.releasePrimary(held);
+    }
+    if(e.button===2){this.mouse.rightDown=false;if(this.game.player)this.game.player.blocking=false;}
+  };
+  D.Input.prototype.update=function(dt){
+    if(this.mouse.leftDown)this.mouse.leftHeld=(performance.now()-this.mouse.leftStarted)/1000;
+    const world=this.game.camera.screenToWorld(this.mouse.x,this.mouse.y);
+    this.mouse.worldX=world.x;this.mouse.worldY=world.y;
+    if(this.game.player)this.game.player.blocking=!!this.mouse.rightDown;
+    this.pressed={};
+  };
+  D.Input.prototype.axis=function(){
+    let x=0,y=0,k=this.keys;
+    if(k.w||k.arrowup) y--;
+    if(k.s||k.arrowdown) y++;
+    if(k.a||k.arrowleft) x--;
+    if(k.d||k.arrowright) x++;
+    const len=Math.hypot(x,y)||1;
+    return {x:x/len,y:y/len};
+  };
+  D.Input.prototype.startRebind=function(action){this.waitingForBind=action;this.game.ui.renderMenu();};
+  D.displayKey=function(k){return k===' '?'SPACE':k==='escape'?'ESC':k==='tab'?'TAB':String(k).toUpperCase();};
+})();
+</script>
+<script>
+/* === engine/camera.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.Camera = function(game){
+    this.game=game;this.x=0;this.y=0;this.shake=0;
+    this.zoom=1.02;this.targetZoom=1.02;this.minZoom=.58;this.maxZoom=1.85;
+    this.angle=0;this.targetAngle=this.angle;
+    this.pitch=.70;this.targetPitch=.70;
+    this.deadzone=34;this.lookAhead=54;
+  };
+  D.Camera.prototype.snapTo=function(x,y){this.x=x-this.game.viewW/2;this.y=y-this.game.viewH/2;this.clamp();};
+  D.Camera.prototype.update=function(dt){
+    const p=this.game.player;if(!p)return;
+    const leadX=(p.dir?.x||0)*this.lookAhead;
+    const leadY=(p.dir?.y||0)*this.lookAhead;
+    const targetX=p.x+leadX-this.game.viewW/2;
+    const targetY=p.y+leadY-this.game.viewH/2;
+    const dx=targetX-this.x, dy=targetY-this.y;
+    if(Math.hypot(dx,dy)>this.deadzone){
+      this.x=D.lerp(this.x,targetX,1-Math.pow(.006,dt));
+      this.y=D.lerp(this.y,targetY,1-Math.pow(.006,dt));
+    }
+    this.zoom=D.lerp(this.zoom,this.targetZoom,1-Math.pow(.018,dt));
+    this.angle=D.lerp(this.angle,this.targetAngle,1-Math.pow(.018,dt));
+    this.pitch=D.lerp(this.pitch,this.targetPitch,1-Math.pow(.018,dt));
+    if(this.shake>0) this.shake=Math.max(0,this.shake-dt*12);
+    this.clamp();
+  };
+  D.Camera.prototype.setZoom=function(delta,silent=false){
+    this.targetZoom=D.clamp(this.targetZoom+delta,this.minZoom,this.maxZoom);
+    if(this.game.ui && !silent) this.game.ui.toast('Camera Zoom', Math.round(this.targetZoom*100)+'%', 'good');
+  };
+  D.Camera.prototype.modeLabel=function(){return this.game.settings.cameraMode==='iso'?'2.5D Aerial':'Overhead';};
+  D.Camera.prototype.toggleMode=function(){
+    if(this.game.settings.cameraMode==='iso') this.setOverhead();
+    else this.setIso();
+  };
+  D.Camera.prototype.setIso=function(){
+    this.game.settings.cameraMode='iso';
+    this.targetAngle=0;
+    this.targetPitch=.70;
+    this.game.ui.toast('Camera Mode','Centered 2.5D aerial view enabled. Use Q/E only when you want to rotate.', 'gold');
+  };
+  D.Camera.prototype.setOverhead=function(){
+    this.game.settings.cameraMode='top';
+    this.targetAngle=0;
+    this.targetPitch=1;
+    this.game.ui.toast('Camera Mode','Overhead view enabled.', 'good');
+  };
+  D.Camera.prototype.rotate=function(delta){
+    this.targetAngle+=delta;
+    if(this.targetAngle>Math.PI)this.targetAngle-=Math.PI*2;
+    if(this.targetAngle<-Math.PI)this.targetAngle+=Math.PI*2;
+    this.game.settings.cameraMode='iso';
+    this.targetPitch=.70;
+  }; 
+  D.Camera.prototype.clamp=function(){
+    const W=D.WORLD.pxW,H=D.WORLD.pxH;
+    this.x=D.clamp(this.x,-this.game.viewW*.25,Math.max(0,W-this.game.viewW*.75));
+    this.y=D.clamp(this.y,-this.game.viewH*.25,Math.max(0,H-this.game.viewH*.75));
+  };
+  D.Camera.prototype.apply=function(ctx){
+    let sx=0,sy=0;
+    if(this.shake>0){sx=(Math.random()-.5)*this.shake*6;sy=(Math.random()-.5)*this.shake*6;}
+    const cx=this.x+this.game.viewW/2, cy=this.y+this.game.viewH/2;
+    ctx.translate(this.game.viewW/2+sx,this.game.viewH/2+sy);
+    const pitch=this.game.settings.cameraMode==='iso'?this.pitch:1;
+    ctx.scale(this.zoom,this.zoom*pitch);
+    if(Math.abs(this.angle)>0.001) ctx.rotate(this.angle);
+    ctx.translate(-cx,-cy);
+  };
+  D.Camera.prototype.worldToScreen=function(wx,wy){
+    const cx=this.x+this.game.viewW/2, cy=this.y+this.game.viewH/2;
+    let dx=wx-cx, dy=wy-cy, rx=dx, ry=dy;
+    const pitch=this.game.settings.cameraMode==='iso'?this.pitch:1;
+    if(Math.abs(this.angle)>0.001){
+      const c=Math.cos(this.angle),s=Math.sin(this.angle);
+      rx=dx*c-dy*s; ry=dx*s+dy*c;
+    }
+    return {x:this.game.viewW/2+rx*this.zoom,y:this.game.viewH/2+ry*this.zoom*pitch};
+  };
+  D.Camera.prototype.screenToWorld=function(sx,sy){
+    const cx=this.x+this.game.viewW/2, cy=this.y+this.game.viewH/2;
+    let rx=(sx-this.game.viewW/2)/this.zoom;
+    const pitch=this.game.settings.cameraMode==='iso'?this.pitch:1;
+    let ry=(sy-this.game.viewH/2)/(this.zoom*pitch);
+    if(Math.abs(this.angle)>0.001){
+      const c=Math.cos(-this.angle),s=Math.sin(-this.angle);
+      const dx=rx*c-ry*s, dy=rx*s+ry*c;
+      return {x:cx+dx,y:cy+dy};
+    }
+    return {x:cx+rx,y:cy+ry};
+  };
+  D.Camera.prototype.bump=function(amount){this.shake=Math.max(this.shake,amount||1);};
+})();
+</script>
+<script>
+/* === engine/render.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+
+  D.render = function(g){
+    const ctx=g.ctx;
+    ctx.setTransform(g.dpr,0,0,g.dpr,0,0);
+    ctx.clearRect(0,0,g.viewW,g.viewH);
+    if(!g.world){ drawMenuBg(g,ctx); return; }
+
+    ctx.save();
+    g.camera.apply(ctx);
+    drawTiles(g,ctx);
+    drawTileDepth(g,ctx);
+    drawBuildGhost(g,ctx);
+    drawGatheringNodes(g,ctx);
+    drawResources(g,ctx);
+    drawDrops(g,ctx);
+    drawNPCs(g,ctx);
+    drawPortals(g,ctx);
+    drawProjectiles(g,ctx);
+    drawEnemies(g,ctx);
+    drawPlayer(g,ctx);
+    drawGatherProgress(g,ctx);
+    drawEffects(g,ctx);
+    ctx.restore();
+    drawLighting(g,ctx);
+    drawVignette(g,ctx);
+  };
+
+  function visibleBounds(g,pad=6){
+    const t=D.TILE;
+    const cx=g.camera.x+g.viewW/2, cy=g.camera.y+g.viewH/2;
+    const reach=(Math.max(g.viewW,g.viewH)/(g.camera.zoom||1.0))*1.35 + t*pad;
+    return {
+      x0:Math.max(0,Math.floor((cx-reach)/t)),
+      y0:Math.max(0,Math.floor((cy-reach)/t)),
+      x1:Math.min(D.WORLD.w,Math.ceil((cx+reach)/t)),
+      y1:Math.min(D.WORLD.h,Math.ceil((cy+reach)/t))
+    };
+  }
+
+  function drawTiles(g,ctx){
+    const b=visibleBounds(g), t=D.TILE;
+    for(let y=b.y0;y<b.y1;y++) for(let x=b.x0;x<b.x1;x++){
+      const id=g.world.tiles[y][x]; const tile=D.TILES[id];
+      ctx.fillStyle=tile.color; ctx.fillRect(x*t,y*t,t,t);
+      // subtle texture
+      const n=g.world.noise[y][x];
+      ctx.fillStyle=n>.52?tile.variant:'rgba(255,255,255,.018)';
+      ctx.globalAlpha=.32;
+      ctx.fillRect(x*t+4+(n*17%8),y*t+5+(n*23%8),t*.45,t*.08);
+      ctx.globalAlpha=1;
+      if(id==='water'){
+        ctx.strokeStyle='rgba(120,205,255,.15)'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(x*t+6,y*t+20+n*10); ctx.quadraticCurveTo(x*t+24,y*t+12,x*t+42,y*t+20+n*10); ctx.stroke();
+      }
+      if(id==='path'){
+        ctx.fillStyle='rgba(255,255,255,.035)';
+        ctx.fillRect(x*t+8,y*t+8,5,4);ctx.fillRect(x*t+31,y*t+28,7,4);
+      }
+    }
+    // grid fade
+    ctx.strokeStyle='rgba(0,0,0,.08)';ctx.lineWidth=1;
+    for(let x=b.x0;x<=b.x1;x++){ctx.beginPath();ctx.moveTo(x*t,b.y0*t);ctx.lineTo(x*t,b.y1*t);ctx.stroke();}
+    for(let y=b.y0;y<=b.y1;y++){ctx.beginPath();ctx.moveTo(b.x0*t,y*t);ctx.lineTo(b.x1*t,y*t);ctx.stroke();}
+  }
+
+  function drawTileDepth(g,ctx){
+    const b=visibleBounds(g), t=D.TILE;
+    const heightMap={wall:34,roof:28,fence:18,woodfloor:8,stonepath:5,plaza:6};
+    for(let y=b.y0;y<b.y1;y++) for(let x=b.x0;x<b.x1;x++){
+      const id=g.world.tiles[y][x], tile=D.TILES[id], h=heightMap[id]||0;
+      if(!h) continue;
+      const px=x*t, py=y*t;
+      ctx.save();
+      ctx.globalAlpha=.88;
+      ctx.fillStyle='rgba(0,0,0,.18)';
+      ctx.fillRect(px+6,py+t-3,t-10,Math.max(4,h*.28));
+      ctx.fillStyle=shade(tile.color,-28);
+      ctx.fillRect(px,py+t-h,t,h);
+      ctx.fillStyle=shade(tile.color,-42);
+      ctx.fillRect(px+t-h*.22,py+h*.15,h*.22,t-h*.15);
+      ctx.strokeStyle='rgba(255,255,255,.07)';
+      ctx.lineWidth=1;
+      ctx.strokeRect(px+2,py+2,t-4,t-4);
+      ctx.restore();
+    }
+  }
+
+  function drawBuildGhost(g,ctx){
+    if(!g.buildMode||!g.player||!g.systems.build)return;
+    const tx=Math.floor(g.input.mouse.worldX/D.TILE), ty=Math.floor(g.input.mouse.worldY/D.TILE);
+    if(tx<0||ty<0||tx>=D.WORLD.w||ty>=D.WORLD.h)return;
+    const tileId=g.systems.build.selected(), tile=D.TILES[tileId];
+    const px=tx*D.TILE, py=ty*D.TILE;
+    const wx=px+D.TILE/2, wy=py+D.TILE/2;
+    const ok=Math.hypot(wx-g.player.x,wy-g.player.y)<=165 && !['water','wall','roof'].includes(g.world.tiles[ty]?.[tx]);
+    ctx.save();
+    ctx.globalAlpha=ok ? .62 : .32;
+    ctx.fillStyle=ok?tile.color:'#ff5c7a';
+    ctx.fillRect(px+3,py+3,D.TILE-6,D.TILE-6);
+    ctx.strokeStyle=ok?'rgba(247,198,91,.95)':'rgba(255,92,122,.95)';
+    ctx.lineWidth=3;
+    ctx.strokeRect(px+3,py+3,D.TILE-6,D.TILE-6);
+    ctx.globalAlpha=1;
+    label(ctx,ok?'Build: '+tile.name:'Blocked',wx,wy-34,ok?'#f7c65b':'#ff5c7a');
+    ctx.restore();
+  }
+
+  function drawGatheringNodes(g,ctx){
+    const sys=g.systems.gathering;
+    if(!sys||!sys.nodes)return;
+    sys.nodes.forEach(node=>{
+      if(!node.active)return;
+      if(!onScreen(g,node,120))return;
+      ctx.save();
+      ctx.translate(node.x,node.y);
+      ctx.fillStyle='rgba(0,0,0,.32)';
+      ellipse(ctx,4,25,30,9);ctx.fill();
+      ctx.fillStyle='#5a351c';
+      round(ctx,-8,-4,16,38,7);ctx.fill();
+      ctx.fillStyle='#1f8f4d';
+      circle(ctx,0,-34,31);ctx.fill();
+      ctx.fillStyle='#38d978';
+      circle(ctx,-10,-45,20);ctx.fill();
+      ctx.strokeStyle='rgba(247,198,91,.95)';
+      ctx.lineWidth=3;
+      circle(ctx,0,-34,36);ctx.stroke();
+      label(ctx,'Harvest Tree',0,-82,'#f7c65b');
+      ctx.restore();
+    });
+  }
+
+  function drawGatherProgress(g,ctx){
+    const sys=g.systems.gathering,p=g.player;
+    if(!sys||!p||!sys.active)return;
+    const pct=D.clamp(sys.timer/sys.duration,0,1);
+    ctx.save();
+    ctx.translate(p.x,p.y-62);
+    ctx.fillStyle='rgba(7,10,17,.82)';
+    round(ctx,-42,-9,84,18,8);ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.18)';
+    ctx.lineWidth=1;round(ctx,-42,-9,84,18,8);ctx.stroke();
+    ctx.fillStyle='#38d978';
+    round(ctx,-38,-5,76*pct,10,5);ctx.fill();
+    ctx.fillStyle='#e9f0ff';
+    ctx.font='10px var(--mono)';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(sys.nodeLabel(sys.active).toUpperCase().slice(0,24),0,-18);
+    ctx.restore();
+  }
+
+  function drawResources(g,ctx){
+    for(const r of g.entities.resources){
+      if(!onScreen(g,r,80) || r.amount<=0) continue;
+      const cfg=r.cfg;
+      ctx.save(); ctx.translate(r.x,r.y);
+      const pulse = r.cooldown>0 ? .55 : 1;
+      ctx.globalAlpha=pulse;
+      if(r.type==='tree'||r.type==='pine'||r.type==='yew'){
+        ctx.fillStyle='rgba(0,0,0,.26)'; ellipse(ctx,5,22,23,7); ctx.fill();
+        ctx.fillStyle='#4a2f19'; round(ctx,-8,-6,16,36,7); ctx.fill();
+        ctx.fillStyle=shade(cfg.color,-12); circle(ctx,0,-28,27); ctx.fill();
+        ctx.fillStyle=cfg.color; circle(ctx,-6,-36,21); ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,.10)'; circle(ctx,-12,-42,7); ctx.fill();
+      }else if(['rock','copper','iron','silver','gold','gem'].includes(r.type)){
+        ctx.fillStyle='rgba(0,0,0,.24)'; ellipse(ctx,3,18,25,7); ctx.fill();
+        ctx.fillStyle=shade(cfg.color,-32); poly(ctx,[[-22,14],[-14,-6],[8,-15],[24,0],[16,20],[-8,22]]); ctx.fill();
+        ctx.fillStyle=cfg.color; poly(ctx,[[-16,8],[-8,-14],[11,-21],[22,-4],[10,8],[-2,13]]); ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,.16)'; poly(ctx,[[-7,-9],[6,-15],[13,-3],[-1,2]]); ctx.fill();
+      }else if(r.type==='fish'){
+        ctx.fillStyle='rgba(0,0,0,.22)'; ellipse(ctx,0,12,26,8); ctx.fill();
+        ctx.strokeStyle='rgba(120,205,255,.65)'; ctx.lineWidth=3; circle(ctx,0,0,19); ctx.stroke();
+        ctx.fillStyle='#7cc7ff'; ctx.font='22px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🐟',0,0);
+      }else if(r.type==='berry'){
+        ctx.fillStyle='#225c39'; circle(ctx,0,0,19); ctx.fill();
+        ctx.fillStyle='#7cc7ff'; for(let i=0;i<5;i++) circle(ctx,Math.cos(i)*10,Math.sin(i*2)*8,3.5),ctx.fill();
+      }else if(r.type==='herb'){
+        ctx.fillStyle=cfg.color; for(let i=0;i<5;i++){ctx.rotate(.8); round(ctx,0,-18,6,18,5);ctx.fill();}
+      }
+      ctx.globalAlpha=1;
+      if(D.dist(g.player,r)<92) label(ctx,`${cfg.action||'Gather'}: ${cfg.name} T${cfg.tier||1}`,0,-44,'#f7c65b');
+      ctx.restore();
+    }
+  }
+
+  function drawNPCs(g,ctx){
+    for(const n of g.entities.npcs){
+      if(!onScreen(g,n,80)) continue;
+      ctx.save();ctx.translate(n.x,n.y);
+      ctx.fillStyle='rgba(0,0,0,.25)'; ellipse(ctx,0,17,22,7); ctx.fill();
+      ctx.fillStyle='rgba(0,0,0,.30)';ellipse(ctx,0,20,24,8);ctx.fill();
+      ctx.fillStyle=shade(n.color||'#6aa7ff',-30);round(ctx,-13,0,26,31,10);ctx.fill();
+      ctx.fillStyle=n.color||'#6aa7ff';round(ctx,-11,-2,22,27,9);ctx.fill();
+      ctx.fillStyle='#d7a86e';circle(ctx,0,-17,11);ctx.fill();
+      ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n.cfg.icon,0,-18);
+      label(ctx,n.cfg.name,0,-34);
+      if(D.dist(g.player,n)<70){label(ctx,'Talk',0,38,'#f7c65b');}
+      ctx.restore();
+    }
+  }
+
+  function drawPortals(g,ctx){
+    for(const p of g.entities.portals){
+      if(!onScreen(g,p,100)) continue;
+      ctx.save();ctx.translate(p.x,p.y);
+      const a=(Math.sin(g.time*3)+1)/2;
+      ctx.strokeStyle=`rgba(185,140,255,${.35+a*.35})`;ctx.lineWidth=5;
+      circle(ctx,0,0,26+a*4);ctx.stroke();
+      ctx.fillStyle='rgba(185,140,255,.12)';circle(ctx,0,0,22);ctx.fill();
+      label(ctx,p.name,0,-43);
+      if(D.dist(g.player,p)<70) label(ctx,'Enter',0,43,'#b98cff');
+      ctx.restore();
+    }
+  }
+
+  function drawEnemies(g,ctx){
+    for(const e of g.entities.enemies){
+      if(!onScreen(g,e,100) || e.dead) continue;
+      const cfg=e.cfg;
+      ctx.save();ctx.translate(e.x,e.y);
+      ctx.fillStyle='rgba(0,0,0,.3)';ellipse(ctx,0,16,22,7);ctx.fill();
+      if(cfg.elite){ctx.strokeStyle='rgba(185,140,255,.45)';ctx.lineWidth=3;circle(ctx,0,0,25+Math.sin(g.time*5)*2);ctx.stroke();}
+      ctx.fillStyle=shade(cfg.color,-30);round(ctx,-15,-1,30,31,12);ctx.fill();
+      ctx.fillStyle=cfg.color;circle(ctx,0,-10,e.r||17);ctx.fill();
+      ctx.fillStyle='rgba(0,0,0,.22)';circle(ctx,6,-5,8);ctx.fill();
+      ctx.font='22px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(cfg.icon,0,-10);
+      // HP bar
+      const w=42,h=6,pct=e.hp/e.maxHp;
+      ctx.fillStyle='rgba(0,0,0,.45)';round(ctx,-w/2,-34,w,h,99);ctx.fill();
+      ctx.fillStyle=pct>.5?'#63e6a4':pct>.25?'#ffcf6e':'#ff5c7a';round(ctx,-w/2,-34,w*pct,h,99);ctx.fill();
+      if(e.targeted){ctx.strokeStyle='rgba(106,167,255,.88)';ctx.lineWidth=3;circle(ctx,0,0,28+Math.sin(g.time*10)*2);ctx.stroke();label(ctx,'TARGET: '+cfg.name,0,-48,'#6aa7ff');}
+      if((e.hitMarker||0)>0){ctx.strokeStyle='rgba(99,230,164,.95)';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-13,-13);ctx.lineTo(13,13);ctx.moveTo(13,-13);ctx.lineTo(-13,13);ctx.stroke();}
+      if((e.missMarker||0)>0){ctx.strokeStyle='rgba(255,92,122,.88)';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,30,0,Math.PI*2);ctx.stroke();}
+      ctx.restore();
+    }
+  }
+
+  function drawPlayer(g,ctx){
+    const p=g.player;if(!p)return;
+    ctx.save();ctx.translate(p.x,p.y);
+    ctx.fillStyle='rgba(0,0,0,.32)';ellipse(ctx,0,18,24,8);ctx.fill();
+    // selection ring
+    ctx.strokeStyle='rgba(106,167,255,.28)';ctx.lineWidth=3;circle(ctx,0,0,24+Math.sin(g.time*4)*1.5);ctx.stroke();
+    const body=p.equipment.body==='iron_armor'?'#9ea7b8':p.equipment.body==='hide_armor'?'#7a5138':'#2f6eea';
+    ctx.fillStyle=shade(body,-32);round(ctx,-13,5,26,30,10);ctx.fill();
+    ctx.fillStyle=body;round(ctx,-12,0,24,31,9);ctx.fill();
+    ctx.fillStyle='#d7a86e';circle(ctx,0,-16,12);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,.16)';circle(ctx,-4,-20,3);ctx.fill();
+    // weapon
+    ctx.strokeStyle=p.equipment.weapon==='iron_sword'?'#dbe4ff':p.equipment.weapon==='crude_sword'?'#c0cadb':'rgba(255,255,255,.25)';ctx.lineWidth=5;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(12,2);ctx.lineTo(31,-18);ctx.stroke();
+    if(p.blocking){
+      ctx.strokeStyle='rgba(106,167,255,.9)';ctx.lineWidth=5;ctx.beginPath();ctx.arc(0,0,32,-1.35,1.35);ctx.stroke();
+      ctx.fillStyle='rgba(106,167,255,.16)';circle(ctx,0,0,34);ctx.fill();
+    }
+    if(p.heavyCharging){
+      const c=D.clamp(p.heavyCharge/.75,0,1);
+      ctx.strokeStyle='rgba(255,92,122,.75)';ctx.lineWidth=3+c*5;ctx.beginPath();ctx.arc(0,0,36+c*16,0,Math.PI*2*c);ctx.stroke();
+    }
+    if(p.attackAnim>0){
+      ctx.strokeStyle=p.lastAttackHeavy?'rgba(255,92,122,.85)':'rgba(255,207,110,.75)';ctx.lineWidth=p.lastAttackHeavy?8:5;
+      ctx.beginPath();ctx.arc(0,0,p.lastAttackHeavy?54:38,-.7,.7);ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawDrops(g,ctx){
+    for(const d of g.entities.drops){
+      if(!onScreen(g,d,60)) continue;
+      const it=D.ITEMS[d.id];
+      ctx.save();ctx.translate(d.x,d.y);
+      ctx.fillStyle='rgba(0,0,0,.25)';ellipse(ctx,0,12,14,5);ctx.fill();
+      ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(it?.icon||'❔',0,0);
+      if(D.dist(g.player,d)<55) label(ctx,(it?.name||d.id)+(d.qty>1?' x'+d.qty:''),0,-24,'#f7c65b');
+      ctx.restore();
+    }
+  }
+
+  function drawProjectiles(g,ctx){
+    for(const p of g.entities.projectiles){
+      ctx.save();ctx.translate(p.x,p.y);ctx.fillStyle=p.color||'#ffcf6e';circle(ctx,0,0,p.r||4);ctx.fill();ctx.restore();
+    }
+  }
+
+  function drawEffects(g,ctx){
+    for(const e of g.entities.effects){
+      ctx.save();ctx.globalAlpha=Math.min(1,e.t*2);ctx.translate(e.x,e.y-e.float*(1-e.t/e.maxT));
+      ctx.font=`800 ${e.size||18}px ${e.font||'Inter'}`;ctx.textAlign='center';ctx.fillStyle=e.color||'#fff';ctx.strokeStyle='rgba(0,0,0,.55)';ctx.lineWidth=4;ctx.strokeText(e.text,0,0);ctx.fillText(e.text,0,0);ctx.restore();
+    }
+  }
+
+  function drawLighting(g,ctx){
+    const dn=g.systems.daynight;if(!dn)return;
+    const night=dn.nightAmount();
+    if(night<=.02)return;
+    ctx.save();
+    ctx.fillStyle=`rgba(5,7,16,${night*.55})`;ctx.fillRect(0,0,g.viewW,g.viewH);
+    // player light
+    const p=g.player; if(p){
+      const screen=g.camera.worldToScreen(p.x,p.y); const sx=screen.x, sy=screen.y;
+      const rad=160 + (g.systems.inventory.has('torch')?80:0);
+      const grad=ctx.createRadialGradient(sx,sy,20,sx,sy,rad);
+      grad.addColorStop(0,`rgba(255,198,91,${night*.24})`);
+      grad.addColorStop(.55,`rgba(255,155,92,${night*.08})`);
+      grad.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.globalCompositeOperation='lighter';ctx.fillStyle=grad;ctx.fillRect(sx-rad,sy-rad,rad*2,rad*2);
+    }
+    ctx.restore();
+  }
+  function drawVignette(g,ctx){
+    const grad=ctx.createRadialGradient(g.viewW/2,g.viewH/2,Math.min(g.viewW,g.viewH)*.25,g.viewW/2,g.viewH/2,Math.max(g.viewW,g.viewH)*.72);
+    grad.addColorStop(0,'rgba(0,0,0,0)');grad.addColorStop(1,'rgba(0,0,0,.38)');ctx.fillStyle=grad;ctx.fillRect(0,0,g.viewW,g.viewH);
+  }
+  function drawMenuBg(g,ctx){
+    const grd=ctx.createLinearGradient(0,0,0,g.viewH);grd.addColorStop(0,'#101827');grd.addColorStop(1,'#05070c');ctx.fillStyle=grd;ctx.fillRect(0,0,g.viewW,g.viewH);
+    for(let i=0;i<80;i++){ctx.fillStyle=`rgba(255,255,255,${.02+(i%5)*.01})`;circle(ctx,(i*97)%g.viewW,(i*53)%g.viewH,1+(i%3));ctx.fill();}
+  }
+  function onScreen(g,o,p=0){const s=g.camera.worldToScreen(o.x,o.y);return s.x>-p&&s.y>-p&&s.x<g.viewW+p&&s.y<g.viewH+p;}
+  function circle(ctx,x,y,r){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2)}
+  function ellipse(ctx,x,y,rx,ry){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2)}
+  function round(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+  function poly(ctx,pts){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath()}
+  function shade(hex,amt){
+    if(!hex||hex[0]!=='#')return hex;
+    let n=parseInt(hex.slice(1),16),r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;
+    r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));
+    return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+  }
+  function label(ctx,text,x,y,color='#e9f0ff'){
+    ctx.font='800 12px Inter';ctx.textAlign='center';ctx.textBaseline='middle';
+    const m=ctx.measureText(text);ctx.fillStyle='rgba(0,0,0,.55)';round(ctx,x-m.width/2-7,y-10,m.width+14,20,8);ctx.fill();
+    ctx.fillStyle=color;ctx.fillText(text,x,y+1);
+  }
+})();
+</script>
+
+<!-- Entities (factories — depend on config) -->
+<script>
+/* === entities/resource.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.RESOURCE_TYPES = {
+    tree:{name:'Oak Tree',item:'log',skill:'woodcutting',tier:1,level:1,xp:18,difficulty:18,color:'#2f7d46',amount:[2,5],respawn:24,action:'Chop'},
+    pine:{name:'Pine Tree',item:'pine_log',skill:'woodcutting',tier:2,level:3,xp:34,difficulty:30,color:'#1f8f5f',amount:[2,4],respawn:38,action:'Chop'},
+    yew:{name:'Yew Tree',item:'yew_log',skill:'woodcutting',tier:3,level:6,xp:72,difficulty:54,color:'#125f4b',amount:[1,3],respawn:65,action:'Chop'},
+    rock:{name:'Stone Outcrop',item:'stone',skill:'mining',tier:1,level:1,xp:14,difficulty:16,color:'#7b8190',amount:[2,5],respawn:26,action:'Mine'},
+    copper:{name:'Copper Vein',item:'copper_ore',skill:'mining',tier:1,level:1,xp:20,difficulty:22,color:'#b87443',amount:[1,4],respawn:36,action:'Mine'},
+    iron:{name:'Iron Vein',item:'iron_ore',skill:'mining',tier:2,level:3,xp:32,difficulty:34,color:'#9d8a70',amount:[1,3],respawn:52,action:'Mine'},
+    silver:{name:'Silver Vein',item:'silver_ore',skill:'mining',tier:2,level:4,xp:42,difficulty:40,color:'#c7ced8',amount:[1,3],respawn:62,action:'Mine'},
+    gold:{name:'Gold Vein',item:'gold_ore',skill:'mining',tier:3,level:6,xp:68,difficulty:58,color:'#d9ad3f',amount:[1,2],respawn:78,action:'Mine'},
+    gem:{name:'Gemstone Cluster',item:'emerald',altItem:'ruby',altChance:.18,skill:'mining',tier:3,level:7,xp:90,difficulty:64,color:'#4de0a1',amount:[1,2],respawn:95,action:'Mine'},
+    berry:{name:'Berry Bush',item:'berry',skill:'foraging',tier:1,level:1,xp:12,difficulty:12,color:'#3e8d55',amount:[2,6],respawn:24,action:'Forage'},
+    herb:{name:'Bitter Herb',item:'herb',skill:'foraging',tier:2,level:2,xp:22,difficulty:26,color:'#66b36a',amount:[1,3],respawn:42,action:'Forage'},
+    fish:{name:'Fishing Spot',item:'raw_fish',altItem:'raw_trout',altChance:.22,skill:'foraging',tier:1,level:1,xp:16,difficulty:18,color:'#4aaee8',amount:[3,8],respawn:32,action:'Fish'}
+  };
+  D.createResource=function(type,x,y,uid){
+    const cfg=D.RESOURCE_TYPES[type];
+    return {uid:uid||D.uid('res'),kind:'resource',type,cfg,x,y,r:24,amount:D.irand(cfg.amount[0],cfg.amount[1]),cooldown:0,
+      update(dt){if(this.amount<=0){this.cooldown-=dt;if(this.cooldown<=0){this.amount=D.irand(cfg.amount[0],cfg.amount[1]);}}}
+    };
+  };
+  D.irand=(a,b)=>Math.floor(a+Math.random()*(b-a+1));
+})();
+</script>
+<script>
+/* === entities/enemy.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.createEnemy=function(type,x,y){
+    const cfg=D.ENEMIES[type];
+    return {
+      uid:D.uid('mob'),kind:'enemy',type,cfg,x,y,vx:0,vy:0,r:17,hp:cfg.hp,maxHp:cfg.hp,dead:false,targeted:false,
+      attackTimer:Math.random(),hitFlash:0,spawnX:x,spawnY:y,wander:Math.random()*10,
+      update(dt,g){
+        if(this.dead)return;
+        this.hitFlash=Math.max(0,this.hitFlash-dt);
+        this.attackTimer=Math.max(0,this.attackTimer-dt);
+      },
+      takeDamage(amount,source){
+        this.hp=Math.max(0,this.hp-amount);this.hitFlash=.12;
+        if(this.hp<=0){this.dead=true;}
+      }
+    };
+  };
+})();
+</script>
+<script>
+/* === entities/npc.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.createNPC=function(id,x,y){
+    const cfg=D.NPCS[id];
+    return {uid:D.uid('npc'),kind:'npc',id,cfg,x,y,r:22,color:id==='banker'?'#f7c65b':id==='trader'?'#63e6a4':'#6aa7ff'};
+  };
+})();
+</script>
+<script>
+/* === entities/portal.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.createPortal=function(id,x,y){return{uid:D.uid('portal'),kind:'portal',id,x,y,r:32,name:id==='dungeon'?'Old Catacombs':'Portal'}};
+})();
+</script>
+<script>
+/* === entities/projectile.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.createProjectile=function(x,y,tx,ty,opts={}){
+    const ang=Math.atan2(ty-y,tx-x), speed=opts.speed||360;
+    return {uid:D.uid('proj'),x,y,vx:Math.cos(ang)*speed,vy:Math.sin(ang)*speed,r:opts.r||4,color:opts.color||'#ffcf6e',life:opts.life||1,dead:false,damage:opts.damage||1,source:opts.source||'player',
+      update(dt){this.x+=this.vx*dt;this.y+=this.vy*dt;this.life-=dt;if(this.life<=0)this.dead=true;}
+    };
+  };
+})();
+</script>
+<script>
+/* === entities/player.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.createPlayer=function(game,classId,factionId=null){
+    const cls=D.CLASSES[classId]||D.CLASSES.wanderer;
+    const allowedFactions=D.getClassFactions(classId);
+    const chosenFaction=factionId&&allowedFactions.includes(factionId)?factionId:allowedFactions[0];
+    const faction=D.FACTIONS[chosenFaction]||D.FACTIONS.ironbound;
+    const start=cls.start||{x:D.WORLD.w/2,y:D.WORLD.h/2};
+    const p={
+      uid:'player',kind:'player',classId,factionId:chosenFaction,factionName:faction.name,zoneName:cls.zone||'Central Crossroads',x:start.x*D.TILE+D.TILE/2,y:start.y*D.TILE+D.TILE/2,r:16,vx:0,vy:0,dir:{x:1,y:0},
+      hp:100,maxHp:100,hunger:100,maxHunger:100,dead:false,attackCooldown:0,attackAnim:0,interactCooldown:0,blocking:false,heavyCharging:false,heavyCharge:0,
+      equipment:{head:null,weapon:null,offhand:null,body:null,tool:null}, skills:{}, perks:[], mods:{},
+      update(dt){
+        if(this.dead)return;
+        const axis=game.input.axis();
+        const stats=this.stats();
+        let sp=stats.moveSpeed;
+        if(this.blocking) sp*=.58;
+        if(this.heavyCharging) sp*=.72;
+        const tile=D.tileAt(game.world,this.x,this.y); if(tile) sp*=D.TILES[tile].speed||1;
+        this.vx=axis.x*sp;this.vy=axis.y*sp;
+        if(axis.x||axis.y)this.dir={x:axis.x,y:axis.y};
+        this.move(dt,game);
+        this.attackCooldown=Math.max(0,this.attackCooldown-dt);
+        this.attackAnim=Math.max(0,this.attackAnim-dt);
+        this.interactCooldown=Math.max(0,this.interactCooldown-dt);
+        this.pickupNearby();
+      },
+      move(dt,g){
+        const nx=this.x+this.vx*dt, ny=this.y+this.vy*dt;
+        if(!D.solidAt(g.world,nx,this.y,this.r)){this.x=D.clamp(nx,this.r,D.WORLD.pxW-this.r);} 
+        if(!D.solidAt(g.world,this.x,ny,this.r)){this.y=D.clamp(ny,this.r,D.WORLD.pxH-this.r);} 
+      },
+      stats(){
+        const s=D.getEquipmentStats(this);
+        s.defense += this.mods.defense||0;
+        s.moveSpeed *= 1+(this.mods.moveSpeed||0);
+        s.accuracy += this.mods.accuracy||0;
+        s.attack += Math.floor((D.levelForXp(this.skills.combat?.xp||0)-1)/2);
+        const faction=D.FACTIONS[this.factionId];
+        if(faction?.buff){
+          s.attack += faction.buff.attack||0;
+          s.defense += faction.buff.defense||0;
+          s.accuracy += faction.buff.accuracy||0;
+          s.moveSpeed *= 1+(faction.buff.moveSpeed||0);
+        }
+        s.maxHp = 100 + (D.levelForXp(this.skills.survival?.xp||0)-1)*4;
+        this.maxHp=s.maxHp; this.maxHunger=s.hungerMax;
+        return s;
+      },
+      takeDamage(n,from){
+        const stats=this.stats();
+        let dmg=Math.max(1,Math.floor(n - stats.defense*.45));
+        if(this.blocking){
+          dmg=Math.max(0,Math.floor(dmg*.32));
+          game.ui.floatText(this.x,this.y-34,dmg>0?'GUARD -'+dmg:'PERFECT BLOCK','#6aa7ff');
+          game.camera.bump(.45);
+          if(Math.random()<.35) game.systems.skills.addXp('combat',1);
+        }else if(Math.random() < (stats.block||0)) {
+          game.ui.floatText(this.x,this.y-30,'BLOCK','#6aa7ff');return 0;
+        }
+        if(dmg>0){this.hp=Math.max(0,this.hp-dmg);game.ui.floatText(this.x,this.y-30,'-'+dmg,'#ff5c7a');game.camera.bump(1.2);}
+        if(this.hp<=0)this.die();
+        return dmg;
+      },
+      heal(n){const bonus=1+(this.mods.healBonus||0);const amt=Math.floor(n*bonus);this.hp=Math.min(this.maxHp,this.hp+amt);game.ui.floatText(this.x,this.y-28,'+'+amt,'#63e6a4');},
+      die(){
+        this.dead=true; game.stats.deaths++; game.paused=true;
+        game.ui.toast('You fell to the dusk', 'You keep your skills, but drop some coins.', 'bad');
+        const coins=game.systems.inventory.count('coin');
+        if(coins>0) game.systems.inventory.remove('coin',Math.ceil(coins*.25));
+        setTimeout(()=>{this.hp=this.maxHp;this.hunger=70;this.x=D.WORLD.pxW/2;this.y=D.WORLD.pxH/2;this.dead=false;game.paused=false;game.camera.snapTo(this.x,this.y);},1200);
+      },
+      pickupNearby(){
+        for(const d of [...game.entities.drops]){
+          if(D.dist(this,d)<34){game.systems.inventory.add(d.id,d.qty);game.entities.drops=game.entities.drops.filter(x=>x!==d);game.ui.log(`Picked up ${D.ITEMS[d.id]?.name||d.id} x${d.qty}`,'good');}
+        }
+      },
+      tryInteract(){
+        if(this.interactCooldown>0)return;this.interactCooldown=.25;
+        const nearNpc=game.entities.npcs.find(n=>D.dist(this,n)<72);
+        if(nearNpc){game.ui.openDialog(nearNpc);return;}
+        const nearPortal=game.entities.portals.find(p=>D.dist(this,p)<72);
+        if(nearPortal){game.systems.dungeon.enter(nearPortal.id);return;}
+        const nearRes=game.entities.resources.filter(r=>r.amount>0 && D.dist(this,r)<80).sort((a,b)=>D.dist(this,a)-D.dist(this,b))[0];
+        if(nearRes){game.ui.log(`${nearRes.cfg.name} is click-based now. Left-click the resource to gather it.`, 'gold');return;}
+        game.ui.log('Nothing close enough to interact with.','bad');
+      }
+    };
+    Object.keys(D.SKILLS).forEach(k=>p.skills[k]={xp:0,level:1});
+    Object.entries(cls.skills||{}).forEach(([k,xp])=>{if(!p.skills[k])p.skills[k]={xp:0,level:1};p.skills[k].xp=xp;p.skills[k].level=D.levelForXp(xp||0);});
+    p.equipment={...p.equipment,...(cls.equipment||{})};
+    p.perks=[...(cls.perks||[])];
+    // inventory setup happens after systems exist
+    setTimeout(()=>{
+      if(game.systems?.inventory){Object.entries(cls.items||{}).forEach(([id,qty])=>game.systems.inventory.add(id,qty,true));game.systems.perks.reapply();}
+    },0);
+    return p;
+  };
+  D.applyPlayerSave=function(p,data={}){
+    p.x=data.x||p.x;p.y=data.y||p.y;p.hp=data.hp||p.hp;p.hunger=data.hunger??p.hunger;p.equipment={head:null,weapon:null,offhand:null,body:null,tool:null,...(data.equipment||p.equipment)};p.skills=data.skills||p.skills;Object.keys(D.SKILLS).forEach(k=>{if(!p.skills[k])p.skills[k]={xp:0,level:1};});p.perks=data.perks||p.perks;p.factionId=data.factionId||p.factionId;p.factionName=D.FACTIONS[p.factionId]?.name||p.factionName;
+  };
+})();
+</script>
+
+<!-- Systems (game logic — depend on entities + config) -->
+<script>
+/* === systems/worldgen.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.generateWorld=function(seed){
+    const rand=D.rand(seed), w=D.WORLD.w,h=D.WORLD.h;
+    const tiles=[],noise=[];
+    for(let y=0;y<h;y++){
+      tiles[y]=[];noise[y]=[];
+      for(let x=0;x<w;x++){
+        const n=fbm(x*.055,y*.055,rand)+fbm(x*.015+40,y*.015-22,rand)*.55;
+        noise[y][x]=(n+1)/2;
+        let id='grass';
+        const dx=x-w/2,dy=y-h/2,d=Math.hypot(dx,dy)/(w*.55);
+        if(noise[y][x]<.27) id='water';
+        else if(noise[y][x]<.33) id='sand';
+        else if(noise[y][x]>.76) id='stone';
+        else if(noise[y][x]>.64) id='darkgrass';
+        else if(noise[y][x]<.39) id='swamp';
+        if(d>.92) id='water';
+        tiles[y][x]=id;
+      }
+    }
+    // upgraded central town: plaza, roads, fenced boundary, buildings, and farmland
+    const cx=Math.floor(w/2),cy=Math.floor(h/2);
+    for(let y=cy-10;y<=cy+10;y++)for(let x=cx-12;x<=cx+12;x++) if(inBounds(x,y,w,h)) tiles[y][x]='dirt';
+    for(let y=cy-4;y<=cy+4;y++)for(let x=cx-5;x<=cx+5;x++) if(inBounds(x,y,w,h)) tiles[y][x]='plaza';
+    for(let x=0;x<w;x++) if(inBounds(x,cy,w,h) && tiles[cy][x]!=='water') tiles[cy][x]='stonepath';
+    for(let y=0;y<h;y++) if(inBounds(cx,y,w,h) && tiles[y][cx]!=='water') tiles[y][cx]='stonepath';
+    for(let x=cx-14;x<=cx+14;x++){ if(inBounds(x,cy-12,w,h)) tiles[cy-12][x]='fence'; if(inBounds(x,cy+12,w,h)) tiles[cy+12][x]='fence'; }
+    for(let y=cy-12;y<=cy+12;y++){ if(inBounds(cx-14,y,w,h)) tiles[y][cx-14]='fence'; if(inBounds(cx+14,y,w,h)) tiles[y][cx+14]='fence'; }
+    tiles[cy][cx-14]='stonepath';tiles[cy][cx+14]='stonepath';tiles[cy-12][cx]='stonepath';tiles[cy+12][cx]='stonepath';
+    rect(tiles,cx-10,cy-8,5,4,'woodfloor');rect(tiles,cx-10,cy-9,5,1,'roof');
+    rect(tiles,cx+6,cy-8,5,4,'woodfloor');rect(tiles,cx+6,cy-9,5,1,'roof');
+    rect(tiles,cx-10,cy+5,5,4,'woodfloor');rect(tiles,cx-10,cy+4,5,1,'roof');
+    rect(tiles,cx+6,cy+5,5,4,'woodfloor');rect(tiles,cx+6,cy+4,5,1,'roof');
+    rect(tiles,cx-18,cy-7,3,7,'farmland');rect(tiles,cx+16,cy+2,4,7,'farmland');
+    return {seed,w,h,tiles,noise};
+  };
+  function fbm(x,y,rand){
+    // deterministic-ish smooth value noise via sin hashing
+    let v=0,a=.5,f=1;
+    for(let i=0;i<4;i++){v+=a*valueNoise(x*f,y*f);f*=2;a*=.5;}
+    return v;
+  }
+  function hash(x,y){let n=Math.sin(x*127.1+y*311.7)*43758.5453123;return n-Math.floor(n)}
+  function smooth(t){return t*t*(3-2*t)}
+  function valueNoise(x,y){
+    const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;
+    const a=hash(xi,yi),b=hash(xi+1,yi),c=hash(xi,yi+1),d=hash(xi+1,yi+1);
+    const u=smooth(xf),v=smooth(yf);
+    return D.lerp(D.lerp(a,b,u),D.lerp(c,d,u),v)*2-1;
+  }
+  function inBounds(x,y,w,h){return x>=0&&y>=0&&x<w&&y<h}
+  function rect(tiles,x,y,w,h,id){for(let yy=y;yy<y+h;yy++)for(let xx=x;xx<x+w;xx++)if(tiles[yy]?.[xx])tiles[yy][xx]=id}
+
+  D.populateWorld=function(game){
+    const rand=D.rand(game.seed+33), w=D.WORLD.w,h=D.WORLD.h,t=D.TILE;
+    const cx=Math.floor(w/2),cy=Math.floor(h/2);
+    // resources
+    for(let y=2;y<h-2;y++) for(let x=2;x<w-2;x++){
+      const tile=game.world.tiles[y][x], n=game.world.noise[y][x], nearTown=Math.hypot(x-cx,y-cy)<12;
+      if(nearTown||D.TILES[tile].solid) continue;
+      let type=null;
+      const r=rand();
+      if((tile==='grass'||tile==='darkgrass') && n>.50 && r<.050) type='tree';
+      else if((tile==='darkgrass'||tile==='grass') && n>.66 && r<.018) type='pine';
+      else if(tile==='darkgrass' && n>.74 && r<.008) type='yew';
+      else if((tile==='stone'||tile==='darkgrass') && n>.70 && r<.028) type='rock';
+      else if(tile==='stone' && n>.72 && r<.018) type='copper';
+      else if(tile==='stone' && n>.80 && r<.016) type='iron';
+      else if(tile==='stone' && n>.84 && r<.010) type='silver';
+      else if(tile==='stone' && n>.88 && r<.006) type='gold';
+      else if(tile==='stone' && n>.91 && r<.004) type='gem';
+      else if(tile==='sand' && n<.45 && r<.025) type='fish';
+      else if((tile==='grass'||tile==='swamp') && n<.55 && r<.035) type='berry';
+      else if((tile==='swamp'||tile==='darkgrass') && r<.018) type='herb';
+      if(type) game.entities.resources.push(D.createResource(type,x*t+t/2,y*t+t/2,`res_${x}_${y}`));
+    }
+    // NPCs in town
+    game.entities.npcs.push(D.createNPC('elder',(cx-4)*t+t/2,(cy-1)*t+t/2));
+    game.entities.npcs.push(D.createNPC('trader',(cx+4)*t+t/2,(cy-1)*t+t/2));
+    game.entities.npcs.push(D.createNPC('banker',(cx-4)*t+t/2,(cy+4)*t+t/2));
+    game.entities.portals.push(D.createPortal('dungeon',(cx+10)*t+t/2,(cy+9)*t+t/2));
+    // enemies
+    for(let i=0;i<22;i++) spawnRandomEnemy(game, rand, false);
+  };
+
+  function spawnRandomEnemy(game, rand, night){
+    const table=night?D.SPAWN_TABLES.night:D.SPAWN_TABLES.day;
+    const type=D.weightedPick(table), t=D.TILE, cx=D.WORLD.w/2,cy=D.WORLD.h/2;
+    for(let tries=0;tries<80;tries++){
+      const x=Math.floor(rand()*D.WORLD.w), y=Math.floor(rand()*D.WORLD.h);
+      if(Math.hypot(x-cx,y-cy)<16) continue;
+      const tile=game.world.tiles[y][x]; if(D.TILES[tile].solid) continue;
+      game.entities.enemies.push(D.createEnemy(type,x*t+t/2,y*t+t/2)); return;
+    }
+  }
+  D.spawnRandomEnemy=spawnRandomEnemy;
+
+  D.tileAt=function(world,x,y){const tx=Math.floor(x/D.TILE),ty=Math.floor(y/D.TILE);return world.tiles[ty]?.[tx]};
+  D.solidAt=function(world,x,y,r=0){
+    const pts=[[x-r,y-r],[x+r,y-r],[x-r,y+r],[x+r,y+r],[x,y]];
+    return pts.some(p=>{const id=D.tileAt(world,p[0],p[1]);return !id||D.TILES[id].solid;});
+  };
+})();
+</script>
+<script>
+/* === systems/inventory.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.InventorySystem=function(game){this.game=game;this.items={};};
+  D.InventorySystem.prototype.add=function(id,qty=1,silent=false){
+    const it=D.ITEMS[id]; if(!it) return false;
+    this.items[id]=(this.items[id]||0)+qty;
+    if(!silent) {this.game.ui.floatText(this.game.player?.x||0,this.game.player?.y||0,`+${qty} ${it.name}`,'#63e6a4');this.game.systems.quests?.notify('collect',id,qty);}
+    return true;
+  };
+  D.InventorySystem.prototype.remove=function(id,qty=1){
+    if((this.items[id]||0)<qty)return false;
+    this.items[id]-=qty;if(this.items[id]<=0)delete this.items[id];return true;
+  };
+  D.InventorySystem.prototype.count=function(id){return this.items[id]||0};
+  D.InventorySystem.prototype.has=function(id,qty=1){return this.count(id)>=qty};
+  D.InventorySystem.prototype.canAfford=function(req){return Object.entries(req||{}).every(([id,q])=>this.has(id,q));};
+  D.InventorySystem.prototype.take=function(req){if(!this.canAfford(req))return false;Object.entries(req).forEach(([id,q])=>this.remove(id,q));return true;};
+  D.InventorySystem.prototype.quickUse=function(id){if(this.has(id))this.use(id);else this.game.ui.toast('Missing item',`You do not have ${D.ITEMS[id]?.name||id}.`,'bad');};
+  D.InventorySystem.prototype.useHotbar=function(index){
+    const g=this.game, id=g.hotbar?.slots?.[index];
+    if(!id){g.ui.toast('Empty Slot',`Hotbar slot ${index+1} is empty.`,'bad');return false;}
+    g.hotbar.selected=index;
+    if(!this.has(id) && !Object.values(g.player.equipment||{}).includes(id)){
+      g.ui.toast('Missing Hotbar Item',`Slot ${index+1}: ${D.ITEMS[id]?.name||id} is not in your backpack.`, 'bad');
+      return false;
+    }
+    const equipped=Object.entries(g.player.equipment||{}).find(([slot,item])=>item===id);
+    if(equipped){g.ui.toast('Selected',`${D.ITEMS[id]?.name||id} is already equipped.`, 'good');return true;}
+    return this.use(id);
+  };
+  D.InventorySystem.prototype.use=function(id){
+    const it=D.ITEMS[id], p=this.game.player;if(!it||!this.has(id))return false;
+    if(it.type==='food'){
+      this.remove(id,1);p.hunger=Math.min(p.maxHunger,p.hunger+(it.hunger||0));this.game.ui.floatText(p.x,p.y-20,'+'+(it.hunger||0)+' hunger','#ffcf6e');this.game.ui.log(`Ate ${it.name}.`,'good');return true;
+    }
+    if(it.type==='consumable'&&it.heal){this.remove(id,1);p.heal(it.heal);this.game.ui.log(`Used ${it.name}.`,'good');return true;}
+    if(['weapon','armor','tool'].includes(it.type)){this.equip(id);return true;}
+    this.game.ui.toast('Cannot use',`${it.name} is not directly usable.`,'bad');return false;
+  };
+  D.InventorySystem.prototype.equip=function(id){
+    const it=D.ITEMS[id], p=this.game.player;if(!it||!it.slot||!this.has(id))return false;
+    const old=p.equipment[it.slot];
+    p.equipment[it.slot]=id;
+    this.remove(id,1); if(old) this.add(old,1,true);
+    this.game.ui.toast('Equipped',it.name,'good');this.game.ui.renderPanel();return true;
+  };
+  D.InventorySystem.prototype.unequip=function(slot){
+    const p=this.game.player,id=p.equipment[slot];if(!id)return;
+    p.equipment[slot]=null;this.add(id,1,true);this.game.ui.renderPanel();
+  };
+  D.InventorySystem.prototype.toSave=function(){return {...this.items};};
+  D.InventorySystem.prototype.fromSave=function(data){this.items={...(data||{})};};
+})();
+</script>
+<script>
+/* === systems/skills.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.SkillSystem=function(game){this.game=game;};
+  D.SkillSystem.prototype.addXp=function(skill,xp){
+    const p=this.game.player,s=p.skills[skill];if(!s)return;
+    const old=D.levelForXp(s.xp);s.xp+=xp;const lvl=D.levelForXp(s.xp);s.level=lvl;
+    this.game.ui.floatText(p.x,p.y-44,`+${xp} ${D.SKILLS[skill].name} XP`,D.SKILLS[skill].color);
+    if(lvl>old){this.game.ui.toast('Level Up!',`${D.SKILLS[skill].name} is now level ${lvl}.`,'gold');this.game.systems.perks.checkUnlocks(skill,lvl);}
+  };
+  D.SkillSystem.prototype.gather=function(res){
+    const p=this.game.player,cfg=res.cfg, level=D.levelForXp(p.skills[cfg.skill].xp), tool=p.stats()[cfg.skill]||0;
+    if(level<cfg.level){this.game.ui.toast('Level too low',`${cfg.name} requires ${D.SKILLS[cfg.skill].name} level ${cfg.level}.`,'bad');return;}
+    const ok=D.rollSkillSuccess(level+tool,cfg.difficulty);
+    if(ok){
+      let qty=1+(Math.random()<.12+((p.mods.extraGather||0))?1:0);
+      qty=Math.min(qty,res.amount);res.amount-=qty;
+      this.game.systems.inventory.add(cfg.item,qty);
+      this.addXp(cfg.skill,cfg.xp*qty);
+      this.game.stats.resourcesGathered+=qty;
+      if(res.amount<=0){res.cooldown=cfg.respawn;this.game.ui.log(`${cfg.name} depleted.`, 'gold');}
+    }else{this.game.ui.floatText(p.x,p.y-35,'Failed','#9aa8c7');this.addXp(cfg.skill,Math.max(1,Math.floor(cfg.xp*.15)));}
+  };
+})();
+</script>
+<script>
+/* === systems/perks.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.PerkSystem=function(game){this.game=game;};
+  D.PerkSystem.prototype.reapply=function(){
+    const p=this.game.player;if(!p)return;p.mods={};
+    for(const id of p.perks||[]){D.PERKS[id]?.apply(p);} 
+  };
+  D.PerkSystem.prototype.unlock=function(id){
+    const p=this.game.player;if(!D.PERKS[id]||p.perks.includes(id))return false;
+    p.perks.push(id);this.reapply();this.game.ui.toast('Perk Unlocked',`${D.PERKS[id].icon} ${D.PERKS[id].name}`,'gold');return true;
+  };
+  D.PerkSystem.prototype.checkUnlocks=function(skill,level){
+    D.PERK_LEVELS.filter(x=>x.skill===skill&&x.level<=level).forEach(x=>this.unlock(x.perk));
+  };
+})();
+</script>
+<script>
+/* === systems/quests.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.QuestSystem=function(game){this.game=game;this.active={};this.completed={};};
+  D.QuestSystem.prototype.init=function(){
+    this.active={};this.completed={};
+    Object.keys(D.QUESTS).forEach(id=>this.start(id));
+  };
+  D.QuestSystem.prototype.start=function(id){if(this.active[id]||this.completed[id])return;this.active[id]={progress:{}};};
+  D.QuestSystem.prototype.notify=function(type,id,qty=1){
+    for(const [qid,st] of Object.entries(this.active)){
+      const q=D.QUESTS[qid];
+      q.steps.forEach((step,i)=>{if(step.type===type && (step.id==null||step.id===id)){const k=i;st.progress[k]=(st.progress[k]||0)+qty;}});
+      this.check(qid);
+    }
+  };
+  D.QuestSystem.prototype.update=function(){this.checkAll();};
+  D.QuestSystem.prototype.checkAll=function(){Object.keys(this.active).forEach(id=>this.check(id));};
+  D.QuestSystem.prototype.check=function(id){
+    const q=D.QUESTS[id], st=this.active[id]; if(!q||!st)return;
+    const done=q.steps.every((s,i)=>(st.progress[i]||0)>=s.qty);
+    if(done){this.complete(id);}
+  };
+  D.QuestSystem.prototype.complete=function(id){
+    const q=D.QUESTS[id]; if(!this.active[id])return;
+    delete this.active[id];this.completed[id]=true;
+    Object.entries(q.rewards.xp||{}).forEach(([sk,xp])=>this.game.systems.skills.addXp(sk,xp));
+    Object.entries(q.rewards.items||{}).forEach(([it,qty])=>this.game.systems.inventory.add(it,qty));
+    this.game.ui.toast('Quest Complete',`${q.icon} ${q.name}`,'gold');
+  };
+  D.QuestSystem.prototype.toSave=function(){return{active:this.active,completed:this.completed};};
+  D.QuestSystem.prototype.fromSave=function(data){this.active=data?.active||{};this.completed=data?.completed||{};};
+})();
+</script>
+<script>
+/* === systems/combat.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.CombatSystem=function(game){this.game=game;this.heavyThreshold=.72;this.maxCharge=1.25;this.baseCritChance=.08;this.baseCritMult=1.65;this.headshotRadius=20;};
+  D.CombatSystem.prototype.weaponStyle=function(player){
+    const w=player?.equipment?.weapon;
+    return D.EQUIPMENT[w]?.style || D.ITEMS[w]?.combatStyle || 'melee';
+  };
+  D.CombatSystem.prototype.rollBonusHit=function(player,enemy,heavy=false){
+    const g=this.game, style=this.weaponStyle(player), aimX=g.input.mouse.worldX, aimY=g.input.mouse.worldY;
+    const combatLevel=D.levelForXp(player.skills.combat?.xp||0);
+    const critChance=this.baseCritChance + Math.min(.12,(combatLevel-1)*.01) + (heavy?.04:0);
+    const headDistance=Math.hypot(enemy.x-aimX,enemy.y-14-aimY);
+    const canHeadshot=style==='range'||style==='mage';
+    const headshot=canHeadshot && headDistance <= this.headshotRadius + (heavy?8:0);
+    const crit=Math.random()<critChance;
+    let mult=1;
+    const tags=[];
+    if(crit){mult*=this.baseCritMult;tags.push('CRIT');}
+    if(headshot){mult*=style==='mage'?1.75:1.9;tags.push('HEADSHOT');}
+    return {crit,headshot,mult,tags,style};
+  };
+  D.CombatSystem.prototype.releasePrimary=function(held){
+    const heavy=held>=this.heavyThreshold;
+    this.playerAttack(heavy, Math.min(held,this.maxCharge));
+  };
+  D.CombatSystem.prototype.playerAttack=function(heavy=false,charge=0){
+    const g=this.game,p=g.player;if(!p||p.dead||p.attackCooldown>0||p.blocking)return;
+    const stats=p.stats();
+    const chargeBonus=D.clamp(charge/this.maxCharge,0,1);
+    const cooldown=heavy?stats.attackSpeed*1.55:stats.attackSpeed;
+    const range=stats.range+(heavy?22:0);
+    const accuracy=D.clamp(stats.accuracy-(heavy ? 0.08 : 0),.1,.96);
+    p.attackCooldown=cooldown;p.attackAnim=heavy ? .28 : .18;p.lastAttackHeavy=heavy;p.heavyCharge=0;p.heavyCharging=false;
+    let targets=g.entities.enemies.filter(e=>!e.dead&&D.dist(p,e)<range+e.r);
+    if(!targets.length){g.ui.floatText(p.x,p.y-32,heavy?'Heavy Swing':'Swing',heavy?'#ff5c7a':'#9aa8c7');return;}
+    const aimX=g.input.mouse.worldX, aimY=g.input.mouse.worldY;
+    targets.sort((a,b)=>{
+      const aAim=Math.hypot(a.x-aimX,a.y-aimY), bAim=Math.hypot(b.x-aimX,b.y-aimY);
+      const aPlayer=D.dist(p,a), bPlayer=D.dist(p,b);
+      return (aAim*.75+aPlayer*.25)-(bAim*.75+bPlayer*.25);
+    });
+    const maxTargets=heavy?Math.min(3,targets.length):1;
+    for(const e of targets.slice(0,maxTargets)){
+      const hit=Math.random()<accuracy;
+      if(hit){
+        e.hitMarker=.2;
+        e.hitFlash=.16;
+        const lvl=D.levelForXp(p.skills.combat.xp);
+        const baseMax=Math.max(3,stats.attack+Math.floor(lvl*.65));
+        const attackMult=heavy?1.45+chargeBonus*.55:1;
+        const bonus=this.rollBonusHit(p,e,heavy);
+        const totalMult=attackMult*bonus.mult;
+        const min=Math.max(1,Math.floor(baseMax*.42*totalMult));
+        const max=Math.max(min,Math.floor(baseMax*totalMult));
+        const raw=D.irand(min,max);
+        const dmg=Math.max(1,Math.floor(raw-(e.cfg.defense||0)*.25));
+        e.takeDamage(dmg,p);
+        const labelText=[heavy?'HEAVY':null,...bonus.tags,'-'+dmg].filter(Boolean).join(' ');
+        const color=bonus.headshot?'#63e6a4':bonus.crit?'#f7c65b':heavy?'#ff5c7a':'#ffcf6e';
+        g.ui.floatText(e.x,e.y-28,labelText,color);
+        if(bonus.crit||bonus.headshot) g.systems.skills.addXp('combat',1);
+        g.camera.bump(bonus.headshot?1.35:heavy?1.05:.45);
+        if(e.dead)this.kill(e);
+      }else{e.missMarker=.2;g.ui.floatText(e.x,e.y-28,'MISS','#9aa8c7');}
+    }
+  };
+  D.CombatSystem.prototype.enemyAttack=function(e){
+    const g=this.game,p=g.player;if(!p||p.dead||e.dead||e.attackTimer>0)return;
+    e.attackTimer=e.cfg.attackCooldown;
+    const hit=Math.random()<e.cfg.accuracy;
+    if(hit)p.takeDamage(D.irand(1,Math.max(1,e.cfg.attack)),e);else g.ui.floatText(p.x,p.y-28,'MISS','#9aa8c7');
+  };
+  D.CombatSystem.prototype.kill=function(e){
+    const g=this.game;
+    g.systems.skills.addXp('combat',e.cfg.xp);
+    g.stats.kills[e.type]=(g.stats.kills[e.type]||0)+1;
+    g.systems.quests.notify('kill',e.type,1);
+    g.systems.loot.dropEnemy(e);
+    g.ui.log(`Defeated ${e.cfg.name}.`,'good');
+    setTimeout(()=>{g.entities.enemies=g.entities.enemies.filter(x=>x!==e);},0);
+  };
+  D.CombatSystem.prototype.update=function(dt){
+    const g=this.game,p=g.player;if(!p)return;
+    const held=g.input.mouse.leftHeld||0;
+    p.heavyCharging=!!g.input.mouse.leftDown && held>=this.heavyThreshold;
+    p.heavyCharge=p.heavyCharging?Math.min(this.maxCharge,held-this.heavyThreshold):0;
+    g.entities.enemies.forEach(e=>{
+      e.targeted=false;
+      e.hitMarker=Math.max(0,(e.hitMarker||0)-dt);
+      e.missMarker=Math.max(0,(e.missMarker||0)-dt);
+    });
+    const aimX=g.input.mouse.worldX, aimY=g.input.mouse.worldY;
+    const near=g.entities.enemies.filter(e=>!e.dead&&D.dist(p,e)<150).sort((a,b)=>{
+      const aAim=Math.hypot(a.x-aimX,a.y-aimY), bAim=Math.hypot(b.x-aimX,b.y-aimY);
+      const aPlayer=D.dist(p,a), bPlayer=D.dist(p,b);
+      return (aAim*.8+aPlayer*.2)-(bAim*.8+bPlayer*.2);
+    })[0];
+    if(near && Math.hypot(near.x-aimX,near.y-aimY)<105) near.targeted=true;
+  };
+})();
+</script>
+<script>
+/* === systems/ai.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.AISystem=function(game){this.game=game;this.spawnTimer=4;};
+  D.AISystem.prototype.update=function(dt){
+    const g=this.game,p=g.player;if(!p)return;
+    const night=g.systems.daynight.isNight();
+    this.spawnTimer-=dt;
+    if(this.spawnTimer<=0){
+      this.spawnTimer=night?5.5:12;
+      const cap=night?42:26;
+      if(g.entities.enemies.length<cap) D.spawnRandomEnemy(g,Math.random,night);
+    }
+    for(const e of g.entities.enemies){
+      e.update(dt,g); if(e.dead) continue;
+      const d=D.dist(e,p), cfg=e.cfg;
+      let tx=e.spawnX,ty=e.spawnY, speed=cfg.speed;
+      if(d<cfg.aggro){tx=p.x;ty=p.y; if(night) speed*=1.08;}
+      else{
+        e.wander-=dt;
+        if(e.wander<=0){e.wander=2+Math.random()*4;e.wx=e.spawnX+(Math.random()-.5)*180;e.wy=e.spawnY+(Math.random()-.5)*180;}
+        tx=e.wx||e.spawnX;ty=e.wy||e.spawnY;speed*=.45;
+      }
+      if(d<cfg.attackRange+e.r+p.r){g.systems.combat.enemyAttack(e); continue;}
+      const ang=Math.atan2(ty-e.y,tx-e.x), nx=e.x+Math.cos(ang)*speed*dt, ny=e.y+Math.sin(ang)*speed*dt;
+      if(!D.solidAt(g.world,nx,e.y,e.r))e.x=nx;
+      if(!D.solidAt(g.world,e.x,ny,e.r))e.y=ny;
+    }
+    g.entities.resources.forEach(r=>r.update(dt));
+  };
+})();
+</script>
+<script>
+/* === systems/daynight.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.DayNightSystem=function(game){this.game=game;this.dayLength=300;};
+  D.DayNightSystem.prototype.phase=function(){return (this.game.time%this.dayLength)/this.dayLength;};
+  D.DayNightSystem.prototype.isNight=function(){const p=this.phase();return p>.62||p<.16;};
+  D.DayNightSystem.prototype.nightAmount=function(){
+    const p=this.phase();
+    if(p>.62) return D.clamp((p-.62)/.16,0,1);
+    if(p<.16) return D.clamp((.16-p)/.16,0,1);
+    return 0;
+  };
+  D.DayNightSystem.prototype.label=function(){
+    const p=this.phase();
+    if(p<.16)return'Dawn'; if(p<.42)return'Day'; if(p<.62)return'Dusk'; if(p<.84)return'Night'; return'Deep Night';
+  };
+  D.DayNightSystem.prototype.update=function(){
+    const is=this.isNight();
+    if(this.game.flags.lastNight && !is){this.game.flags.survivedNights++;this.game.systems.quests.notify('surviveNight',null,1);this.game.ui.toast('Dawn Breaks','You survived the night.','gold');}
+    if(!this.game.flags.lastNight && is){this.game.ui.toast('Night Falls','Hostile creatures grow stronger after dusk.','bad');}
+    this.game.flags.lastNight=is;
+  };
+})();
+</script>
+<script>
+/* === systems/survival.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.SurvivalSystem=function(game){this.game=game;this.timer=0;};
+  D.SurvivalSystem.prototype.update=function(dt){
+    const g=this.game,p=g.player;if(!p||p.dead)return;
+    if(!g.settings.hungerEnabled){p.hunger=p.maxHunger;return;}
+    this.timer+=dt;
+    const night=g.systems.daynight.isNight();
+    const lvl=D.levelForXp(p.skills.survival.xp);
+    let drain=(night?1.25:.72)*(1-Math.min(.35,(lvl-1)*.018));
+    if(night) drain*=1-(p.mods.nightHunger||0);
+    p.hunger=Math.max(0,p.hunger-drain*dt);
+    if(p.hunger<=0 && this.timer>.8){this.timer=0;p.takeDamage(3,{name:'starvation'});g.ui.log('Starvation hurts. Eat something.','bad');}
+    if(this.timer>10){this.timer=0;g.systems.skills.addXp('survival',night?4:2);}
+  };
+})();
+</script>
+<script>
+/* === systems/crafting.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.CraftingSystem=function(game){this.game=game;};
+  D.CraftingSystem.prototype.canCraft=function(recipe){
+    const p=this.game.player;
+    if(!p||!recipe||!recipe.skill||!D.SKILLS[recipe.skill]) return false;
+    if(!p.skills[recipe.skill]) p.skills[recipe.skill]={xp:0,level:1};
+    const lvl=D.levelForXp(p.skills[recipe.skill].xp||0);
+    return lvl>=recipe.level && this.game.systems.inventory.canAfford(recipe.requires);
+  };
+  D.CraftingSystem.prototype.craft=function(id){
+    const r=D.getRecipe(id), g=this.game,p=g.player;if(!r||!p||!D.SKILLS[r.skill])return;
+    if(!p.skills[r.skill]) p.skills[r.skill]={xp:0,level:1};
+    const lvl=D.levelForXp(p.skills[r.skill].xp||0);
+    if(lvl<r.level){g.ui.toast('Level too low',`${r.name} requires ${D.SKILLS[r.skill].name} level ${r.level}.`,'bad');return;}
+    if(!g.systems.inventory.canAfford(r.requires)){g.ui.toast('Missing materials','You do not have the required items.','bad');return;}
+    let req={...r.requires};
+    if(Math.random()<(p.mods.craftSave||0)){
+      const keys=Object.keys(req); if(keys.length){const k=keys[Math.floor(Math.random()*keys.length)]; req[k]=Math.max(0,req[k]-1); if(req[k]===0)delete req[k]; g.ui.log('Efficient Crafter saved a material!','gold');}
+    }
+    g.systems.inventory.take(req);
+    Object.entries(r.produces).forEach(([it,qty])=>g.systems.inventory.add(it,qty));
+    g.systems.skills.addXp(r.skill,r.xp);g.stats.crafted++;
+    g.systems.quests.notify('craft',id,1);
+    g.ui.toast('Crafted',`${r.icon} ${r.name}`,'good');g.ui.renderPanel();
+  };
+})();
+</script>
+<script>
+/* === systems/economy.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.EconomySystem=function(game){this.game=game;};
+  D.EconomySystem.prototype.buy=function(id){
+    const price=D.priceOf(id), inv=this.game.systems.inventory;
+    if(!inv.has('coin',price)){this.game.ui.toast('Not enough coins',`${D.ITEMS[id].name} costs ${price}.`,'bad');return;}
+    inv.remove('coin',price);inv.add(id,1,true);this.game.ui.toast('Purchased',`${D.ITEMS[id].name} for ${price} coins.`,'good');this.game.ui.renderDialog();
+  };
+  D.EconomySystem.prototype.sell=function(id){
+    const inv=this.game.systems.inventory;if(id==='coin')return;
+    if(!inv.has(id)){this.game.ui.toast('Missing item','You do not have that item.','bad');return;}
+    const price=Math.max(1,Math.floor(D.priceOf(id)*.55));
+    inv.remove(id,1);inv.add('coin',price,true);this.game.ui.toast('Sold',`${D.ITEMS[id].name} for ${price} coins.`,'gold');this.game.ui.renderDialog();
+  };
+})();
+</script>
+<script>
+/* === systems/bank.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.BankSystem=function(game){this.game=game;this.items={};};
+  D.BankSystem.prototype.deposit=function(id,qty=1){
+    const inv=this.game.systems.inventory;if(!inv.has(id,qty))return false;
+    inv.remove(id,qty);this.items[id]=(this.items[id]||0)+qty;this.game.flags.bankDeposits++;this.game.systems.quests.notify('bankDeposit',id,1);this.game.ui.renderPanel();return true;
+  };
+  D.BankSystem.prototype.withdraw=function(id,qty=1){
+    if((this.items[id]||0)<qty)return false;
+    this.items[id]-=qty;if(this.items[id]<=0)delete this.items[id];this.game.systems.inventory.add(id,qty,true);this.game.ui.renderPanel();return true;
+  };
+  D.BankSystem.prototype.toSave=function(){return{...this.items};};
+  D.BankSystem.prototype.fromSave=function(data){this.items={...(data||{})};};
+})();
+</script>
+<script>
+/* === systems/gathering.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.GatheringSystem=function(game){
+    this.game=game;
+    this.nodes=[];
+    this.active=null;
+    this.timer=0;
+    this.duration=3;
+    this.respawnTime=10;
+    this.seeded=false;
+  };
+  D.GatheringSystem.prototype.nodeLabel=function(node){
+    if(!node)return 'Gathering';
+    if(node.cfg)return `${node.cfg.action||'Gather'}: ${node.cfg.name}`;
+    return 'Chop: Harvest Tree';
+  };
+  D.GatheringSystem.prototype.gatherDuration=function(node){
+    if(!node||!node.cfg)return 3;
+    const p=this.game.player, lvl=D.levelForXp(p.skills[node.cfg.skill]?.xp||0), tool=p.stats()[node.cfg.skill]||0;
+    return D.clamp(3.4 + (node.cfg.tier||1)*.45 - (lvl+tool)*.10,1.3,5.2);
+  };
+  D.GatheringSystem.prototype.ensureNodes=function(){
+    const g=this.game;
+    if(this.seeded||!g.world||!g.player)return;
+    this.seeded=true;
+    const nodes=[];
+    const tries=260;
+    for(let i=0;i<tries&&nodes.length<3;i++){
+      const angle=Math.random()*Math.PI*2;
+      const dist=160+Math.random()*360;
+      let x=D.clamp(g.player.x+Math.cos(angle)*dist,D.TILE*3,D.WORLD.pxW-D.TILE*3);
+      let y=D.clamp(g.player.y+Math.sin(angle)*dist,D.TILE*3,D.WORLD.pxH-D.TILE*3);
+      const tx=Math.floor(x/D.TILE),ty=Math.floor(y/D.TILE);
+      const tileId=g.world.tiles[ty]?.[tx];
+      if(!tileId||D.TILES[tileId]?.solid||tileId==='water')continue;
+      if(nodes.some(n=>Math.hypot(n.x-x,n.y-y)<140))continue;
+      nodes.push({id:'tree_'+nodes.length,x,y,r:34,active:true,respawn:0,type:'tree'});
+    }
+    while(nodes.length<3){
+      const n=nodes.length;
+      nodes.push({id:'tree_'+n,x:g.player.x+(n-1)*120,y:g.player.y+190+n*40,r:34,active:true,respawn:0,type:'tree'});
+    }
+    this.nodes=nodes;
+  };
+  D.GatheringSystem.prototype.tryStartAt=function(x,y){
+    this.ensureNodes();
+    const g=this.game,p=g.player;
+    if(!p)return false;
+    let node=this.nodes.find(n=>n.active&&Math.hypot(n.x-x,n.y-y)<=n.r+24&&Math.hypot(n.x-p.x,n.y-p.y)<=92);
+    if(!node){
+      node=g.entities.resources.find(r=>r.amount>0&&Math.hypot(r.x-x,r.y-y)<=r.r+26&&Math.hypot(r.x-p.x,r.y-p.y)<=96);
+    }
+    if(!node)return false;
+    if(node.cfg){
+      const level=D.levelForXp(p.skills[node.cfg.skill]?.xp||0);
+      if(level<node.cfg.level){g.ui.toast('Level too low',`${node.cfg.name} requires ${D.SKILLS[node.cfg.skill].name} level ${node.cfg.level}.`,'bad');return true;}
+    }
+    this.active=node;
+    this.duration=this.gatherDuration(node);
+    this.timer=0;
+    if(p){p.gathering=true;p.blocking=false;p.heavyCharging=false;}
+    if(g.input?.mouse){g.input.mouse.leftDown=false;g.input.mouse.rightDown=false;}
+    g.ui.log(`Started ${this.nodeLabel(node).toLowerCase()}.`,'gold');
+    return true;
+  };
+  D.GatheringSystem.prototype.cancel=function(){
+    if(this.game.player)this.game.player.gathering=false;
+    this.active=null;
+    this.timer=0;
+  };
+  D.GatheringSystem.prototype.finish=function(){
+    const g=this.game,node=this.active;
+    if(!node){this.cancel();return;}
+    if(node.cfg){
+      const p=g.player,cfg=node.cfg;
+      const lvl=D.levelForXp(p.skills[cfg.skill]?.xp||0), tool=p.stats()[cfg.skill]||0;
+      const ok=D.rollSkillSuccess(lvl+tool,cfg.difficulty);
+      if(!ok){
+        g.ui.floatText(p.x,p.y-35,'Failed','#9aa8c7');
+        if(g.systems.skills) g.systems.skills.addXp(cfg.skill,Math.max(1,Math.floor(cfg.xp*.15)));
+        this.cancel();return;
+      }
+      let qty=1+(Math.random()<.10+(p.mods.extraGather||0)?1:0);
+      qty=Math.min(qty,node.amount);
+      const item=(cfg.altItem&&Math.random()<(cfg.altChance||0))?cfg.altItem:cfg.item;
+      node.amount-=qty;
+      g.systems.inventory.add(item,qty);
+      if(g.systems.skills) g.systems.skills.addXp(cfg.skill,cfg.xp*qty);
+      if(g.systems.quests) g.systems.quests.notify('gather',item,qty);
+      g.stats.resourcesGathered+=qty;
+      g.ui.floatText(p.x,p.y-42,`+${qty} ${D.ITEMS[item]?.name||item}`,'#38d978');
+      if(node.amount<=0){node.cooldown=cfg.respawn;g.ui.log(`${cfg.name} depleted.`, 'gold');}
+    }else{
+      node.active=false;
+      node.respawn=this.respawnTime;
+      g.systems.inventory.add('log',1);
+      if(g.systems.skills) g.systems.skills.addXp('woodcutting',12);
+      if(g.systems.quests) g.systems.quests.notify('gather','log',1);
+      g.ui.floatText(g.player.x,g.player.y-42,'+1 Wood','#38d978');
+      g.ui.log('Collected 1 Wood. The tree will regrow soon.','good');
+    }
+    this.cancel();
+  };
+  D.GatheringSystem.prototype.update=function(dt){
+    this.ensureNodes();
+    const g=this.game,p=g.player;
+    this.nodes.forEach(n=>{if(!n.active&&n.respawn>0){n.respawn-=dt;if(n.respawn<=0){n.active=true;n.respawn=0;g.ui.log('A harvest tree has regrown.','gold');}}});
+    if(!this.active||!p)return;
+    if(!this.active.active){this.cancel();return;}
+    if(Math.hypot(this.active.x-p.x,this.active.y-p.y)>112){g.ui.log(`You moved too far away and stopped ${this.nodeLabel(this.active).toLowerCase()}.`,'bad');this.cancel();return;}
+    this.timer+=dt;
+    if(this.timer>=this.duration)this.finish();
+  };
+})();
+</script>
+<script>
+/* === systems/build.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.BuildSystem=function(game){
+    this.game=game;
+    this.palette=['woodfloor','fence','stonepath','farmland'];
+    this.index=0;
+    this.costs={woodfloor:{log:1},fence:{log:2},stonepath:{stone:2},farmland:{stone:1}};
+  };
+  D.BuildSystem.prototype.selected=function(){return this.palette[this.index]||'woodfloor';};
+  D.BuildSystem.prototype.toggle=function(){
+    const g=this.game;
+    g.buildMode=!g.buildMode;
+    if(g.player){g.player.blocking=false;g.input.mouse.rightDown=false;g.input.mouse.leftDown=false;}
+    g.ui.toast('Build Mode', g.buildMode?`ON — ${D.TILES[this.selected()].name}. LMB place, RMB remove.`:'OFF — combat controls restored.', g.buildMode?'gold':'good');
+  };
+  D.BuildSystem.prototype.cycle=function(){
+    this.index=(this.index+1)%this.palette.length;
+    this.game.ui.toast('Build Tile', D.TILES[this.selected()].name, 'gold');
+  };
+  D.BuildSystem.prototype.canEdit=function(tx,ty){
+    const g=this.game,p=g.player;
+    if(!p||tx<0||ty<0||tx>=D.WORLD.w||ty>=D.WORLD.h)return false;
+    const wx=tx*D.TILE+D.TILE/2, wy=ty*D.TILE+D.TILE/2;
+    if(Math.hypot(wx-p.x,wy-p.y)>165){g.ui.toast('Too Far','Move closer to build there.','bad');return false;}
+    if(g.entities.npcs.some(n=>Math.hypot(wx-n.x,wy-n.y)<58)){g.ui.toast('Blocked','You cannot build on town NPCs.','bad');return false;}
+    if(g.entities.enemies.some(e=>!e.dead&&Math.hypot(wx-e.x,wy-e.y)<44)){g.ui.toast('Blocked','Clear nearby mobs before building.','bad');return false;}
+    return true;
+  };
+  D.BuildSystem.prototype.placeAt=function(x,y){
+    const g=this.game, tx=Math.floor(x/D.TILE), ty=Math.floor(y/D.TILE);
+    if(!this.canEdit(tx,ty))return;
+    const current=g.world.tiles[ty]?.[tx], tile=this.selected();
+    if(!current||['water','wall','roof'].includes(current)){g.ui.toast('Cannot Build','That tile cannot be replaced yet.','bad');return;}
+    const cost=this.costs[tile]||{};
+    if(!g.systems.inventory.canAfford(cost)){g.ui.toast('Need Materials',Object.entries(cost).map(([id,q])=>`${q} ${D.ITEMS[id].name}`).join(', '),'bad');return;}
+    g.systems.inventory.take(cost);
+    g.world.tiles[ty][tx]=tile;
+    g.ui.floatText(tx*D.TILE+D.TILE/2,ty*D.TILE+D.TILE/2,'BUILD','#f7c65b');
+    g.ui.log(`Placed ${D.TILES[tile].name}.`,'gold');
+  };
+  D.BuildSystem.prototype.removeAt=function(x,y){
+    const g=this.game, tx=Math.floor(x/D.TILE), ty=Math.floor(y/D.TILE);
+    if(!this.canEdit(tx,ty))return;
+    const current=g.world.tiles[ty]?.[tx];
+    if(!this.palette.includes(current)){g.ui.toast('Cannot Remove','Only player-built tiles can be removed right now.','bad');return;}
+    g.world.tiles[ty][tx]='dirt';
+    g.ui.floatText(tx*D.TILE+D.TILE/2,ty*D.TILE+D.TILE/2,'REMOVED','#9aa8c7');
+    g.ui.log(`Removed ${D.TILES[current].name}.`,'good');
+  };
+})();
+</script>
+<script>
+/* === systems/dungeon.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.DungeonSystem=function(game){this.game=game;this.inside=false;this.returnPos=null;};
+  D.DungeonSystem.prototype.enter=function(id){
+    const g=this.game;if(id!=='dungeon')return;
+    if(this.inside){this.exit();return;}
+    this.returnPos={x:g.player.x,y:g.player.y};this.inside=true;
+    g.ui.toast('Old Catacombs','A compact dungeon prototype begins. Defeat the ambush.','gold');
+    g.player.x=D.WORLD.pxW/2;g.player.y=D.WORLD.pxH/2+420;g.camera.snapTo(g.player.x,g.player.y);
+    // spawn an encounter around player
+    for(let i=0;i<5;i++){const a=i/5*Math.PI*2;g.entities.enemies.push(D.createEnemy(i===4?'lurker':'husk',g.player.x+Math.cos(a)*180,g.player.y+Math.sin(a)*140));}
+  };
+  D.DungeonSystem.prototype.exit=function(){
+    const g=this.game;if(!this.returnPos)return;g.player.x=this.returnPos.x;g.player.y=this.returnPos.y;g.camera.snapTo(g.player.x,g.player.y);this.inside=false;g.ui.toast('Returned','You step back into the overworld.','good');
+  };
+  D.DungeonSystem.prototype.update=function(){
+    if(!this.inside)return;
+    const g=this.game,p=g.player;
+    if(this.returnPos && Math.hypot(p.x-D.WORLD.pxW/2,p.y-(D.WORLD.pxH/2+420))>520){this.exit();}
+  };
+})();
+</script>
+<script>
+/* === systems/loot.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.LootSystem=function(game){this.game=game;};
+  D.LootSystem.prototype.drop=function(id,qty,x,y){
+    this.game.entities.drops.push({uid:D.uid('drop'),id,qty,x:x+(Math.random()-.5)*24,y:y+(Math.random()-.5)*24,r:10});
+  };
+  D.LootSystem.prototype.dropEnemy=function(e){
+    const p=this.game.player;
+    let [min,max]=e.cfg.coins||[0,0];let coins=D.irand(min,max);
+    coins=Math.floor(coins*(1+(p.mods.coinBonus||0)));
+    if(coins>0)this.drop('coin',coins,e.x,e.y);
+    for(const l of e.cfg.loot||[]){if(Math.random()<l.chance)this.drop(l.id,D.irand(l.min,l.max),e.x,e.y);}
+  };
+})();
+</script>
+<script>
+/* === systems/save.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.SaveSystem=function(game){this.game=game;this.key='unkscape.save.v1';};
+  D.SaveSystem.prototype.data=function(){
+    const g=this.game,p=g.player;
+    return {version:1,seed:g.seed,time:g.time,flags:g.flags,stats:g.stats,classId:p.classId,factionId:p.factionId,
+      player:{x:p.x,y:p.y,hp:p.hp,hunger:p.hunger,equipment:p.equipment,skills:p.skills,perks:p.perks},
+      inventory:g.systems.inventory.toSave(),bank:g.systems.bank.toSave(),quests:g.systems.quests.toSave(),
+      resources:{depleted:g.entities.resources.filter(r=>r.amount<=0).map(r=>r.uid)}
+    };
+  };
+  D.SaveSystem.prototype.save=function(){localStorage.setItem(this.key,JSON.stringify(this.data()));this.game.ui.toast('Saved','Your progress is stored locally.','good');};
+  D.SaveSystem.prototype.autosave=function(){if(this.game.state==='play'&&this.game.player&&!this.game.player.dead)localStorage.setItem(this.key,JSON.stringify(this.data()));};
+  D.SaveSystem.prototype.load=function(){const raw=localStorage.getItem(this.key);if(!raw)return null;try{return JSON.parse(raw)}catch(e){return null}};
+  D.SaveSystem.prototype.delete=function(){localStorage.removeItem(this.key);};
+})();
+</script>
+
+<!-- UI overlays -->
+<script>
+/* === ui/ui.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.UI=function(game){this.game=game;this.panel=null;this.dialogNpc=null;this.toastId=0;};
+  D.UI.prototype.closeAll=function(){document.getElementById('panel').classList.remove('show');document.getElementById('dialog').classList.remove('show');document.getElementById('menu').classList.remove('show');this.panel=null;this.dialogNpc=null;if(this.game.state==='play')this.game.paused=false;this.syncLayoutState();};
+  D.UI.prototype.syncLayoutState=function(){
+    const root=document.getElementById('ui-root');
+    const panel=document.getElementById('panel').classList.contains('show');
+    const dialog=document.getElementById('dialog').classList.contains('show');
+    const menu=document.getElementById('menu').classList.contains('show');
+    root.classList.toggle('panel-open',panel);
+    root.classList.toggle('dialog-open',dialog&&!panel&&!menu);
+    root.classList.toggle('menu-open',menu);
+  };
+  D.UI.prototype.update=function(){this.syncLayoutState();this.renderHUD();this.renderCombatUI();this.renderHotbar();};
+  D.UI.prototype.floatText=function(x,y,text,color){this.game.entities.effects.push({x,y,text,color,t:1,maxT:1,float:55,size:16});};
+})();
+</script>
+<script>
+/* === ui/hud.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.UI.prototype.renderHUD=function(){
+    const g=this.game, root=document.getElementById('hud');
+    if(!g.player||g.state==='menu'){root.innerHTML='';return;}
+    const p=g.player, combatLvl=D.levelForXp(p.skills.combat.xp), totalLvl=Object.values(p.skills).reduce((a,s)=>a+D.levelForXp(s.xp),0);
+    const hpPct=p.hp/p.maxHp*100;
+    const next=D.xpForLevel(combatLvl+1), cur=D.xpForLevel(combatLvl), xpPct=(p.skills.combat.xp-cur)/Math.max(1,next-cur)*100;
+    root.innerHTML=`
+      <div class="hud-left">
+        <div class="hud-card brand"><div class="brand-mark"></div><div><h1>UNK-SCAPE</h1><small>${g.systems.daynight.label()} • Day ${Math.floor(g.time/g.systems.daynight.dayLength)+1} • ${g.entities.enemies.length} mobs • ${g.camera.modeLabel()}</small></div></div>
+        <div class="hud-card bars">
+          <div class="bar-wrap"><span>Health</span><div class="bar hp"><i style="width:${hpPct}%"></i></div><b>${Math.ceil(p.hp)}/${p.maxHp}</b></div>
+          <div class="bar-wrap"><span>Combat</span><div class="bar xp"><i style="width:${D.clamp(xpPct,0,100)}%"></i></div><b>Lv ${combatLvl}</b></div>
+        </div>
+        <div class="hud-card stat-row">
+          <span class="pill gold"><i class="dot"></i>${g.systems.inventory.count('coin')} coins</span>
+          <span class="pill green"><i class="dot"></i>Total Lv ${totalLvl}</span>
+          <span class="pill purple"><i class="dot"></i>Zoom ${Math.round(g.camera.targetZoom*100)}%</span>
+          <span class="pill orange"><i class="dot"></i>Hunger ${g.settings.hungerEnabled?'On':'Off'}</span>
+          <span class="pill"><i class="dot"></i>Build ${g.buildMode?'On':'Off'}</span>
+          <span class="pill gold"><i class="dot"></i>${p.factionName||'No Faction'}</span>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-card minimap"><canvas id="minimap" width="164" height="164"></canvas></div>
+      </div>`;
+    this.drawMinimap();
+  };
+  D.UI.prototype.renderCombatUI=function(){
+    const el=document.getElementById('combat-ui'), g=this.game, p=g.player;
+    if(!el||!p||g.state==='menu'){if(el)el.innerHTML='';return;}
+    const charge=D.clamp((p.heavyCharge||0)/Math.max(.01,(g.systems.combat?.maxCharge||1.25)-(g.systems.combat?.heavyThreshold||.72)),0,1)*100;
+    el.innerHTML=`<div class="combat-card">
+      <div class="combat-chip ${p.heavyCharging?'active':''}">⚔️ ${g.buildMode?'Place':p.heavyCharging?'Heavy Charging':'Tap Attack'}</div>
+      <div class="charge-meter"><i style="width:${charge}%"></i></div>
+      <div class="combat-chip ${p.blocking?'blocking':''}">🛡️ ${g.buildMode?'Remove':p.blocking?'Guarding':'Guard'}</div>
+      <div class="combat-chip ${g.buildMode?'active':''}">🛠️ Build ${g.buildMode?D.TILES[g.systems.build.selected()].name:'Off'}</div>
+    </div>`;
+  };
+  D.UI.prototype.renderHotbar=function(){
+    const el=document.getElementById('hotbar'), g=this.game, p=g.player;
+    if(!el||!p||g.state==='menu'){if(el)el.innerHTML='';return;}
+    const slots=g.hotbar?.slots||[];
+    el.innerHTML=`<div class="hotbar-card">${slots.map((id,i)=>{
+      const it=D.ITEMS[id]||{name:id,icon:'❔'};
+      const equipped=Object.values(p.equipment||{}).includes(id);
+      const qty=g.systems.inventory.count(id)+(equipped?1:0);
+      const selected=g.hotbar.selected===i || (equipped && ['weapon','tool'].includes(it.slot||''));
+      return `<div class="hotbar-slot ${selected?'selected':''} ${qty<=0?'missing':''}" title="${it.name}"><span class="num">${i+1}</span><span class="ico">${it.icon}</span>${qty>1?`<span class="qty">x${qty}</span>`:''}<span class="name">${it.name}</span></div>`;
+    }).join('')}</div>`;
+  };
+  D.UI.prototype.drawMinimap=function(){
+    const c=document.getElementById('minimap'); if(!c||!this.game.world)return; const ctx=c.getContext('2d'), g=this.game;
+    const W=164,H=164;ctx.clearRect(0,0,W,H);
+    const sx=W/D.WORLD.w, sy=H/D.WORLD.h;
+    for(let y=0;y<D.WORLD.h;y+=2)for(let x=0;x<D.WORLD.w;x+=2){ctx.fillStyle=D.TILES[g.world.tiles[y][x]].color;ctx.fillRect(x*sx,y*sy,Math.ceil(sx*2),Math.ceil(sy*2));}
+    ctx.fillStyle='#63e6a4';g.entities.npcs.forEach(n=>ctx.fillRect(n.x/D.TILE*sx-1,n.y/D.TILE*sy-1,3,3));
+    ctx.fillStyle='#ff5c7a';g.entities.enemies.slice(0,90).forEach(e=>ctx.fillRect(e.x/D.TILE*sx,e.y/D.TILE*sy,2,2));
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(g.player.x/D.TILE*sx,g.player.y/D.TILE*sy,3,0,Math.PI*2);ctx.fill();
+    ctx.save();
+    ctx.translate(g.player.x/D.TILE*sx,g.player.y/D.TILE*sy);
+    ctx.rotate(g.camera.targetAngle||g.camera.angle||0);
+    ctx.strokeStyle='#f7c65b';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(0,-9);ctx.lineTo(5,4);ctx.lineTo(0,1);ctx.lineTo(-5,4);ctx.closePath();ctx.stroke();
+    ctx.restore();
+  };
+})();
+</script>
+<script>
+/* === ui/panels.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.UI.prototype.togglePanel=function(name){if(this.panel===name){this.closePanel();return;}this.openPanel(name);};
+  D.UI.prototype.openPanel=function(name){this.panel=name;this.game.paused=true;document.getElementById('panel').classList.add('show');document.getElementById('dialog').classList.remove('show');this.dialogNpc=null;this.renderPanel();this.syncLayoutState();};
+  D.UI.prototype.closePanel=function(){this.panel=null;document.getElementById('panel').classList.remove('show');this.game.paused=false;this.syncLayoutState();};
+  D.UI.prototype.renderPanel=function(){
+    if(!this.panel)return; const el=document.getElementById('panel');
+    const title={inventory:'Inventory',skills:'Skills',crafting:'Crafting',quests:'Quests',bank:'Bank',map:'World Map'}[this.panel]||'Panel';
+    el.innerHTML=`<div class="panel-box"><div class="panel-head"><div><h2>${title}</h2><div class="sub">UNK-SCAPE survival interface</div></div><button class="close-btn" onclick="Duskfall.game.ui.closePanel()">Close</button></div><div class="panel-body">${this.panelHTML(this.panel)}</div></div>`;
+  };
+  D.UI.prototype.panelHTML=function(name){
+    if(name==='inventory')return this.inventoryHTML();
+    if(name==='skills')return this.skillsHTML();
+    if(name==='crafting')return this.craftingHTML();
+    if(name==='quests')return this.questsHTML();
+    if(name==='bank')return this.bankHTML();
+    if(name==='map')return this.mapHTML();
+    return '';
+  };
+  D.UI.prototype.inventoryHTML=function(){
+    const g=this.game, inv=g.systems.inventory.items, p=g.player;
+    const eq=['head','weapon','offhand','body','tool'].map(s=>`<div class="item-card"><h3>${s.toUpperCase()}</h3><p>${p.equipment[s]?D.ITEMS[p.equipment[s]].icon+' '+D.ITEMS[p.equipment[s]].name:'Empty'}</p>${p.equipment[s]?`<button class="small-btn" onclick="Duskfall.game.systems.inventory.unequip('${s}')">Unequip</button>`:''}</div>`).join('');
+    const items=Object.entries(inv).map(([id,qty])=>{const it=D.ITEMS[id];return`<div class="item-card"><span class="qty">x${qty}</span><h3>${it.icon} ${it.name}</h3><p>${it.desc||''}</p><span class="tag">${it.type}</span><br><button class="small-btn" onclick="Duskfall.game.systems.inventory.use('${id}')">Use / Equip</button></div>`}).join('')||'<div class="help-note">Inventory empty.</div>';
+    return `<h3>Equipment</h3><div class="grid">${eq}</div><h3 style="margin-top:22px">Backpack</h3><div class="grid">${items}</div>`;
+  };
+  D.UI.prototype.skillsHTML=function(){
+    const p=this.game.player;
+    return `<table class="table"><thead><tr><th>Skill</th><th>Level</th><th>XP</th><th>Next</th></tr></thead><tbody>${Object.entries(D.SKILLS).map(([id,c])=>{if(!p.skills[id])p.skills[id]={xp:0,level:1};const xp=p.skills[id].xp||0,l=D.levelForXp(xp),next=D.xpForLevel(l+1);return`<tr><td><strong>${c.icon} ${c.name}</strong><br><small style="color:var(--muted)">${c.desc}</small></td><td>${l}</td><td>${xp}</td><td>${next-xp}</td></tr>`}).join('')}</tbody></table><h3>Perks</h3><div class="grid">${p.perks.map(id=>D.PERKS[id]?`<div class="item-card"><h3>${D.PERKS[id].icon} ${D.PERKS[id].name}</h3><p>${D.PERKS[id].desc}</p></div>`:'').join('')||'<div class="help-note">No perks yet.</div>'}</div>`;
+  };
+  D.UI.prototype.craftingHTML=function(){
+    const g=this.game;
+    return `<div class="grid">${D.RECIPES.map(r=>{const can=g.systems.crafting.canCraft(r);const req=Object.entries(r.requires||{}).map(([id,q])=>`${D.ITEMS[id]?.icon||'❔'} ${q}`).join(' ');const skill=D.SKILLS[r.skill]?.name||r.skill;return`<div class="item-card"><h3>${r.icon} ${r.name}</h3><p>${r.desc}</p><p><b>Req:</b> ${req}</p><span class="tag">${skill} Lv ${r.level}</span><br><button class="small-btn" ${can?'':'disabled'} onclick="Duskfall.game.systems.crafting.craft('${r.id}')">Craft</button></div>`}).join('')}</div>`;
+  };
+  D.UI.prototype.questsHTML=function(){
+    const qs=this.game.systems.quests;
+    const active=Object.entries(qs.active).map(([id,st])=>{const q=D.QUESTS[id];return`<div class="item-card"><h3>${q.icon} ${q.name}</h3><p>${q.desc}</p>${q.steps.map((s,i)=>`<p>${(st.progress[i]||0)>=s.qty?'✅':'⬜'} ${s.text} <b>${st.progress[i]||0}/${s.qty}</b></p>`).join('')}</div>`}).join('')||'<div class="help-note">No active quests.</div>';
+    return `<h3>Active</h3><div class="grid">${active}</div><h3>Completed</h3><p>${Object.keys(qs.completed).map(id=>D.QUESTS[id].name).join(', ')||'None yet.'}</p>`;
+  };
+  D.UI.prototype.bankHTML=function(){
+    const g=this.game, inv=g.systems.inventory.items, bank=g.systems.bank.items;
+    const invRows=Object.entries(inv).filter(([id])=>id!=='coin').map(([id,q])=>`<div class="shop-row"><div>${D.ITEMS[id].icon} <b>${D.ITEMS[id].name}</b><small>Backpack x${q}</small></div><button class="small-btn" onclick="Duskfall.game.systems.bank.deposit('${id}',1)">Deposit 1</button><button class="small-btn" onclick="Duskfall.game.systems.bank.deposit('${id}',${q})">All</button></div>`).join('')||'<div class="help-note">No depositable items.</div>';
+    const bankRows=Object.entries(bank).map(([id,q])=>`<div class="shop-row"><div>${D.ITEMS[id].icon} <b>${D.ITEMS[id].name}</b><small>Bank x${q}</small></div><button class="small-btn" onclick="Duskfall.game.systems.bank.withdraw('${id}',1)">Withdraw 1</button><button class="small-btn" onclick="Duskfall.game.systems.bank.withdraw('${id}',${q})">All</button></div>`).join('')||'<div class="help-note">Bank empty.</div>';
+    return `<div class="two-col"><div><h3>Backpack</h3>${invRows}</div><div><h3>Bank Vault</h3>${bankRows}</div></div>`;
+  };
+  D.UI.prototype.mapHTML=function(){
+    setTimeout(()=>this.drawWorldMap(),0);
+    return `<div class="help-note">World map with camera heading marker. White = you, gold arrow = current camera direction, green = town/NPCs, red = mobs.</div><div class="map-legend"><span>🟩 grass</span><span>🟫 roads</span><span>🟦 water</span><span>⬛ walls</span><span>🟨 town</span><span>🔺 camera heading</span></div><canvas id="worldMap" class="map-canvas" width="720" height="720"></canvas>`;
+  };
+  D.UI.prototype.drawWorldMap=function(){
+    const c=document.getElementById('worldMap'); if(!c||!this.game.world)return; const ctx=c.getContext('2d'), g=this.game, W=720,H=720;
+    ctx.clearRect(0,0,W,H); const sx=W/D.WORLD.w, sy=H/D.WORLD.h;
+    for(let y=0;y<D.WORLD.h;y++)for(let x=0;x<D.WORLD.w;x++){ctx.fillStyle=D.TILES[g.world.tiles[y][x]].color;ctx.fillRect(x*sx,y*sy,Math.ceil(sx),Math.ceil(sy));}
+    ctx.fillStyle='#63e6a4';g.entities.npcs.forEach(n=>ctx.fillRect(n.x/D.TILE*sx-3,n.y/D.TILE*sy-3,7,7));
+    ctx.fillStyle='#ff5c7a';g.entities.enemies.forEach(e=>ctx.fillRect(e.x/D.TILE*sx-1,e.y/D.TILE*sy-1,3,3));
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(g.player.x/D.TILE*sx,g.player.y/D.TILE*sy,5,0,Math.PI*2);ctx.fill();
+    ctx.save();ctx.translate(g.player.x/D.TILE*sx,g.player.y/D.TILE*sy);ctx.rotate(g.camera.targetAngle||g.camera.angle||0);ctx.strokeStyle='#f7c65b';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(0,-18);ctx.lineTo(10,8);ctx.lineTo(0,2);ctx.lineTo(-10,8);ctx.closePath();ctx.stroke();ctx.restore();
+  };
+})();
+</script>
+<script>
+/* === ui/dialogs.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.UI.prototype.openDialog=function(npc){this.dialogNpc=npc;this.game.paused=true;document.getElementById('dialog').classList.add('show');this.renderDialog();this.syncLayoutState();};
+  D.UI.prototype.closeDialog=function(){this.dialogNpc=null;document.getElementById('dialog').classList.remove('show');this.game.paused=false;this.syncLayoutState();};
+  D.UI.prototype.renderDialog=function(){
+    const npc=this.dialogNpc;if(!npc)return; const cfg=npc.cfg, el=document.getElementById('dialog');
+    if(npc.id==='trader') return this.renderShop(npc);
+    if(npc.id==='banker') return this.openPanel('bank');
+    el.innerHTML=`<div class="dialog-box"><div class="dialog-top"><div class="portrait">${cfg.icon}</div><div><h3>${cfg.name}</h3><small style="color:var(--muted)">${cfg.role}</small></div></div><div class="dialog-text">${cfg.lines[Math.floor(Math.random()*cfg.lines.length)]}</div><div class="dialog-actions"><button class="action-btn" onclick="Duskfall.game.ui.openPanel('quests')">Open Quests</button><button class="action-btn" onclick="Duskfall.game.ui.closeDialog()">Leave</button></div></div>`;
+  };
+  D.UI.prototype.renderShop=function(npc){
+    const el=document.getElementById('dialog'), inv=this.game.systems.inventory;
+    const buy=npc.cfg.shop.buy.map(id=>`<div class="shop-row"><div>${D.ITEMS[id].icon} <b>${D.ITEMS[id].name}</b><small>${D.ITEMS[id].desc}</small></div><span class="coin">${D.priceOf(id)} 🪙</span><button class="small-btn" onclick="Duskfall.game.systems.economy.buy('${id}')">Buy</button></div>`).join('');
+    const sell=Object.keys(inv.items).filter(id=>id!=='coin').map(id=>`<div class="shop-row"><div>${D.ITEMS[id].icon} <b>${D.ITEMS[id].name}</b><small>You own x${inv.count(id)}</small></div><span class="coin">${Math.max(1,Math.floor(D.priceOf(id)*.55))} 🪙</span><button class="small-btn" onclick="Duskfall.game.systems.economy.sell('${id}')">Sell 1</button></div>`).join('')||'<div class="help-note">Nothing to sell.</div>';
+    el.innerHTML=`<div class="dialog-box"><div class="dialog-top"><div class="portrait">${npc.cfg.icon}</div><div><h3>${npc.cfg.name}</h3><small style="color:var(--muted)">Coins: ${inv.count('coin')}</small></div></div><div class="dialog-text"><div class="two-col"><div><h3>Buy</h3>${buy}</div><div><h3>Sell</h3>${sell}</div></div></div><div class="dialog-actions"><button class="action-btn" onclick="Duskfall.game.ui.closeDialog()">Leave</button></div></div>`;
+  };
+})();
+</script>
+<script>
+/* === ui/toasts.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.UI.prototype.toast=function(title,msg,type=''){
+    const root=document.getElementById('toasts'), id=++this.toastId;
+    const div=document.createElement('div');div.className='toast '+type;div.dataset.id=id;div.innerHTML=`<b>${title}</b>${msg}`;root.appendChild(div);
+    setTimeout(()=>{div.style.opacity='0';div.style.transform='translateY(-8px)';},3300);
+    setTimeout(()=>div.remove(),3800);
+  };
+})();
+</script>
+<script>
+/* === ui/log.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.UI.prototype.log=function(msg,type=''){
+    const root=document.getElementById('log');
+    if(!root.querySelector('.log-box')) root.innerHTML='<div class="log-box"></div>';
+    const box=root.querySelector('.log-box'), line=document.createElement('div');line.className='log-line '+type;line.textContent='› '+msg;box.appendChild(line);
+    while(box.children.length>4)box.removeChild(box.firstChild);
+  };
+})();
+</script>
+<script>
+/* === ui/menu.js === */
+(function(){
+  const D = window.Duskfall = window.Duskfall || {};
+  D.UI.prototype.showMenu=function(){document.getElementById('menu').classList.add('show');this.game.paused=true;this.renderMenu();this.syncLayoutState();};
+  D.UI.prototype.toggleMenu=function(){
+    const m=document.getElementById('menu');
+    if(m.classList.contains('show')&&this.game.state==='play'){m.classList.remove('show');this.game.paused=false;this.syncLayoutState();}
+    else this.showMenu();
+  };
+  D.UI.prototype.renderMenu=function(){
+    const g=this.game;
+    if(g.state==='play') return this.renderPauseMenu();
+    const saved=g.systems.save?.load();
+    document.getElementById('menu').innerHTML=`<div class="menu-card"><h1>UNK-SCAPE</h1><p>A retro medieval survival sandbox/MMO prototype where UNK gaming meets base-building, class islands, faction turf wars, skilling, crafting, mobs, banking, quests, and action combat.</p><div class="help-note">Choose a class island, pick one of its two factions, then complete world quests to claim turf and unlock territory buffs.</div><h3>Choose Class + Faction</h3><div class="class-grid">${Object.entries(D.CLASSES).map(([id,c])=>`<div class="class-card"><h3>${c.icon} ${c.name}</h3><p>${c.desc}</p><p><b>Zone:</b> ${c.zone||'Central Crossroads'}</p><ul>${Object.entries(c.items||{}).slice(0,4).map(([it,q])=>`<li>${D.ITEMS[it]?.icon||''} ${D.ITEMS[it]?.name||it} x${q}</li>`).join('')}</ul><div class="menu-actions" style="justify-content:flex-start;margin-top:12px">${D.getClassFactions(id).map(fid=>`<button class="small-btn" onclick="Duskfall.game.newGame('${id}','${fid}')">${D.FACTIONS[fid].icon} ${D.FACTIONS[fid].name}</button>`).join('')}</div></div>`).join('')}</div><div class="menu-actions">${saved?`<button class="big-btn" onclick="Duskfall.game.loadGame(Duskfall.game.systems.save.load())">Continue</button>`:''}<button class="big-btn secondary" onclick="Duskfall.game.systems.save.delete();Duskfall.game.ui.renderMenu()">Delete Save</button></div></div>`;
+  };
+  D.UI.prototype.renderPauseMenu=function(){
+    const g=this.game, binds=g.settings.keybinds;
+    const actions=[['inventory','Inventory'],['skills','Skills'],['crafting','Crafting'],['quests','Quests'],['bank','Bank'],['map','Map'],['interact','Interact / Use'],['attack','Keyboard Attack'],['buildToggle','Build Mode'],['buildCycle','Cycle Build Tile'],['zoomIn','Zoom In'],['zoomOut','Zoom Out'],['cameraToggle','Toggle Camera'],['cameraOverhead','Overhead Reset'],['rotateLeft','Rotate Left'],['rotateRight','Rotate Right'],['save','Save'],['pause','Pause']];
+    document.getElementById('menu').innerHTML=`<div class="menu-card"><h1>Paused</h1><p>Settings, controls, camera, survival toggles, and sandbox building. Combat: LMB attack/heavy, RMB block. Build Mode: LMB place, RMB remove.</p><div class="menu-actions"><button class="big-btn" onclick="Duskfall.game.ui.toggleMenu()">Resume</button><button class="big-btn secondary" onclick="Duskfall.game.systems.save.save()">Save Game</button><button class="big-btn secondary" onclick="Duskfall.game.camera.toggleMode();Duskfall.game.ui.renderMenu()">Camera: ${g.camera.modeLabel()}</button><button class="big-btn secondary" onclick="Duskfall.game.camera.setOverhead();Duskfall.game.ui.renderMenu()">Overhead Reset</button><button class="big-btn secondary" onclick="Duskfall.game.settings.hungerEnabled=!Duskfall.game.settings.hungerEnabled;Duskfall.game.ui.renderMenu()">Hunger: ${g.settings.hungerEnabled?'On':'Off'}</button><button class="big-btn secondary" onclick="Duskfall.game.systems.build.toggle();Duskfall.game.ui.renderMenu()">Build Mode: ${g.buildMode?'On':'Off'}</button></div><div class="setting-grid"><div class="setting-card"><h3>Camera</h3><p>Use mouse wheel or keybinds. Current zoom: ${Math.round(g.camera.targetZoom*100)}%. Current view: ${g.camera.modeLabel()}.</p><button class="small-btn" onclick="Duskfall.game.camera.setZoom(.12);Duskfall.game.ui.renderMenu()">Zoom In</button> <button class="small-btn" onclick="Duskfall.game.camera.setZoom(-.12);Duskfall.game.ui.renderMenu()">Zoom Out</button> <button class="small-btn" onclick="Duskfall.game.camera.rotate(-Math.PI/12);Duskfall.game.ui.renderMenu()">Rotate Left</button> <button class="small-btn" onclick="Duskfall.game.camera.rotate(Math.PI/12);Duskfall.game.ui.renderMenu()">Rotate Right</button> <button class="small-btn" onclick="Duskfall.game.camera.setOverhead();Duskfall.game.ui.renderMenu()">Overhead</button></div><div class="setting-card"><h3>Combat + Build</h3><p>LMB press = regular attack. Hold/release = heavy attack. RMB hold = block. In Build Mode, LMB places and RMB removes. Current build tile: <b>${D.TILES[g.systems.build.selected()].name}</b>.</p><p>${g.input.waitingForBind?'Press a key for: <b>'+g.input.waitingForBind+'</b>':'Keybinds ready.'}</p></div>${actions.map(([a,label])=>`<div class="setting-card"><h3>${label}</h3><button class="small-btn rebind-btn" onclick="Duskfall.game.input.startRebind('${a}')"><span>Current</span><b>${D.displayKey(binds[a])}</b></button></div>`).join('')}</div></div>`;
+  };
+})();
+</script>
+
+<!-- Boot -->
+<script>
+/* === main.js === */
+window.addEventListener('DOMContentLoaded',()=>{
+  const D = window.Duskfall = window.Duskfall || {};
+  D.runSmokeTests = function(){
+    const testWorld = D.generateWorld(12345);
+    console.assert(testWorld && testWorld.tiles && testWorld.tiles.length === D.WORLD.h, 'Smoke test failed: world generation did not create tiles.');
+    const cx=Math.floor(D.WORLD.w/2), cy=Math.floor(D.WORLD.h/2);
+    console.assert(['plaza','stonepath'].includes(testWorld.tiles[cy][cx]), 'Smoke test failed: town center was not generated correctly.');
+    console.assert(typeof D.CombatSystem === 'function', 'Smoke test failed: combat system missing.');
+    console.assert(D.ENEMIES.rat.attack<=2 && D.ENEMIES.goblin.attack<=4, 'Smoke test failed: early mob balance too strong.');
+    console.assert(typeof D.Camera === 'function', 'Smoke test failed: camera system missing.');
+    console.assert(typeof D.Camera.prototype.setOverhead === 'function', 'Smoke test failed: overhead camera control missing.');
+    console.assert(typeof D.Camera.prototype.rotate === 'function', 'Smoke test failed: camera rotate control missing.');
+    const camSmoke={viewW:1280,viewH:720,settings:{cameraMode:'iso'},ui:{toast(){}}};
+    const cam=new D.Camera(camSmoke);
+    console.assert(cam.targetAngle===0, 'Smoke test failed: default camera should not start sideways.');
+    cam.rotate(Math.PI/12);
+    console.assert(typeof cam.targetAngle==='number' && typeof cam.targetPitch==='number', 'Smoke test failed: smooth camera targets missing.');
+    console.assert(typeof D.BuildSystem === 'function', 'Smoke test failed: build system missing.');
+    console.assert(typeof D.GatheringSystem === 'function', 'Smoke test failed: gathering system missing.');
+    console.assert(D.RESOURCE_TYPES.pine && D.RESOURCE_TYPES.yew && D.RESOURCE_TYPES.copper && D.RESOURCE_TYPES.gold && D.RESOURCE_TYPES.fish && D.RESOURCE_TYPES.gem, 'Smoke test failed: tier resource foundation missing.');
+    console.assert(typeof D.UI.prototype.syncLayoutState === 'function', 'Smoke test failed: UI layout state manager missing.');
+    const tmpGame={buildMode:false,ui:{toast(){},log(){},floatText(){}},input:{mouse:{}},systems:{inventory:{canAfford(){return true},take(){return true}}},player:{x:D.WORLD.pxW/2,y:D.WORLD.pxH/2,blocking:false},entities:{npcs:[],enemies:[]},world:testWorld};
+    const build=new D.BuildSystem(tmpGame);
+    console.assert(build.selected()==='woodfloor', 'Smoke test failed: default build tile incorrect.');
+    console.assert(D.CLASSES.melee && D.CLASSES.range && D.CLASSES.mage, 'Smoke test failed: core combat classes missing.');
+    console.assert(D.getClassFactions('melee').length===2, 'Smoke test failed: class faction choices missing.');
+    console.assert(D.ITEMS.training_bow && D.ITEMS.oak_staff && D.ITEMS.bronze_helm, 'Smoke test failed: expanded class gear missing.');
+    const combatSmoke=new D.CombatSystem({input:{mouse:{worldX:0,worldY:0}}});
+    console.assert(typeof combatSmoke.rollBonusHit === 'function' && typeof combatSmoke.weaponStyle === 'function', 'Smoke test failed: crit/headshot combat helpers missing.');
+    console.assert(combatSmoke.heavyThreshold >= .7, 'Smoke test failed: heavy attack threshold too low.');
+    console.assert(D.getRecipe('training_bow') && D.getRecipe('leather_hood') && D.getRecipe('ranger_tunic'), 'Smoke test failed: craftable starter gear missing.');
+  };
+  D.runSmokeTests();
+  console.assert(typeof D.createPlayer === 'function', 'Smoke test failed: player factory missing.');
+  const smokeGame={
+    input:{axis(){return{x:0,y:0}},mouse:{}},
+    world:D.generateWorld(777),
+    systems:{inventory:{add(){return true}},perks:{reapply(){}}},
+    ui:{toast(){},log(){},floatText(){}},
+    camera:{snapTo(){}},
+    entities:{drops:[]},
+    stats:{deaths:0},settings:{hungerEnabled:false}
+  };
+  const smokePlayer=D.createPlayer(smokeGame,'melee','ironbound');
+  console.assert(smokePlayer && smokePlayer.equipment.head === 'bronze_helm', 'Smoke test failed: class/faction player creation failed.');
+  console.assert(smokePlayer.factionName === D.FACTIONS.ironbound.name, 'Smoke test failed: faction assignment failed.');
+  D.game = new D.Game();
+  D.game.init();
+});
+</script>
+
+</body>
+</html>
