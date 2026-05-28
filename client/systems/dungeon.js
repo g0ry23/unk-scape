@@ -19,5 +19,3 @@
     if(this.returnPos && Math.hypot(p.x-D.WORLD.pxW/2,p.y-(D.WORLD.pxH/2+420))>520){this.exit();}
   };
 })();
-</script>
-<script>
