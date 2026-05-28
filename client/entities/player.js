@@ -40,7 +40,12 @@ this.attackCooldown=Math.max(0,this.attackCooldown-dt);
 this.attackAnim=Math.max(0,this.attackAnim-dt);
 this.interactCooldown=Math.max(0,this.interactCooldown-dt);
 this.pickupNearby();
-},    stats(){
+},    move(dt,g){
+const nx=this.x+this.vx*dt, ny=this.y+this.vy*dt;
+if(!D.solidAt(g.world,nx,this.y,this.r)){this.x=D.clamp(nx,this.r,D.WORLD.pxW-this.r);}
+if(!D.solidAt(g.world,this.x,ny,this.r)){this.y=D.clamp(ny,this.r,D.WORLD.pxH-this.r);}
+},
+stats(){
         const s=D.getEquipmentStats(this);
         s.defense += this.mods.defense||0;
         s.moveSpeed *= 1+(this.mods.moveSpeed||0);
