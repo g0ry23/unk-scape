@@ -5,5 +5,3 @@
     return {uid:D.uid('npc'),kind:'npc',id,cfg,x,y,r:22,color:id==='banker'?'#f7c65b':id==='trader'?'#63e6a4':'#6aa7ff'};
   };
 })();
-</script>
-<script>
