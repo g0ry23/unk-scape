@@ -20,5 +20,3 @@
     this.game.flags.lastNight=is;
   };
 })();
-</script>
-<script>
