@@ -233,3 +233,55 @@ body.theme-iron-crown {
   letter-spacing:.04em;
   min-height:1.4em;
 }
+
+
+/* === Advanced UI Style Polish - Faction Glassmorphism Overrides === */
+
+/* Background image on menu overlay */
+#menu {
+  background: url('/background.png') no-repeat center center fixed !important;
+  background-size: cover !important;
+  backdrop-filter: blur(3px);
+}
+
+/* Floating Sleek Purple Enchanted Glass panels */
+.menu-card, .panel-box, .dialog-box {
+  background: rgba(20, 14, 28, 0.88) !important;
+  border: 1px solid var(--faction-primary, #6aa7ff) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7), 0 0 24px var(--faction-glow, rgba(106, 167, 255, 0.15)) !important;
+  backdrop-filter: blur(12px);
+  padding: 24px;
+  color: #e9f0ff;
+}
+
+/* Selection Card Hover Lifts */
+.class-card, .item-card, .setting-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px;
+  transition: all 0.2s ease-in-out;
+}
+.class-card:hover, .item-card:hover, .setting-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--faction-primary, #6aa7ff) !important;
+  box-shadow: 0 8px 24px var(--faction-glow, rgba(106, 167, 255, 0.15)) !important;
+}
+
+/* Smooth Interactive Button Rigs */
+.big-btn, .action-btn, .small-btn {
+  border: 1px solid var(--faction-primary, #6aa7ff) !important;
+  background: linear-gradient(180deg, var(--faction-glow, rgba(106, 167, 255, 0.1)), rgba(0, 0, 0, 0.4)) !important;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.big-btn:hover, .action-btn:hover, .small-btn:hover {
+  background: linear-gradient(180deg, var(--faction-primary, #6aa7ff), rgba(0, 0, 0, 0.5)) !important;
+  box-shadow: 0 0 14px var(--faction-primary, #6aa7ff);
+  transform: scale(1.02);
+}
