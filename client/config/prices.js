@@ -8,5 +8,3 @@
   };
   D.priceOf = id => D.PRICES[id] ?? (D.ITEMS[id]?.value || 1);
 })();
-</script>
-<script>
