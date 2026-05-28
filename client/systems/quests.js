@@ -33,5 +33,3 @@
   D.QuestSystem.prototype.toSave=function(){return{active:this.active,completed:this.completed};};
   D.QuestSystem.prototype.fromSave=function(data){this.active=data?.active||{};this.completed=data?.completed||{};};
 })();
-</script>
-<script>
