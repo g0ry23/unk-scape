@@ -80,5 +80,3 @@
 
   D.getRecipe = id => D.RECIPES.find(r=>r.id===id);
 })();
-</script>
-<script>
