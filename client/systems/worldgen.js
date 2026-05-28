@@ -262,5 +262,3 @@
     return pts.some(p=>{const id=D.tileAt(world,p[0],p[1]);return !id||D.TILES[id].solid;});
   };
 })();
-</script>
-<script>
