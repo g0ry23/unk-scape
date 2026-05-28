@@ -153,5 +153,3 @@
     if(near && Math.hypot(near.x-aimX,near.y-aimY)<105) near.targeted=true;
   };
 })();
-</script>
-<script>
