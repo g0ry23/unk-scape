@@ -15,5 +15,3 @@
   D.MOUNTS={old_mule:{name:'Old Mule',icon:'🐴',speedBonus:.12,source:'Rare overworld reward'},ember_stag:{name:'Ember Stag',icon:'🦌',speedBonus:.22,source:'World boss reward'}};
   D.PETS={dusk_wolf_pup:{name:'Dusk Wolf Pup',icon:'🐺',bonus:{attack:1},source:'World boss reward'},ember_sprite:{name:'Ember Sprite',icon:'✨',bonus:{wisdom:1},source:'Mythic support pet'}};
 })();
-</script>
-<script>
