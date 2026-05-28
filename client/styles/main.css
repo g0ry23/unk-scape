@@ -167,3 +167,24 @@ button,input,select{font-family:inherit}
     transform: translateY(-2px);
     transition: transform 0.15s, box-shadow 0.15s;
 }
+
+
+/* ===== FACTION BODY THEMES ===== */
+body.theme-blood-oath {
+  --faction-primary: #c0392b;
+  --faction-glow: rgba(192, 57, 43, 0.22);
+  --panel: rgba(18, 10, 10, 0.96);
+}
+body.theme-iron-crown {
+  --faction-primary: #2980b9;
+  --faction-glow: rgba(41, 128, 185, 0.22);
+  --panel: rgba(11, 15, 24, 0.96);
+}
+.panel-box {
+  border: 1px solid var(--faction-primary) !important;
+  box-shadow: 0 24px 70px var(--faction-glow) !important;
+}
+.action-btn, .tab-btn.active, .big-btn {
+  border-color: var(--faction-primary) !important;
+  background: linear-gradient(180deg, var(--faction-glow), rgba(0,0,0,0.3)) !important;
+}
