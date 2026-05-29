@@ -123,3 +123,87 @@
 
     console.log("UnkScape3D: CharacterVisuals system loaded.");
 })();
+
+/**
+ * Weapon style classifier — returns style string from item ID.
+ */
+D.CharacterVisuals.getWeaponStyle = function(itemId) {
+  if (!itemId) return null;
+  var id = itemId.toLowerCase();
+  if (id.indexOf('bow') > -1) return 'bow';
+  if (id.indexOf('staff') > -1) return 'staff';
+  if (id.indexOf('axe') > -1 || id.indexOf('hatchet') > -1) return 'axe';
+  if (id.indexOf('pickaxe') > -1 || id.indexOf('pick') > -1) return 'pick';
+  if (id.indexOf('sword') > -1 || id.indexOf('blade') > -1 || id.indexOf('dagger') > -1) return 'sword';
+  return 'sword';
+};
+
+/**
+ * Attach or update weapon mesh on playerMesh.userData.rightArm.
+ * Called from RenderFrame3D each frame with the current weaponId.
+ * Only rebuilds mesh when weaponId changes.
+ */
+D.CharacterVisuals.updateWeapon = function(playerMesh, weaponId) {
+  if (!playerMesh || !playerMesh.userData.rightArm) return;
+  var arm = playerMesh.userData.rightArm;
+  var current = playerMesh.userData.weaponId || null;
+  if (current === weaponId) return;
+  playerMesh.userData.weaponId = weaponId;
+
+  if (playerMesh.userData.weaponMesh) {
+    arm.remove(playerMesh.userData.weaponMesh);
+    playerMesh.userData.weaponMesh = null;
+  }
+
+  if (!weaponId) return;
+
+  var style = D.CharacterVisuals.getWeaponStyle(weaponId);
+  var mat = new THREE.MeshLambertMaterial({ color: 0xc0c0c0 });
+  var wGeo, wMesh;
+
+  if (style === 'sword') {
+    wGeo = new THREE.BoxGeometry(0.06, 0.7, 0.04);
+    mat = new THREE.MeshLambertMaterial({ color: 0xdce4f0 });
+    wMesh = new THREE.Mesh(wGeo, mat);
+    wMesh.position.set(0.06, -0.55, 0);
+  } else if (style === 'axe') {
+    var handle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.5, 0.05), new THREE.MeshLambertMaterial({ color: 0x7a4b1a }));
+    handle.position.set(0.05, -0.4, 0);
+    var blade = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.2, 0.04), new THREE.MeshLambertMaterial({ color: 0x8a9ba8 }));
+    blade.position.set(0.17, -0.22, 0);
+    wMesh = new THREE.Group();
+    wMesh.add(handle);
+    wMesh.add(blade);
+  } else if (style === 'pick') {
+    var pHandle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.5, 0.05), new THREE.MeshLambertMaterial({ color: 0x7a4b1a }));
+    pHandle.position.set(0.05, -0.35, 0);
+    var pHead = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.07, 0.05), new THREE.MeshLambertMaterial({ color: 0x8a9ba8 }));
+    pHead.position.set(0.12, -0.13, 0);
+    var pTip = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.14, 0.04), new THREE.MeshLambertMaterial({ color: 0x8a9ba8 }));
+    pTip.position.set(0.24, -0.2, 0);
+    pTip.rotation.z = -0.6;
+    wMesh = new THREE.Group();
+    wMesh.add(pHandle); wMesh.add(pHead); wMesh.add(pTip);
+  } else if (style === 'bow') {
+    wGeo = new THREE.BoxGeometry(0.05, 0.65, 0.05);
+    mat = new THREE.MeshLambertMaterial({ color: 0x9b5a1a });
+    wMesh = new THREE.Mesh(wGeo, mat);
+    wMesh.position.set(0.08, -0.32, 0);
+  } else if (style === 'staff') {
+    wGeo = new THREE.BoxGeometry(0.055, 0.85, 0.055);
+    mat = new THREE.MeshLambertMaterial({ color: 0x6a3d9a });
+    wMesh = new THREE.Mesh(wGeo, mat);
+    wMesh.position.set(0.05, -0.55, 0);
+    var orb = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.13, 0.13), new THREE.MeshLambertMaterial({ color: 0xc39bd3 }));
+    orb.position.set(0.05, 0.35, 0);
+    var staffGroup = new THREE.Group();
+    staffGroup.add(wMesh); staffGroup.add(orb);
+    wMesh = staffGroup;
+  }
+
+  if (wMesh) {
+    arm.add(wMesh);
+    playerMesh.userData.weaponMesh = wMesh;
+  }
+};
+
