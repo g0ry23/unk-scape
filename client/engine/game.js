@@ -2,7 +2,7 @@
 const D = window.Duskfall = window.Duskfall || {};
 D.Game = function(){
 this.canvas = document.getElementById('game');
-this.ctx = this.canvas.getContext('2d');
+this.ctx = null; // 2D context removed - 3D engine handles all rendering
 this.w = 0; this.h = 0; this.dpr = 1;
 this.last = performance.now();
 this.accum = 0;
@@ -44,7 +44,7 @@ this.canvas.width = this.w;
 this.canvas.height = this.h;
 this.canvas.style.width = innerWidth+'px';
 this.canvas.style.height = innerHeight+'px';
-this.ctx.setTransform(this.dpr,0,0,this.dpr,0,0);
+// ctx.setTransform removed - no 2D canvas rendering
 this.viewW = innerWidth; this.viewH = innerHeight;
 };
 
@@ -261,7 +261,7 @@ this.entities.projectiles.forEach(p=>p.update(dt,this));
 this.entities.projectiles = this.entities.projectiles.filter(p=>!p.dead);
 this.entities.effects.forEach(e=>e.t-=dt);
 this.entities.effects = this.entities.effects.filter(e=>e.t>0);
-this.camera.update(dt);
+// camera.update removed - 3D camera managed by render_3d.js
 this.systems.quests.update(dt);
 if(this.tick % 300 === 0) this.systems.save.autosave();
 };
