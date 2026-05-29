@@ -25,6 +25,6 @@
       if(!D.solidAt(g.world,nx,e.y,e.r))e.x=nx;
       if(!D.solidAt(g.world,e.x,ny,e.r))e.y=ny;
     }
-    g.entities.resources.forEach(r=>r.update(dt));
+    g.entities.resources.forEach(r=>{ if(typeof r.update === "function") r.update(dt); });
   };
 })();
