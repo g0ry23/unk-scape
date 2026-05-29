@@ -1,6 +1,25 @@
 (function(){
 const D = window.Duskfall = window.Duskfall || {};
 
+// ── createResource factory (entity spawn helper) ─────────────────────────
+D.createResource = D.createResource || function(type, x, y, id) {
+    const resNode = {
+        uid: id || ('res_' + type + '_' + Math.floor(Math.random() * 100000)),
+        id: id || ('res_' + type + '_' + Math.floor(Math.random() * 100000)),
+        kind: 'resource',
+        type: type,
+        x: x,
+        y: y,
+        r: 14,
+        tier: 1,
+        harvested: false,
+        respawnTimer: 0,
+        hp: 3,
+        maxHp: 3
+    };
+    return resNode;
+};
+
 // ── Sync fallback (kept for compatibility) ────────────────────────────────
 D.generateWorld=function(seed){
 const rand=D.rand(seed), w=D.WORLD.w,h=D.WORLD.h;
