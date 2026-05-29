@@ -1,4 +1,4 @@
-—(function(){
+(function(){
 const D = window.Duskfall = window.Duskfall || {};
 D.Game = function(){
 this.canvas = document.getElementById('game');
