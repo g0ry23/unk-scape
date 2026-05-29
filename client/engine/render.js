@@ -11,7 +11,7 @@ if(!g.world){ drawMenuBg(g,ctx); return; }
 ctx.save();
 g.camera.apply(ctx);
 // ── Painter's Algorithm depth-sort: ground tiles → world objects → entities → player ──
-// drawTiles(g,ctx); // ── v0.5.2: disabled — iso tile coords mismatched with world-pixel camera; D.RenderIsometricScene handles terrain
+drawTiles(g,ctx);
 drawZoneOverlays(g,ctx);
 drawTurfClaims(g,ctx);
 drawBuildGhost(g,ctx);
@@ -29,18 +29,6 @@ drawEffects(g,ctx);
 ctx.restore();
 drawLighting(g,ctx);
 drawVignette(g,ctx);
-	// ── v0.5.0: Isometric world scene (world.js) ──────────────────────────
-	// Called outside camera.apply() — manages its own translate to screen centre.
-	if (typeof D.RenderIsometricScene === 'function' && g.world && g.player) {
-		D.RenderIsometricScene(ctx, g.viewW, g.viewH, g.player, g.entities);
-	}
-	// ── v0.5.0: Screen-space HUD overlays (ui_overlay.js) ──────────────────
-	if (typeof D.RenderPlayerHUD === 'function' && g.player) {
-		D.RenderPlayerHUD(ctx, g.player);
-	}
-	if (typeof D.RenderStatsWindow === 'function' && g.player && D.UIState && D.UIState.showStatsWindow) {
-		D.RenderStatsWindow(ctx, g.viewW, g.viewH, g.player);
-	}
 };
 function visibleBounds(g,pad=6){
 const t=D.TILE;
