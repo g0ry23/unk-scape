@@ -33,8 +33,8 @@ canvas#game{display:block;width:100vw;height:100vh;background:#0b111a;image-rend
 button,input,select{font-family:inherit}
 
 /* HUD */
-#hud{position:absolute;left:18px;top:18px;right:18px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;pointer-events:none}
-.hud-left,.hud-right{display:flex;flex-direction:column;gap:10px;max-width:min(440px,44vw)}
+#hud{position:absolute;left:18px;top:18px;display:flex;align-items:flex-start;gap:16px;pointer-events:none}
+.hud-left,.hud-right{display:flex;flex-direction:column;gap:10px;max-width:min(440px,44vw)}.hud-right{display:none!important}
 .hud-card{background:linear-gradient(180deg,rgba(13,18,31,.92),rgba(9,12,20,.88));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(12px);padding:12px}
 .brand{display:flex;align-items:center;gap:12px;padding:12px 14px}
 .brand-mark{width:38px;height:38px;border-radius:12px;background:radial-gradient(circle at 30% 25%,#ffd873,#b86b22 46%,#341b11 100%);box-shadow:0 0 26px rgba(247,198,91,.18)}
