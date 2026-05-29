@@ -11,7 +11,7 @@ if(!g.world){ drawMenuBg(g,ctx); return; }
 ctx.save();
 g.camera.apply(ctx);
 // ── Painter's Algorithm depth-sort: ground tiles → world objects → entities → player ──
-drawTiles(g,ctx);
+// drawTiles(g,ctx); // ── v0.5.2: disabled — iso tile coords mismatched with world-pixel camera; D.RenderIsometricScene handles terrain
 drawZoneOverlays(g,ctx);
 drawTurfClaims(g,ctx);
 drawBuildGhost(g,ctx);
