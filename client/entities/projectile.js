@@ -1,5 +1,5 @@
-(function(){
-  const D = window.UnkScape3D = window.UnkScape3D || {};
+→(function(){
+  const D = window.Duskfall = window.Duskfall || {};
   D.createProjectile=function(x,y,tx,ty,opts={}){
     const ang=Math.atan2(ty-y,tx-x), speed=opts.speed||360;
     return {uid:D.uid('proj'),x,y,vx:Math.cos(ang)*speed,vy:Math.sin(ang)*speed,r:opts.r||4,color:opts.color||'#ffcf6e',life:opts.life||1,dead:false,damage:opts.damage||1,source:opts.source||'player',recoverable:!!opts.recoverable,recoverChance:opts.recoverChance??.72,dropped:false,dropId:opts.dropId||'arrow',style:opts.style||null,
