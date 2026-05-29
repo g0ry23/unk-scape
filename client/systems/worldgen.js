@@ -154,7 +154,7 @@ if(type) game.entities.resources.push(D.createResource(type,x*t+t/2,y*t+t/2,'res
 Object.entries(D.STARTER_ZONES||{}).forEach(function([id,z]){
 const zone=D.getStarterZone(id);
 zone.resourceBias.forEach(function(type,idx){
-if(!D.RESOURCE_TYPES[type])return;
+if(!D.RESOURCE_TYPES?.[type])return;
 const count=idx===0?9:5;
 for(let j=0;j<count;j++){
 const a=(j/count)*Math.PI*2+idx*.75;
