@@ -1,210 +1,149 @@
-// ============================================================
-// UNK-SCAPE: HUD & CUSTOM MENU INTERFACE OVERLAYS
-// File: client/engine/ui_overlay.js
-// Version: v0.4.7 (Modular UI Core)
-// ============================================================
-// Exposes on window.Duskfall (D):
-//   D.UIState            - shared UI flag + faction color dict
-//   D.RenderPlayerHUD()  - top-left floating HP/MP status board
-//   D.RenderStatsWindow()- centered character attributes window
-// Called from game.js render frame after D.render(this) if desired,
-// or directly from UnkScape.Engine.Renderer.renderFrame().
-// ============================================================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNK-SCAPE — Survival RPG</title>
+<link rel="stylesheet" href="client/styles/main.css">
+</head>
+<body>
 
-((D) => {
-  console.log('[UNK-SCAPE] HUD & Interface Layer v0.4.7 loading...');
+<!-- ============================================================ -->
+<!-- UNK-SCAPE GAME SHELL -->
+<!-- ============================================================ -->
+<div id="unkscape-game-container" style="position: relative; width: 100vw; height: 100vh; overflow: hidden; background-color: #0f0c1b; font-family: 'Courier New', Courier, monospace; user-select: none; -webkit-user-select: none;">
 
-  // ── UI State Configuration ──
-  D.UIState = D.UIState || {
-    showStatsWindow: false,  // false by default: toggled open by keybind/button
-    factionColors: {
-      blood_oath: '#c0392b',  // Crimson Red
-      iron_crown: '#2980b9'   // Cobalt Blue
-    }
-  };
+<!-- Primary render surface (id=&quot;game&quot; required by game.js) -->
+<canvas id="game" style="width: 100%; height: 100%; display: block;"></canvas>
 
-  // ── Helper: draw a rounded rect path (safe fallback for older browsers) ──
-  function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-  }
+<!-- UnkScape HUD overlay — pointer-events none by default, re-enabled per child -->
+<div id="unkscape-hud-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;">
 
-  /**
-   * Renders Top-Left Floating Player Status HUD.
-   * Call each frame OUTSIDE g.camera.apply(ctx) - screen-space coords.
-   *   D.RenderPlayerHUD(g.ctx, g.player);
-   */
-  D.RenderPlayerHUD = function(ctx, player) {
-    if (!ctx || !player) return;
-    ctx.save();
+<!-- Title banner -->
+<div style="position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: rgba(18, 14, 26, 0.9); border: 2px solid #cbd5e1; padding: 6px 24px; color: #ffffff; text-align: center; border-radius: 4px; pointer-events: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.6);">
+<h1 style="margin: 0; font-size: 18px; color: #f1c40f; letter-spacing: 3px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">UNK-SCAPE</h1>
+<div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">UNK-SCAPE Sandbox MMORPG</div>
+</div>
 
-    // ── Background Board ──
-    roundRect(ctx, 15, 15, 290, 90, 6);
-    ctx.fillStyle = 'rgba(18,14,26,0.92)';
-    ctx.fill();
-    ctx.strokeStyle = '#5d4037';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+<!-- Right panel: Skills / Quests / G.E. tabs (populated by UnkScape.UI) -->
+<div id="unkscape-right-tabs" style="position: absolute; right: 20px; top: 20px; width: 330px; background: rgba(22, 18, 30, 0.95); border: 2px solid #47385a; border-radius: 5px; pointer-events: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.8); color: #e2e8f0; display: flex; flex-direction: column;">
+<div style="display: flex; background: #120e1a; border-bottom: 2px solid #47385a; height: 42px;">
+<button onclick="UnkScape.UI.switchTab('skills')" style="flex: 1; background: none; border: none; color: #f1c40f; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 12px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">SKILLS</button>
+<button onclick="UnkScape.UI.switchTab('quests')" style="flex: 1; background: none; border: none; color: #f1c40f; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 12px; border-left: 1px solid #47385a; border-right: 1px solid #47385a; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">QUESTS</button>
+<button onclick="UnkScape.UI.switchTab('ge')" style="flex: 1; background: none; border: none; color: #f1c40f; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 12px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">G.E.</button>
+</div>
+<div id="tab-content-viewport" style="padding: 18px; height: 380px; overflow-y: auto; font-size: 13px; line-height: 1.4; background-image: radial-gradient(circle at top, rgba(88, 66, 119, 0.1) 0%, rgba(0,0,0,0) 80%);"></div>
+</div>
 
-    // ── Name & Faction Text ──
-    const lvl  = player.level || 1;
-    const name = (player.characterName || player.name || 'Hero').toUpperCase();
-    ctx.font         = 'bold 14px monospace';
-    ctx.fillStyle    = '#ffffff';
-    ctx.textAlign    = 'left';
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillText(name + ' (LVL ' + lvl + ')', 30, 40);
+<!-- Chat / event log -->
+<div id="unkscape-chatbox" style="position: absolute; bottom: 20px; left: 20px; width: 450px; height: 140px; background: rgba(14, 11, 20, 0.85); border: 2px solid #332742; border-radius: 4px; padding: 12px; pointer-events: auto; box-shadow: 0 4px 16px rgba(0,0,0,0.7); display: flex; flex-direction: column-reverse; overflow-y: hidden; font-size: 12px;">
+<div style="color: #2ecc71;">[SYSTEM]: Global network initialized. Welcome back to the frontier, Survivor.</div>
+<div style="color: #f1c40f;">[COMBAT]: Ironbound Order territory anchoring guard spawned nearby.</div>
+<div style="color: #bdc3c7;">[SYSTEM]: Code namespace audit finalized completely: [UnkScape] standard active.</div>
+</div>
 
-    const factionKey   = player.factionId || player.faction || '';
-    const factionColor = (D.UIState.factionColors && D.UIState.factionColors[factionKey]) || '#bdc3c7';
-    const factionLabel = factionKey === 'blood_oath' ? 'Blood-Oath Clans'
-                       : factionKey === 'iron_crown'  ? 'Iron-Crown Accord'
-                       : (player.factionName || 'Wanderer');
-    ctx.fillStyle = factionColor;
-    ctx.font      = '11px monospace';
-    ctx.fillText(factionLabel, 30, 58);
+</div><!-- /unkscape-hud-layer -->
 
-    // ── Health Bar ──
-    const hpMax = player.hpMax || player.maxHp || 100;
-    const hpPct = Math.max(0, Math.min(1, (player.hp || 0) / hpMax));
-    ctx.fillStyle = 'rgba(0,0,0,0.45)';
-    ctx.fillRect(150, 25, 140, 13);
-    ctx.fillStyle = '#c0392b';
-    ctx.fillRect(150, 25, Math.floor(140 * hpPct), 13);
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(150, 25, 140, 13);
-    ctx.font      = '9px monospace';
-    ctx.fillStyle = '#fff';
-    ctx.textAlign = 'center';
-    ctx.fillText('HP ' + Math.ceil(player.hp || 0) + ' / ' + hpMax, 220, 35);
+<!-- Legacy DOM hooks required by the Duskfall game engine -->
+<div id="ui-root"></div>
+<div id="hud"></div>
+<div id="panel"></div>
+<div id="dialog"></div>
+<div id="menu" class="hidden"></div>
+<div id="toast-container"></div>
+<div id="action-hint"></div>
+<div id="log"></div>
+<canvas id="minimap" width="164" height="164" style="display:none"></canvas>
+<div id="hotbar"></div>
+<div id="combat-ui"></div>
+<div id="float-texts"></div>
 
-    // ── Mana Bar ──
-    const mpMax = player.mpMax || player.maxMp || 50;
-    const mpPct = Math.max(0, Math.min(1, (player.mp || 0) / mpMax));
-    ctx.fillStyle = 'rgba(0,0,0,0.45)';
-    ctx.fillRect(150, 45, 140, 13);
-    ctx.fillStyle = '#2980b9';
-    ctx.fillRect(150, 45, Math.floor(140 * mpPct), 13);
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(150, 45, 140, 13);
-    ctx.font      = '9px monospace';
-    ctx.fillStyle = '#fff';
-    ctx.textAlign = 'center';
-    ctx.fillText('MP ' + Math.ceil(player.mp || 0) + ' / ' + mpMax, 220, 55);
+</div><!-- /unkscape-game-container -->
 
-    // ── Zone strip ──
-    const zoneName = player.zoneName || '';
-    if (zoneName) {
-      ctx.font      = '10px monospace';
-      ctx.fillStyle = 'rgba(255,207,110,0.72)';
-      ctx.textAlign = 'left';
-      ctx.fillText('▶ ' + zoneName, 30, 96);
-    }
+<!-- ============================================================ -->
+<!-- CONFIG -->
+<!-- ============================================================ -->
+<script src="client/config/classes.js"></script>
+<script src="client/config/factions.js"></script>
+<script src="client/config/races.js"></script>
+<script src="client/config/enemies.js"></script>
+<script src="client/config/equipment.js"></script>
+<script src="client/config/items.js?v=3"></script>
+<script src="client/config/npcs.js"></script>
+<script src="client/config/perks.js"></script>
+<script src="client/config/prices.js"></script>
+<script src="client/config/quests.js"></script>
+<script src="client/config/recipes.js"></script>
+<script src="client/config/skills.js"></script>
+<script src="client/config/tiles.js"></script>
+<script src="client/config/worldbosses.js"></script>
 
-    ctx.restore();
-  };
+<!-- ============================================================ -->
+<!-- ENGINE -->
+<!-- ============================================================ -->
+<script src="client/world/mmoWorld.js"></script>
+<script src="client/engine/camera.js"></script>
+<script src="client/engine/input.js"></script>
+<script src="client/engine/player.js"></script>
+<script src="client/engine/render.js"></script>
+<script src="client/engine/environment.js"></script>
+<script src="client/engine/ui_overlay.js"></script>
+<script src="client/engine/ui.js"></script>
+<script src="client/engine/game.js"></script>
 
-  /**
-   * Renders Centered Character Statistics Window.
-   * Toggle with D.UIState.showStatsWindow or D.toggleStatsWindow().
-   * Call each frame OUTSIDE g.camera.apply(ctx).
-   *   D.RenderStatsWindow(g.ctx, g.viewW, g.viewH, g.player);
-   */
-  D.RenderStatsWindow = function(ctx, canvasWidth, canvasHeight, player) {
-    if (!ctx || !D.UIState.showStatsWindow || !player) return;
+<!-- ============================================================ -->
+<!-- ENTITIES -->
+<!-- ============================================================ -->
+<script src="client/entities/resource.js"></script>
+<script src="client/entities/projectile.js"></script>
+<script src="client/entities/enemy.js"></script>
+<script src="client/entities/npc.js"></script>
+<script src="client/entities/portal.js"></script>
+<script src="client/entities/player.js"></script>
 
-    const W = 340, H = 310;
-    const wx = Math.floor((canvasWidth  / 2) - (W / 2));
-    const wy = Math.floor((canvasHeight / 2) - (H / 2));
+<!-- ============================================================ -->
+<!-- SYSTEMS -->
+<!-- ============================================================ -->
+<script src="client/systems/worldgen.js"></script>
+<script src="client/systems/inventory.js"></script>
+<script src="client/systems/skills.js"></script>
+<script src="client/systems/perks.js"></script>
+<script src="client/systems/quests.js"></script>
+<script src="client/systems/combat.js"></script>
+<script src="client/systems/ai.js"></script>
+<script src="client/systems/daynight.js"></script>
+<script src="client/systems/survival.js"></script>
+<script src="client/systems/crafting.js"></script>
+<script src="client/systems/economy.js"></script>
+<script src="client/systems/bank.js"></script>
+<script src="client/systems/gathering.js"></script>
+<script src="client/systems/build.js"></script>
+<script src="client/systems/dungeon.js"></script>
+<script src="client/systems/turf.js"></script>
+<script src="client/systems/loot.js"></script>
+<script src="client/systems/audio.js"></script>
+<script src="client/systems/save.js"></script>
 
-    ctx.save();
+<!-- ============================================================ -->
+<!-- UI -->
+<!-- ============================================================ -->
+<script src="client/ui/ui.js"></script>
+<script src="client/ui/hud.js"></script>
+<script src="client/ui/panels.js"></script>
+<script src="client/ui/dialogs.js"></script>
+<script src="client/ui/toasts.js"></script>
+<script src="client/ui/log.js"></script>
+<script src="client/ui/menu.js"></script>
 
-    // ── Window body ──
-    const factionKey  = player.factionId || player.faction || '';
-    const borderColor = (D.UIState.factionColors && D.UIState.factionColors[factionKey]) || '#7f8c8d';
-    roundRect(ctx, wx, wy, W, H, 8);
-    ctx.fillStyle = '#2c3e50';
-    ctx.fill();
-    ctx.strokeStyle = borderColor;
-    ctx.lineWidth = 3;
-    ctx.stroke();
+<!-- ============================================================ -->
+<!-- AI -->
+<!-- ============================================================ -->
+<script src="client/ai/mobController.js"></script>
 
-    // ── Header Ribbon ──
-    ctx.fillStyle = 'rgba(0,0,0,0.40)';
-    ctx.fillRect(wx, wy, W, 36);
-    ctx.font         = 'bold 13px monospace';
-    ctx.fillStyle    = '#ecf0f1';
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('CHARACTER ATTRIBUTES & SKILLS', wx + W / 2, wy + 18);
-    ctx.font      = '10px monospace';
-    ctx.fillStyle = 'rgba(255,255,255,0.30)';
-    ctx.textAlign = 'right';
-    ctx.fillText('[P] close', wx + W - 10, wy + 18);
+<!-- ============================================================ -->
+<!-- BOOT -->
+<!-- ============================================================ -->
+<script src="client/main.js"></script>
 
-    // ── Stat Lines ──
-    ctx.textAlign    = 'left';
-    ctx.textBaseline = 'alphabetic';
-    ctx.font         = '12px monospace';
-    let sy   = wy + 60;
-    const sp = 22;
-    const cx = wx + 30;
-    const stats = player.stats || {};
-    const skl   = player.skills || {};
-
-    ctx.fillStyle = '#bdc3c7';
-    ctx.fillText('Class:   ' + (player.charClass || player.classId || 'Wanderer'), cx, sy); sy += sp;
-    ctx.fillText('Race:    ' + (player.raceId    || player.race    || 'Human'),    cx, sy); sy += sp * 1.4;
-
-    ctx.fillStyle = '#ecf0f1';
-    ctx.font      = 'bold 12px monospace';
-    ctx.fillText('— Attributes —', cx, sy); sy += sp;
-
-    ctx.font      = '12px monospace';
-    ctx.fillStyle = '#fff';
-    ctx.fillText('STRENGTH:      ' + (stats.strength     || 10), cx, sy); sy += sp;
-    ctx.fillText('AGILITY:       ' + (stats.agility      || 10), cx, sy); sy += sp;
-    ctx.fillText('INTELLIGENCE:  ' + (stats.intelligence || 10), cx, sy); sy += sp;
-    ctx.fillText('ARMOR RATING:  ' + (stats.armor        ||  5), cx, sy); sy += sp * 1.4;
-
-    ctx.fillStyle = '#ecf0f1';
-    ctx.font      = 'bold 12px monospace';
-    ctx.fillText('— Skills —', cx, sy); sy += sp;
-
-    ctx.font      = '12px monospace';
-    ctx.fillStyle = '#f7c65b';
-    const skillKeys   = ['woodcutting','mining','combat','cooking','crafting','foraging','survival'];
-    const skillLabels = { woodcutting:'Woodcutting', mining:'Mining', combat:'Combat',
-                         cooking:'Cooking', crafting:'Crafting', foraging:'Foraging', survival:'Survival' };
-    for (const k of skillKeys) {
-      const sk  = skl[k] || {};
-      const lv  = sk.level || 1;
-      const xp  = sk.xp   || 0;
-      ctx.fillText(skillLabels[k] + ': Lv.' + lv + '  (' + xp + ' xp)', cx, sy);
-      sy += sp;
-      if (sy > wy + H - 10) break;
-    }
-
-    ctx.restore();
-  };
-
-  /**
-   * Toggle the stats window open/closed.
-   * Wire into game.js keybind handler: if (key === 'p') D.toggleStatsWindow();
-   */
-  D.toggleStatsWindow = function() {
-    D.UIState.showStatsWindow = !D.UIState.showStatsWindow;
-  };
-
-})(window.Duskfall = window.Duskfall || {});
+</body>
+</html>
