@@ -1,4 +1,4 @@
-→(function(){
+(function(){
   const D = window.Duskfall = window.Duskfall || {};
   D.RESOURCE_TYPES = {
     tree:{name:'Oak Tree',item:'log',skill:'woodcutting',tier:1,level:1,xp:18,difficulty:18,color:'#2f7d46',amount:[2,5],respawn:24,action:'Chop'},
