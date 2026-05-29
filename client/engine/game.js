@@ -211,25 +211,6 @@ const _U = window.UnkScape || {};
 if (_U.Engine && _U.Engine.Renderer && this.world && this.player) {
 _U.Engine.Renderer.renderFrame(this.world, this.player, this.camera);
 }
-// ─────────────────────────────────────────────────────────────────────────
-// ── v0.5.0: Isometric World Scene (world.js) ──────────────────────────
-// Fires D.RenderIsometricScene after the base D.render() pass so the 3D
-// terrain + entity bridge draws on top in iso-projected screen space.
-// Uses this.viewW/viewH (CSS pixels) to match the DPR-aware ctx transform.
-if (this.state === 'play' && this.world && this.player) {
-if (typeof D.RenderIsometricScene === 'function') {
-D.RenderIsometricScene(this.ctx, this.viewW, this.viewH, this.player, this.entities);
-}
-// ── Screen-space HUD overlay (ui_overlay.js) ──────────────────────────
-// Draws flat on top of the 3D world, exactly like OSRS UI panels.
-if (typeof D.RenderPlayerHUD === 'function') {
-D.RenderPlayerHUD(this.ctx, this.player);
-}
-if (typeof D.RenderStatsWindow === 'function' && D.UIState && D.UIState.showStatsWindow) {
-D.RenderStatsWindow(this.ctx, this.viewW, this.viewH, this.player);
-}
-}
-// ─────────────────────────────────────────────────────────────────────────
 if(this.state !== 'loading') this.ui.update();
 requestAnimationFrame(t=>this.loop(t));
 };
