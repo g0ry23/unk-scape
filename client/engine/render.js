@@ -21,6 +21,7 @@ drawNPCs(g,ctx);
 drawPortals(g,ctx);
 drawProjectiles(g,ctx);
 drawEnemies(g,ctx);
+drawMobEntities(g,ctx);
 drawPlayer(g,ctx);
 drawGatherProgress(g,ctx);
 drawEffects(g,ctx);
@@ -456,22 +457,107 @@ ctx.font='800 '+(e.size||18)+'px '+(e.font||'Inter');ctx.textAlign='center';ctx.
 }
 }
 
-function drawLighting(g,ctx){
-const dn=g.systems.daynight;if(!dn)return;
-const night=dn.nightAmount();
-if(night<=.02)return;
-ctx.save();
-ctx.fillStyle='rgba(5,7,16,'+(night*.55)+')';ctx.fillRect(0,0,g.viewW,g.viewH);
-const p=g.player; if(p){
-const screen=g.camera.worldToScreen(p.x,p.y); const sx=screen.x, sy=screen.y;
-const rad=160 + (g.systems.inventory.has('torch')?80:0);
-const grad=ctx.createRadialGradient(sx,sy,20,sx,sy,rad);
-grad.addColorStop(0,'rgba(255,198,91,'+(night*.24)+')');
-grad.addColorStop(.55,'rgba(255,155,92,'+(night*.08)+')');
-grad.addColorStop(1,'rgba(0,0,0,0)');
-ctx.globalCompositeOperation='lighter';ctx.fillStyle=grad;ctx.fillRect(sx-rad,sy-rad,rad*2,rad*2);
+function drawMobEntities(g,ctx){
+  const ME = window.UnkScape && window.UnkScape.AI && window.UnkScape.AI.MobEngine;
+  if (!ME) return;
+  const mobs = ME.getMobs();
+  for (const mob of mobs) {
+    if (mob.dead) continue;
+    if (!onScreen(g, mob, 120)) continue;
+    const cfg = mob.cfg;
+    ctx.save();
+    ctx.translate(mob.x, mob.y);
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.30)';
+    ellipse(ctx, 0, 16, 22, 7); ctx.fill();
+    // Elite aura
+    if (cfg.elite) {
+      ctx.strokeStyle = 'rgba(192,57,43,0.55)';
+      ctx.lineWidth = 4;
+      circle(ctx, 0, 0, 28 + Math.sin(g.time * 4) * 3); ctx.stroke();
+    }
+    // Body
+    ctx.fillStyle = shade(cfg.color, -30);
+    round(ctx, -15, -1, 30, 31, 12); ctx.fill();
+    ctx.fillStyle = cfg.color;
+    circle(ctx, 0, -10, cfg.r || 17); ctx.fill();
+    // Icon
+    ctx.font = '22px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(cfg.icon || '👾', 0, -10);
+    // HP bar
+    const w = 42, h = 6, pct = mob.hp / mob.maxHp;
+    ctx.fillStyle = 'rgba(0,0,0,0.45)'; round(ctx, -w/2, -34, w, h, 99); ctx.fill();
+    ctx.fillStyle = pct > 0.5 ? '#63e6a4' : pct > 0.25 ? '#ffcf6e' : '#ff5c7a';
+    round(ctx, -w/2, -34, w * pct, h, 99); ctx.fill();
+    // State label when nearby
+    if (D.dist(g.player, mob) < 120) {
+      const stateColor = mob.state === 'PURSUIT' ? '#ff5c7a' : mob.state === 'LEASH' ? '#ffcf6e' : '#63e6a4';
+      label(ctx, cfg.name + ' [' + mob.state + ']', 0, -46, stateColor);
+    }
+    ctx.restore();
+  }
 }
-ctx.restore();
+function drawLighting(g,ctx){
+  // ── Priority 1: UnkScape.Engine.Environment darkness overlay (new apocalypse cycle) ──
+  const Env = window.UnkScape && window.UnkScape.Engine && window.UnkScape.Engine.Environment;
+  const darkness = Env ? Env.getDarkness() : 0;
+
+  // ── Fallback: legacy DayNight system ──
+  const dn = g.systems.daynight;
+  const legacyNight = (!Env && dn) ? dn.nightAmount() : 0;
+
+  const nightIntensity = Math.max(darkness, legacyNight);
+  if (nightIntensity <= 0.02) return;
+
+  // ── Step 1: Draw full-screen darkness layer on an offscreen canvas ──
+  // We use a temporary canvas so we can cut torch circles out with destination-out.
+  const oc = document.createElement('canvas');
+  oc.width  = g.viewW;
+  oc.height = g.viewH;
+  const oc2 = oc.getContext('2d');
+
+  // Fill darkness rectangle (rgba(10, 8, 20, 0.82) at max night)
+  oc2.fillStyle = 'rgba(10,8,20,' + (nightIntensity * 0.82).toFixed(3) + ')';
+  oc2.fillRect(0, 0, g.viewW, g.viewH);
+
+  // ── Step 2: Cut transparent torch circle around player via destination-out ──
+  const p = g.player;
+  if (p) {
+    const screen = g.camera.worldToScreen(p.x, p.y);
+    const hasTorch = g.systems && g.systems.inventory && g.systems.inventory.has('torch');
+    const torchRadius = hasTorch ? 200 : 120;  // 120px default, 200px with torch item
+    const grad = oc2.createRadialGradient(screen.x, screen.y, 0, screen.x, screen.y, torchRadius);
+    // destination-out: alpha 1 = fully transparent (cuts hole), alpha 0 = leaves darkness
+    grad.addColorStop(0,   'rgba(0,0,0,1.0)');
+    grad.addColorStop(0.55,'rgba(0,0,0,0.72)');
+    grad.addColorStop(0.85,'rgba(0,0,0,0.22)');
+    grad.addColorStop(1,   'rgba(0,0,0,0.0)');
+    oc2.globalCompositeOperation = 'destination-out';
+    oc2.fillStyle = grad;
+    oc2.fillRect(screen.x - torchRadius, screen.y - torchRadius, torchRadius * 2, torchRadius * 2);
+
+    // ── Step 3: Cut light circles for active campfires in world ──
+    if (g.entities && g.entities.resources) {
+      for (const r of g.entities.resources) {
+        if (r.type !== 'campfire' || !r.active) continue;
+        const fs = g.camera.worldToScreen(r.x, r.y);
+        if (Math.hypot(fs.x - screen.x, fs.y - screen.y) > 900) continue;
+        const fireGrad = oc2.createRadialGradient(fs.x, fs.y, 0, fs.x, fs.y, 80);
+        fireGrad.addColorStop(0,   'rgba(0,0,0,0.9)');
+        fireGrad.addColorStop(0.6, 'rgba(0,0,0,0.35)');
+        fireGrad.addColorStop(1,   'rgba(0,0,0,0.0)');
+        oc2.fillStyle = fireGrad;
+        oc2.fillRect(fs.x - 80, fs.y - 80, 160, 160);
+      }
+    }
+    oc2.globalCompositeOperation = 'source-over';
+  }
+
+  // ── Step 4: Blit the darkness+cutout layer onto the main canvas ──
+  ctx.save();
+  ctx.setTransform(1,0,0,1,0,0);  // reset DPR transform for overlay blit
+  ctx.drawImage(oc, 0, 0);
+  ctx.restore();
 }
 function drawVignette(g,ctx){
 const grad=ctx.createRadialGradient(g.viewW/2,g.viewH/2,Math.min(g.viewW,g.viewH)*.25,g.viewW/2,g.viewH/2,Math.max(g.viewW,g.viewH)*.72);
