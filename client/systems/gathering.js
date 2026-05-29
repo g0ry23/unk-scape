@@ -41,33 +41,53 @@ D.GatheringSystem.prototype.ensureNodes = function() {
   const g = this.game;
   if (this.seeded || !g.world || !g.player) return;
   this.seeded = true;
-  const nodes = [];
-  const tries = 260;
-  for (let i = 0; i < tries && nodes.length < 3; i++) {
+
+  // Seed starter trees directly into g.entities.resources near the player spawn.
+  // g.entities.resources is the one source of truth for all gatherable resources.
+  const resources = g.entities && g.entities.resources;
+  if (!resources) return;
+
+  const px = g.player.x, py = g.player.y;
+  const nearbyTree = resources.find(r =>
+    r && r.type === 'tree' && Math.hypot(r.x - px, r.y - py) < 500
+  );
+  if (nearbyTree) return;
+
+  const tries = 200;
+  const seeded = [];
+  for (let i = 0; i < tries && seeded.length < 4; i++) {
     const angle = Math.random() * Math.PI * 2;
-    const dist  = 160 + Math.random() * 360;
-    let x = D.clamp(g.player.x + Math.cos(angle) * dist, D.TILE * 3, D.WORLD.pxW - D.TILE * 3);
-    let y = D.clamp(g.player.y + Math.sin(angle) * dist, D.TILE * 3, D.WORLD.pxH - D.TILE * 3);
+    const dist = 140 + Math.random() * 300;
+    let x = D.clamp(px + Math.cos(angle) * dist, D.TILE * 3, D.WORLD.pxW - D.TILE * 3);
+    let y = D.clamp(py + Math.sin(angle) * dist, D.TILE * 3, D.WORLD.pxH - D.TILE * 3);
     const tx = Math.floor(x / D.TILE), ty = Math.floor(y / D.TILE);
-    const tileId = g.world.tiles[ty]?.[tx];
-    if (!tileId || D.TILES[tileId]?.solid || tileId === 'water') continue;
-    if (nodes.some(n => Math.hypot(n.x - x, n.y - y) < 140)) continue;
-    nodes.push({ id: 'tree_' + nodes.length, x, y, r: 34, active: true, respawn: 0, type: 'tree' });
+    const tileId = g.world.tiles[ty] && g.world.tiles[ty][tx];
+    if (!tileId || (D.TILES[tileId] && D.TILES[tileId].solid) || tileId === 'water') continue;
+    if (seeded.some(n => Math.hypot(n.x - x, n.y - y) < 120)) continue;
+    seeded.push({ x, y });
   }
-  while (nodes.length < 3) {
-    const n = nodes.length;
-    nodes.push({ id: 'tree_' + n, x: g.player.x + (n - 1) * 120,
-                 y: g.player.y + 190 + n * 40, r: 34, active: true, respawn: 0, type: 'tree' });
+  while (seeded.length < 4) {
+    const n = seeded.length;
+    seeded.push({ x: px + (n % 2 === 0 ? 1 : -1) * (150 + n * 60), y: py + (n < 2 ? 180 : -200) });
   }
-  this.nodes = nodes;
+
+  seeded.forEach((pos, idx) => {
+    resources.push({
+      uid: 'starter_tree_' + idx,
+      kind: 'resource',
+      type: 'tree',
+      cfg: { name: 'Oak Tree', item: 'log', skill: 'woodcutting', tier: 1, level: 1,
+             xp: 18, difficulty: 18, color: '#2f7d46', amount: [2, 5], respawn: 24, action: 'Chop' },
+      x: pos.x, y: pos.y, r: 28, amount: 4, cooldown: 0
+    });
+  });
+
+  g.ui && g.ui.log('Starter oak trees placed nearby. Chop one to begin gathering.', 'gold');
+  console.log('[Gathering] Seeded ' + seeded.length + ' starter trees into g.entities.resources');
+  var E = window.UnkScape3D;
+  if (E && E.RebuildProps) E.RebuildProps(px, py);
 };
 
-/**
- * _checkToolPermission(node)
- * Verifies the player's equipped weapon/tool meets the node's toolReq.
- * Uses UnkScape.Player.canUseTool() — references TOOL_TIERS dictionary.
- * Returns true if allowed, false + toast if blocked.
- */
 D.GatheringSystem.prototype._checkToolPermission = function(node) {
   const g  = this.game;
   const p  = g.player;
@@ -97,39 +117,36 @@ D.GatheringSystem.prototype.tryStartAt = function(x, y) {
   const g = this.game, p = g.player;
   if (!p) return false;
 
-  let node = this.nodes.find(n =>
-    n.active &&
-    Math.hypot(n.x - x, n.y - y) <= n.r + 24 &&
-    Math.hypot(n.x - p.x, n.y - p.y) <= 92
+  // g.entities.resources is the ONE source of truth for all gatherable resources
+  const resources = g.entities && g.entities.resources;
+  if (!resources) return false;
+
+  const node = resources.find(r =>
+    r && r.amount > 0 &&
+    Math.hypot(r.x - x, r.y - y) <= (r.r || 28) + 26 &&
+    Math.hypot(r.x - p.x, r.y - p.y) <= 200
   );
   if (!node) {
-    node = g.entities.resources.find(r =>
-      r.amount > 0 &&
-      Math.hypot(r.x - x, r.y - y) <= r.r + 26 &&
-      Math.hypot(r.x - p.x, r.y - p.y) <= 96
-    );
+    console.log('[Gathering] tryStartAt (' + Math.round(x) + ',' + Math.round(y) + '): no resource found within range (player at ' + Math.round(p.x) + ',' + Math.round(p.y) + ')');
+    return false;
   }
-  if (!node) return false;
 
-  // ── Level gate from cfg ──
   if (node.cfg) {
-    const level = D.levelForXp(p.skills[node.cfg.skill]?.xp || 0);
+    const level = D.levelForXp(p.skills[node.cfg.skill] && p.skills[node.cfg.skill].xp || 0);
     if (level < node.cfg.level) {
       g.ui.toast('Level too low',
-        node.cfg.name + ' requires ' + D.SKILLS[node.cfg.skill].name +
-        ' level ' + node.cfg.level + '.', 'bad');
+        node.cfg.name + ' requires ' + D.SKILLS[node.cfg.skill].name + ' level ' + node.cfg.level + '.', 'bad');
       return true;
     }
   }
 
-  // ── Tool tier check via UnkScape.Player.canUseTool ──
   if (!this._checkToolPermission(node)) return true;
 
-  this.active   = node;
+  this.active = node;
   this.duration = this.gatherDuration(node);
-  this.timer    = 0;
+  this.timer = 0;
   if (p) { p.gathering = true; p.blocking = false; p.heavyCharging = false; }
-  if (g.input?.mouse) { g.input.mouse.leftDown = false; g.input.mouse.rightDown = false; }
+  if (g.input && g.input.mouse) { g.input.mouse.leftDown = false; g.input.mouse.rightDown = false; }
   g.ui.log('Started ' + this.nodeLabel(node).toLowerCase() + '.', 'gold');
   return true;
 };
@@ -223,19 +240,31 @@ function _logXpGain(g, skillKey, amount) {
 D.GatheringSystem.prototype.update = function(dt) {
   this.ensureNodes();
   const g = this.game, p = g.player;
-  this.nodes.forEach(n => {
-    if (!n.active && n.respawn > 0) {
-      n.respawn -= dt;
-      if (n.respawn <= 0) {
-        n.active  = true;
-        n.respawn = 0;
-        g.ui.log('A harvest node has respawned.', 'gold');
+
+  // Tick down cooldowns on resource entities so they respawn
+  const resources = g.entities && g.entities.resources;
+  if (resources) {
+    resources.forEach(r => {
+      if (!r) return;
+      if (r.cooldown > 0) {
+        r.cooldown -= dt;
+        if (r.cooldown <= 0) {
+          r.cooldown = 0;
+          if (r.cfg && r.cfg.amount) {
+            const [min, max] = Array.isArray(r.cfg.amount) ? r.cfg.amount : [r.cfg.amount, r.cfg.amount];
+            r.amount = min + Math.floor(Math.random() * (max - min + 1));
+          } else {
+            r.amount = 4;
+          }
+          g.ui && g.ui.log('A resource node has respawned.', 'gold');
+        }
       }
-    }
-  });
+    });
+  }
+
   if (!this.active || !p) return;
-  if (!this.active.active) { this.cancel(); return; }
-  if (Math.hypot(this.active.x - p.x, this.active.y - p.y) > 112) {
+  if (this.active.amount <= 0) { this.cancel(); return; }
+  if (Math.hypot(this.active.x - p.x, this.active.y - p.y) > 250) {
     g.ui.log('You moved too far away and stopped ' + this.nodeLabel(this.active).toLowerCase() + '.', 'bad');
     this.cancel(); return;
   }
