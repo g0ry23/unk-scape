@@ -6,176 +6,231 @@ const E = window.UnkScape3D;
 
     console.log("UnkScape3D: Injecting WebGL 3D Viewport into Core Game...");
 
-    E.active = false;
+    E.active       = false;
+    E.scene        = null;
+    E.camera       = null;
+    E.renderer     = null;
+    E.playerMesh   = null;
+    E.terrainGroup = null;
+    E.lastChunkX   = -9999;
+    E.lastChunkY   = -9999;
 
-    E.scene = null;
+    // ── SCALE CONSTANTS ──────────────────────────────────────────────
+    // Player pixel coords (e.g. 6000) mapped to 3D world units.
+    // SCALE=0.1 means player sits at (600, y, 600) in 3D.
+    // TSCALE = 32 pixels * 0.1 = 3.2 units wide per tile block.
+    // This ensures terrain tiles align exactly with player position.
+    const SCALE  = 0.1;
+    const TILE   = 32;
+    const TSCALE = TILE * SCALE; // 3.2 3D units per tile
 
-    E.camera = null;
+    // ── TILE TYPE -> 3D COLOR LOOKUP ─────────────────────────────────
+    const TILE_COLORS = {
+        grass:     '#2d6a3f',
+        darkgrass: '#1d3a2a',
+        dirt:      '#6b4c2e',
+        path:      '#7a6040',
+        water:     '#1a5276',
+        stone:     '#566573',
+        wall:      '#1c2833',
+        sand:      '#b7950b',
+        swamp:     '#2e4d22',
+        plaza:     '#8d7a52',
+        stonepath: '#717d8c',
+        woodfloor: '#7d5a38',
+        roof:      '#4a2332',
+        fence:     '#5c3d1a',
+        farmland:  '#7a5c2a'
+    };
 
-    E.renderer = null;
+    // ── PRIVATE HELPERS ───────────────────────────────────────────────
 
-    E.playerMesh = null;
+    // Resolve the best available color for tile (tx, ty)
+    function getTileColor(tx, ty) {
+        const D = window.Duskfall;
+        if (D && D.game && D.game.world && D.game.world.tiles && D.game.world.w) {
+            const idx  = ty * D.game.world.w + tx;
+            const type = D.game.world.tiles[idx];
+            if (type && TILE_COLORS[type]) return TILE_COLORS[type];
+        }
+        // Procedural checkerboard fallback
+        return (tx + ty) % 2 === 0 ? '#2d6a3f' : '#36854f';
+    }
 
-    /**
+    // Resolve elevation for tile (tx, ty) — sine-wave proc-gen via GetTerrainAt
+    function getTileHeight(tx, ty) {
+        const D = window.Duskfall;
+        if (D && typeof D.GetTerrainAt === 'function') {
+            const td = D.GetTerrainAt(tx, ty);
+            return (td.z00 || 0) * 0.3;
+        }
+        return Math.max(0, Math.sin(tx * 0.2) * Math.cos(ty * 0.2) * 3);
+    }
 
-     * Initializes the true 3D WebGL framework.
-
-     * Creates a dedicated WebGL canvas layered OVER the existing 2D game canvas
-
-     * so both can coexist (2D canvas keeps its context, WebGL gets its own).
-
-     */
-
+    // ── INITIALIZE 3D ────────────────────────────────────────────────
     E.Initialize3D = function() {
 
         if (typeof THREE === 'undefined') {
-
             console.error("UnkScape3D: Three.js library not loaded!");
-
             return;
-
         }
 
-        // Reference the existing game container
         const gameCanvas = document.getElementById("game");
-
         if (!gameCanvas) {
-
-            console.error("UnkScape3D: Could not find target canvas element id='game'");
-
+            console.error("UnkScape3D: Could not find canvas id='game'");
             return;
-
         }
 
-        // 1. Create a NEW dedicated WebGL canvas (layered over the 2D canvas)
-        //    The 2D canvas already holds a '2d' context — we cannot share it with WebGL.
-
-        const webglCanvas = document.createElement('canvas');
-
-        webglCanvas.id = 'game-webgl';
-
-        webglCanvas.style.position = 'absolute';
-
-        webglCanvas.style.top = '0';
-
-        webglCanvas.style.left = '0';
-
-        webglCanvas.style.width = '100%';
-
-        webglCanvas.style.height = '100%';
-
-        webglCanvas.style.pointerEvents = 'none'; // Let clicks pass through to 2D canvas
-
-        webglCanvas.style.zIndex = '1'; // Above 2D canvas but below HUD (z-index:10)
-
+        // Dedicated WebGL canvas — must not reuse the canvas that has 2d context
+        const webglCanvas         = document.createElement('canvas');
+        webglCanvas.id            = 'game-webgl';
+        webglCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;';
         gameCanvas.parentElement.appendChild(webglCanvas);
 
-        // 2. Setup Scene & Sky Background Color
-
-        E.scene = new THREE.Scene();
-
+        // Scene + sky
+        E.scene            = new THREE.Scene();
         E.scene.background = new THREE.Color('#0b0e1a');
 
-        // 3. Perspective Camera (True depth camera projection)
-
+        // Perspective camera
         const aspect = window.innerWidth / window.innerHeight;
+        E.camera     = new THREE.PerspectiveCamera(60, aspect, 0.1, 2000);
+        E.camera.position.set(0, 25, 30);
 
-        E.camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 1000);
-
-        E.camera.position.set(0, 25, 30); // Raised and looking downward at an angle
-
-        // 4. WebGL Renderer on the dedicated new canvas
-
+        // WebGL renderer
         E.renderer = new THREE.WebGLRenderer({ canvas: webglCanvas, antialias: true });
-
         E.renderer.setSize(window.innerWidth, window.innerHeight);
 
-        // 5. Environmental Lighting
+        // Lighting: ambient + warm directional sun
+        E.scene.add(new THREE.AmbientLight('#ffffff', 0.55));
+        const sun = new THREE.DirectionalLight('#ffe8c0', 0.9);
+        sun.position.set(80, 120, 60);
+        E.scene.add(sun);
 
-        const ambientLight = new THREE.AmbientLight('#ffffff', 0.5);
-
-        E.scene.add(ambientLight);
-
-        const dirLight = new THREE.DirectionalLight('#ffffff', 0.8);
-
-        dirLight.position.set(10, 40, 20);
-
-        E.scene.add(dirLight);
-
-        // 6. Build Player Avatar Placeholder (3D Cylinder)
-
-        const geometry = new THREE.CylinderGeometry(0.8, 0.8, 3, 16);
-
-        const material = new THREE.MeshLambertMaterial({ color: '#f1c40f' });
-
-        E.playerMesh = new THREE.Mesh(geometry, material);
-
+        // Player avatar — gold cylinder placeholder
+        const pGeo     = new THREE.CylinderGeometry(0.8, 0.8, 3, 16);
+        const pMat     = new THREE.MeshLambertMaterial({ color: '#f1c40f' });
+        E.playerMesh   = new THREE.Mesh(pGeo, pMat);
         E.playerMesh.position.set(0, 1.5, 0);
-
         E.scene.add(E.playerMesh);
 
-        // 7. Build a Basic Ground Floor to show depth instantly
-
-        const floorGeo = new THREE.BoxGeometry(100, 1, 100);
-
-        const floorMat = new THREE.MeshLambertMaterial({ color: '#27ae60' });
-
-        const floor = new THREE.Mesh(floorGeo, floorMat);
-
-        floor.position.set(0, -0.5, 0);
-
-        E.scene.add(floor);
-
         E.camera.lookAt(E.playerMesh.position);
-
         E.active = true;
 
-        // Handle window resizing
-
-        window.addEventListener('resize', () => {
-
+        window.addEventListener('resize', function() {
             E.camera.aspect = window.innerWidth / window.innerHeight;
-
             E.camera.updateProjectionMatrix();
-
             E.renderer.setSize(window.innerWidth, window.innerHeight);
-
         });
 
-        console.log("UnkScape3D: 3D Render Bridge successfully bound to canvas. WebGL canvas id=game-webgl created.");
-
+        console.log("UnkScape3D: 3D Render Bridge live. Canvas id=game-webgl. Terrain system armed.");
     };
 
+    // ── TERRAIN GENERATOR ────────────────────────────────────────────
     /**
-
-     * Executed inside the core loop to frame-render our active positions
-
+     * Procedural 3D Tile Grid Renderer
+     * Builds elevated block columns around the player position.
+     * Regenerates only when the player crosses a new 5-tile chunk boundary.
+     * Disposes old geometry to prevent GPU memory leaks.
+     *
+     * @param {number} pxX  player pixel X (e.g. 6000)
+     * @param {number} pxY  player pixel Y (e.g. 6000)
      */
+    E.Update3DTerrain = function(pxX, pxY) {
+        if (!E.scene) return;
 
+        // Convert pixel coords to tile grid coords
+        const tileX = Math.floor(pxX / TILE);
+        const tileY = Math.floor(pxY / TILE);
+
+        // Regenerate only when entering a new 5-tile chunk
+        const chunkX = Math.floor(tileX / 5);
+        const chunkY = Math.floor(tileY / 5);
+        if (chunkX === E.lastChunkX && chunkY === E.lastChunkY) return;
+        E.lastChunkX = chunkX;
+        E.lastChunkY = chunkY;
+
+        // Dispose old terrain group — prevents GPU memory leaks
+        if (E.terrainGroup) {
+            E.scene.remove(E.terrainGroup);
+            E.terrainGroup.traverse(function(child) {
+                if (child.isMesh) {
+                    child.geometry.dispose();
+                    child.material.dispose();
+                }
+            });
+            E.terrainGroup = null;
+        }
+
+        E.terrainGroup = new THREE.Group();
+
+        // Reuse one BoxGeometry blueprint for all blocks (good for low-spec)
+        const renderRadius = 14;
+        const blockGeo     = new THREE.BoxGeometry(TSCALE, 1, TSCALE);
+
+        for (var dx = -renderRadius; dx <= renderRadius; dx++) {
+            for (var dz = -renderRadius; dz <= renderRadius; dz++) {
+                var tx = tileX + dx;
+                var ty = tileY + dz;
+                if (tx < 0 || ty < 0) continue;
+
+                var heightCalc  = getTileHeight(tx, ty);
+                var finalHeight = Math.max(0.4, 1 + heightCalc);
+                var hexColor    = getTileColor(tx, ty);
+
+                var blockMat  = new THREE.MeshLambertMaterial({ color: hexColor });
+                var blockMesh = new THREE.Mesh(blockGeo, blockMat);
+
+                // Scale Y to represent elevation column height
+                blockMesh.scale.set(1, finalHeight, 1);
+
+                // Position: tile coord * TSCALE aligns with player 3D position
+                // Y: half-height so block base sits flush at world y=0
+                blockMesh.position.set(
+                    tx * TSCALE,
+                    finalHeight * 0.5,
+                    ty * TSCALE
+                );
+
+                E.terrainGroup.add(blockMesh);
+            }
+        }
+
+        E.scene.add(E.terrainGroup);
+        console.log("UnkScape3D: Terrain grid regenerated — centre tile (" + tileX + ", " + tileY + ")");
+    };
+
+    // ── FRAME RENDER LOOP ────────────────────────────────────────────
+    /**
+     * Called every frame from game.js loop via E.RenderFrame3D(this.player)
+     */
     E.RenderFrame3D = function(playerData) {
-
         if (!E.active || !E.renderer) return;
 
         if (playerData) {
+            var pxX = playerData.x || 0;
+            var pxY = playerData.y || 0;
 
-            // Translate 2D coordinates straight onto 3D positions
+            // Regenerate terrain chunks around current player tile
+            E.Update3DTerrain(pxX, pxY);
 
-            const targetX = (playerData.x || 0) * 0.1;
+            // Convert pixel coords to 3D world units (same SCALE as terrain blocks)
+            var target3X = pxX * SCALE;
+            var target3Z = pxY * SCALE;
 
-            const targetZ = (playerData.y || 0) * 0.1;
+            // Sample ground height at player tile so cylinder rides slopes smoothly
+            var tileX   = Math.floor(pxX / TILE);
+            var tileY   = Math.floor(pxY / TILE);
+            var groundH = getTileHeight(tileX, tileY);
+            var playerY = 1 + groundH + 1.5; // block top + half-height of cylinder
 
-            E.playerMesh.position.set(targetX, 1.5, targetZ);
+            E.playerMesh.position.set(target3X, playerY, target3Z);
 
-            // Keep the third-person camera locked tightly over the character
-
-            E.camera.position.set(targetX, 20, targetZ + 25);
-
+            // Third-person camera: 18 units above player, 20 units behind
+            E.camera.position.set(target3X, playerY + 18, target3Z + 20);
             E.camera.lookAt(E.playerMesh.position);
-
         }
 
         E.renderer.render(E.scene, E.camera);
-
     };
 
 })();
