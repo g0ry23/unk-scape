@@ -4,16 +4,15 @@
 // Version: v0.4.7 (Modular UI Core)
 // ============================================================
 // Exposes on window.Duskfall (D):
-//   D.UIState               — shared UI flag + faction color dict
-//   D.RenderPlayerHUD()     — top-left floating HP/MP status board
-//   D.RenderStatsWindow()   — centered character attributes window
+//   D.UIState            - shared UI flag + faction color dict
+//   D.RenderPlayerHUD()  - top-left floating HP/MP status board
+//   D.RenderStatsWindow()- centered character attributes window
+//   D.toggleStatsWindow()- toggle stats window on/off
 // Called from game.js render frame after D.render(this) if desired,
 // or directly from UnkScape.Engine.Renderer.renderFrame().
 // ============================================================
 
-(function() {
-  const D = window.Duskfall = window.Duskfall || {};
-
+((D) => {
   console.log('[UNK-SCAPE] HUD & Interface Layer v0.4.7 loading...');
 
   // ── UI State Configuration ──
@@ -26,8 +25,7 @@
   };
 
   // ── Helper: draw a rounded rect path (safe fallback for older browsers) ──
-  function _roundRect(ctx, x, y, w, h, r) {
-    r = Math.min(r, w / 2, h / 2);
+  function roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
     ctx.lineTo(x + w - r, y);
@@ -41,184 +39,172 @@
     ctx.closePath();
   }
 
-  // ── Helper: draw a labeled resource bar (HP / MP / Stamina) ──
-  function _drawBar(ctx, x, y, w, h, pct, fillColor, label) {
-    // Background track
-    ctx.fillStyle = 'rgba(0,0,0,0.55)';
-    _roundRect(ctx, x, y, w, h, 3); ctx.fill();
-    // Fill
-    const fillW = Math.max(0, Math.min(w, w * pct));
-    if (fillW > 0) {
-      ctx.fillStyle = fillColor;
-      _roundRect(ctx, x, y, fillW, h, 3); ctx.fill();
-    }
-    // Border
-    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
-    ctx.lineWidth = 1;
-    _roundRect(ctx, x, y, w, h, 3); ctx.stroke();
-    // Label inside bar
-    if (label) {
-      ctx.font = '700 9px monospace';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = 'rgba(255,255,255,0.82)';
-      ctx.fillText(label, x + w / 2, y + h / 2 + 0.5);
-    }
-  }
-
-  // ============================================================
-  // D.RenderPlayerHUD
-  // Top-left floating player status board: name, faction, HP/MP bars.
-  // ctx   — the 2D canvas context (screen-space, NOT inside camera.apply)
-  // player — D.game.player object
-  // ============================================================
+  /**
+   * Renders Top-Left Floating Player Status HUD.
+   * Call each frame OUTSIDE g.camera.apply(ctx) - screen-space coords.
+   *   D.RenderPlayerHUD(g.ctx, g.player);
+   */
   D.RenderPlayerHUD = function(ctx, player) {
     if (!ctx || !player) return;
     ctx.save();
 
-    const bx = 15, by = 15, bw = 290, bh = 90;
-    const factionColor = D.UIState.factionColors[player.faction] || '#bdc3c7';
-    const level = player.level || 1;
-    const name  = (player.characterName || player.name || 'Unknown').toUpperCase();
-
-    // ── Background board ──
-    ctx.fillStyle   = 'rgba(12,10,22,0.88)';
-    ctx.strokeStyle = factionColor;
+    // ── Background Board ──
+    roundRect(ctx, 15, 15, 290, 90, 6);
+    ctx.fillStyle   = 'rgba(18,14,26,0.92)';
+    ctx.fill();
+    ctx.strokeStyle = '#5d4037';
     ctx.lineWidth   = 2;
-    _roundRect(ctx, bx, by, bw, bh, 8);
-    ctx.fill();
-    _roundRect(ctx, bx, by, bw, bh, 8);
     ctx.stroke();
 
-    // Faction accent top strip
-    ctx.fillStyle = factionColor;
-    ctx.globalAlpha = 0.18;
-    _roundRect(ctx, bx, by, bw, 28, 8);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    // ── Name + Level ──
-    ctx.font      = 'bold 13px monospace';
-    ctx.fillStyle = '#ffffff';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(name + '  (LVL ' + level + ')', bx + 14, by + 17);
-
-    // ── Faction label ──
-    ctx.fillStyle = factionColor;
-    ctx.font      = '10px monospace';
-    const factionLabel = player.faction === 'blood_oath'
-      ? 'Blood-Oath Clans'
-      : player.faction === 'iron_crown'
-        ? 'Iron-Crown Accord'
-        : (player.factionName || 'No Faction');
-    ctx.fillText(factionLabel, bx + 14, by + 34);
-
-    // ── HP bar ──
-    const hpPct = player.hpMax > 0 ? Math.max(0, Math.min(1, player.hp / player.hpMax)) : 0;
-    const mpPct = player.mpMax > 0 ? Math.max(0, Math.min(1, player.mp / player.mpMax)) : 0;
-    const hpLabel = Math.round(player.hp || 0) + ' / ' + Math.round(player.hpMax || 0) + ' HP';
-    const mpLabel = Math.round(player.mp || 0) + ' / ' + Math.round(player.mpMax || 0) + ' MP';
-
-    _drawBar(ctx, bx + 14, by + 47, 262, 13, hpPct, '#c0392b', hpLabel);
-    _drawBar(ctx, bx + 14, by + 65, 262, 13, mpPct, '#2980b9', mpLabel);
-
-    ctx.restore();
-  };
-
-  // ============================================================
-  // D.RenderStatsWindow
-  // Centered character attributes panel. Toggled via D.UIState.showStatsWindow.
-  // ctx         — screen-space 2D context
-  // canvasWidth / canvasHeight — viewport dimensions
-  // player      — D.game.player object
-  // ============================================================
-  D.RenderStatsWindow = function(ctx, canvasWidth, canvasHeight, player) {
-    if (!ctx || !D.UIState.showStatsWindow || !player) return;
-    ctx.save();
-
-    const w = 340, h = 290;
-    const x = Math.round((canvasWidth  / 2) - (w / 2));
-    const y = Math.round((canvasHeight / 2) - (h / 2));
-    const factionColor = D.UIState.factionColors[player.faction] || '#7f8c8d';
-
-    // ── Window body ──
-    ctx.fillStyle   = 'rgba(18,14,28,0.96)';
-    ctx.strokeStyle = factionColor;
-    ctx.lineWidth   = 3;
-    _roundRect(ctx, x, y, w, h, 10);
-    ctx.fill();
-    _roundRect(ctx, x, y, w, h, 10);
-    ctx.stroke();
-
-    // ── Header ribbon ──
-    ctx.fillStyle = 'rgba(0,0,0,0.45)';
-    _roundRect(ctx, x, y, w, 36, 10);
-    ctx.fill();
-    ctx.font         = 'bold 12px monospace';
-    ctx.fillStyle    = '#ecf0f1';
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('CHARACTER ATTRIBUTES & SKILLS', x + w / 2, y + 19);
-
-    // ── Close hint ──
-    ctx.font      = '10px monospace';
-    ctx.fillStyle = 'rgba(255,255,255,0.35)';
-    ctx.textAlign = 'right';
-    ctx.fillText('[P] Close', x + w - 12, y + 19);
-
-    // ── Identity section ──
+    // ── Name & Faction Text ──
+    const lvl  = player.level || 1;
+    const name = (player.characterName || player.name || 'Hero').toUpperCase();
+    ctx.font         = 'bold 14px monospace';
+    ctx.fillStyle    = '#ffffff';
     ctx.textAlign    = 'left';
     ctx.textBaseline = 'alphabetic';
-    ctx.font         = '12px monospace';
-    ctx.fillStyle    = '#bdc3c7';
-    let sy = y + 60;
-    const sp = 22;
-    const col = x + 28;
+    ctx.fillText(name + ' (LVL ' + lvl + ')', 30, 40);
 
-    const charClass = player.charClass || player.classId  || 'Wanderer';
-    const race      = player.race      || player.raceId   || 'Human';
+    const factionKey   = player.factionId || player.faction || '';
+    const factionColor = (D.UIState.factionColors && D.UIState.factionColors[factionKey]) || '#bdc3c7';
+    const factionLabel = factionKey === 'blood_oath' ? 'Blood-Oath Clans'
+                       : factionKey === 'iron_crown'  ? 'Iron-Crown Accord'
+                       : (player.factionName || 'Wanderer');
+    ctx.fillStyle = factionColor;
+    ctx.font      = '11px monospace';
+    ctx.fillText(factionLabel, 30, 58);
 
-    ctx.fillText('Class:  ' + charClass, col, sy); sy += sp;
-    ctx.fillText('Race:   ' + race,      col, sy); sy += sp * 1.4;
-
-    // ── Divider line ──
-    ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+    // ── Health Bar ──
+    const hpMax = player.hpMax || player.maxHp || 100;
+    const hpPct = Math.max(0, Math.min(1, (player.hp || 0) / hpMax));
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fillRect(150, 25, 140, 13);
+    ctx.fillStyle = '#c0392b';
+    ctx.fillRect(150, 25, Math.floor(140 * hpPct), 13);
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
     ctx.lineWidth   = 1;
-    ctx.beginPath();
-    ctx.moveTo(x + 14, sy - 8);
-    ctx.lineTo(x + w - 14, sy - 8);
-    ctx.stroke();
+    ctx.strokeRect(150, 25, 140, 13);
+    ctx.font      = '9px monospace';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.fillText('HP ' + Math.ceil(player.hp || 0) + ' / ' + hpMax, 220, 35);
 
-    // ── Core stats ──
-    const st = player.stats || {};
-    const skills = player.skills || {};
+    // ── Mana Bar ──
+    const mpMax = player.mpMax || player.maxMp || 50;
+    const mpPct = Math.max(0, Math.min(1, (player.mp || 0) / mpMax));
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fillRect(150, 45, 140, 13);
+    ctx.fillStyle = '#2980b9';
+    ctx.fillRect(150, 45, Math.floor(140 * mpPct), 13);
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth   = 1;
+    ctx.strokeRect(150, 45, 140, 13);
+    ctx.font      = '9px monospace';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.fillText('MP ' + Math.ceil(player.mp || 0) + ' / ' + mpMax, 220, 55);
 
-    const rows = [
-      ['STRENGTH',      st.strength     || 10,  '#e74c3c'],
-      ['AGILITY',       st.agility      || 10,  '#f39c12'],
-      ['INTELLIGENCE',  st.intelligence || 10,  '#9b59b6'],
-      ['ARMOR RATING',  st.armor        || 5,   '#7f8c8d'],
-      ['WOODCUTTING',   (skills.woodcutting  && skills.woodcutting.level)  || 1, '#27ae60'],
-      ['MINING',        (skills.mining       && skills.mining.level)       || 1, '#95a5a6'],
-    ];
-
-    ctx.font = '12px monospace';
-    for (const [label, val, color] of rows) {
-      // Label
-      ctx.fillStyle = '#bdc3c7';
+    // ── Zone strip ──
+    if (player.zoneName) {
+      ctx.font      = '10px monospace';
+      ctx.fillStyle = 'rgba(255,207,110,0.72)';
       ctx.textAlign = 'left';
-      ctx.fillText(label + ':', col, sy);
-      // Value (right-aligned, colored)
-      ctx.fillStyle = color;
-      ctx.textAlign = 'right';
-      ctx.fillText(String(Math.round(val)), x + w - 28, sy);
-      sy += sp;
+      ctx.fillText('▶ ' + player.zoneName, 30, 96);
     }
 
     ctx.restore();
   };
 
-  console.log('[UNK-SCAPE] D.RenderPlayerHUD + D.RenderStatsWindow registered on window.Duskfall.');
+  /**
+   * Renders Centered Character Statistics Window.
+   * Toggle with D.UIState.showStatsWindow or D.toggleStatsWindow().
+   *   D.RenderStatsWindow(g.ctx, g.viewW, g.viewH, g.player);
+   */
+  D.RenderStatsWindow = function(ctx, canvasWidth, canvasHeight, player) {
+    if (!ctx || !D.UIState.showStatsWindow || !player) return;
 
-})();
+    const W = 340, H = 310;
+    const wx = Math.floor((canvasWidth  / 2) - (W / 2));
+    const wy = Math.floor((canvasHeight / 2) - (H / 2));
+
+    ctx.save();
+
+    // ── Window body ──
+    const factionKey  = player.factionId || player.faction || '';
+    const borderColor = (D.UIState.factionColors && D.UIState.factionColors[factionKey]) || '#7f8c8d';
+    roundRect(ctx, wx, wy, W, H, 8);
+    ctx.fillStyle   = '#2c3e50';
+    ctx.fill();
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth   = 3;
+    ctx.stroke();
+
+    // ── Header Ribbon ──
+    ctx.fillStyle = 'rgba(0,0,0,0.40)';
+    ctx.fillRect(wx, wy, W, 36);
+    ctx.font         = 'bold 13px monospace';
+    ctx.fillStyle    = '#ecf0f1';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('CHARACTER ATTRIBUTES & SKILLS', wx + W / 2, wy + 18);
+    ctx.font      = '10px monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.30)';
+    ctx.textAlign = 'right';
+    ctx.fillText('[P] close', wx + W - 10, wy + 18);
+
+    // ── Stat Lines ──
+    ctx.textAlign    = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.font         = '12px monospace';
+    let sy   = wy + 60;
+    const sp = 22;
+    const cx = wx + 30;
+    const stats = player.stats  || {};
+    const skl   = player.skills || {};
+
+    ctx.fillStyle = '#bdc3c7';
+    ctx.fillText('Class:   ' + (player.charClass || player.classId || 'Wanderer'), cx, sy); sy += sp;
+    ctx.fillText('Race:    ' + (player.raceId    || player.race    || 'Human'),    cx, sy); sy += sp * 1.4;
+
+    ctx.fillStyle = '#ecf0f1';
+    ctx.font      = 'bold 12px monospace';
+    ctx.fillText('— Attributes —', cx, sy); sy += sp;
+
+    ctx.font      = '12px monospace';
+    ctx.fillStyle = '#fff';
+    ctx.fillText('STRENGTH:      ' + (stats.strength     || 10), cx, sy); sy += sp;
+    ctx.fillText('AGILITY:       ' + (stats.agility      || 10), cx, sy); sy += sp;
+    ctx.fillText('INTELLIGENCE:  ' + (stats.intelligence || 10), cx, sy); sy += sp;
+    ctx.fillText('ARMOR RATING:  ' + (stats.armor        ||  5), cx, sy); sy += sp * 1.4;
+
+    ctx.fillStyle = '#ecf0f1';
+    ctx.font      = 'bold 12px monospace';
+    ctx.fillText('— Skills —', cx, sy); sy += sp;
+
+    ctx.font      = '12px monospace';
+    ctx.fillStyle = '#f7c65b';
+    const skillKeys   = ['woodcutting','mining','combat','cooking','crafting','foraging','survival'];
+    const skillLabels = {
+      woodcutting: 'Woodcutting', mining:    'Mining',   combat:   'Combat',
+      cooking:     'Cooking',    crafting:  'Crafting', foraging: 'Foraging',
+      survival:    'Survival'
+    };
+    for (const k of skillKeys) {
+      const sk = skl[k] || {};
+      ctx.fillText(skillLabels[k] + ': Lv.' + (sk.level || 1) + '  (' + (sk.xp || 0) + ' xp)', cx, sy);
+      sy += sp;
+      if (sy > wy + H - 10) break;
+    }
+
+    ctx.restore();
+  };
+
+  /**
+   * Toggle the stats window open/closed.
+   * Wire into game.js keybind: if (key === 'p') D.toggleStatsWindow();
+   */
+  D.toggleStatsWindow = function() {
+    D.UIState.showStatsWindow = !D.UIState.showStatsWindow;
+  };
+
+})(window.Duskfall = window.Duskfall || {});
