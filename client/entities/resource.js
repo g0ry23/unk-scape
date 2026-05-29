@@ -1,5 +1,5 @@
-(function(){
-  const D = window.UnkScape3D = window.UnkScape3D || {};
+→(function(){
+  const D = window.Duskfall = window.Duskfall || {};
   D.RESOURCE_TYPES = {
     tree:{name:'Oak Tree',item:'log',skill:'woodcutting',tier:1,level:1,xp:18,difficulty:18,color:'#2f7d46',amount:[2,5],respawn:24,action:'Chop'},
     pine:{name:'Pine Tree',item:'pine_log',skill:'woodcutting',tier:2,level:3,xp:34,difficulty:30,color:'#1f8f5f',amount:[2,4],respawn:38,action:'Chop'},
