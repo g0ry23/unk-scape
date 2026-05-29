@@ -77,7 +77,7 @@
     // ── UnkScape module initialization ──────────────────────────────────────
     const U = window.UnkScape || {};
     if (U.Engine && U.Engine.Input)    { U.Engine.Input.init(); }
-    if (U.Engine && U.Engine.Renderer) { U.Engine.Renderer.init('game'); }
+    if (U.Engine && U.Engine.Renderer && typeof U.Engine.Renderer.init === 'function') { U.Engine.Renderer.init('game'); }
     if (U.UI)                          { U.UI.init(); }
     // ────────────────────────────────────────────────────────────────────────
     this.ui.log('Preview booted. Audio starts after your first click/key press.', 'gold');
