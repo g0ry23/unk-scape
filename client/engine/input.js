@@ -138,47 +138,46 @@ D.Input.prototype.onMouseUp = function(e) {
 D.Input.prototype.tryRaycastClick = function(clientX, clientY) {
   var E = window.UnkScape3D;
   if (!E || !E.active || !E.camera || !E.propGroup) return false;
-  var D2 = window.Duskfall;
-  var g  = this.game;
+  var g = this.game;
 
-  var ndcX = (clientX / window.innerWidth)  * 2 - 1;
+  // Build NDC coords from click position
+  var ndcX = (clientX / window.innerWidth) * 2 - 1;
   var ndcY = -(clientY / window.innerHeight) * 2 + 1;
 
   var raycaster = new THREE.Raycaster();
   raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), E.camera);
 
   var hits = raycaster.intersectObjects(E.propGroup.children, true);
-  if (hits.length > 0) {
-    var hitObj = hits[0].object;
-    // Walk up to the propNode (direct child of propGroup)
-    var propNode = hitObj;
-    while (propNode.parent && propNode.parent !== E.propGroup) {
-      propNode = propNode.parent;
-    }
-    // propNode.position is in 3D units — convert back to pixel coords
-    var SCALE = 0.1;
-    var pixelX = propNode.position.x / SCALE;
-    var pixelY = propNode.position.z / SCALE;
+  if (hits.length === 0) return false;
 
-    // Find closest resource at those pixel coords
-    var resources = g.entities && g.entities.resources;
-    if (resources) {
-      var closest = null;
-      var bestDist = 999999;
-      for (var i = 0; i < resources.length; i++) {
-        var r = resources[i];
-        var d = Math.hypot(r.x - pixelX, r.y - pixelY);
-        if (d < bestDist) { bestDist = d; closest = r; }
-      }
-      if (closest && bestDist < 80) {
-        if (g.systems.gathering && g.systems.gathering.tryStartAt(closest.x, closest.y)) {
-          return true;
-        }
-      }
-    }
+  // Read resourceId from mesh or its parent (the propNode Group)
+  var hitObj = hits[0].object;
+  var resourceId = hitObj.userData.resourceId;
+  if (!resourceId && hitObj.parent) {
+    resourceId = hitObj.parent.userData.resourceId;
+  }
+  if (!resourceId) { console.log('[Click] Hit prop but no resourceId tagged'); return false; }
+
+  // Look up the resource directly in g.entities.resources by uid
+  var resources = g.entities && g.entities.resources;
+  if (!resources) { console.log('[Click] No g.entities.resources'); return false; }
+
+  var resource = null;
+  for (var i = 0; i < resources.length; i++) {
+    if (resources[i] && resources[i].uid === resourceId) { resource = resources[i]; break; }
   }
 
-  // Also try terrain hit -> move target (for point-to-move if desired, optional)
+  if (!resource) { console.log('[Click] resourceId not found in entities.resources: ' + resourceId); return false; }
+  if (resource.amount !== undefined && resource.amount <= 0) {
+    g.ui.log('That resource is depleted. Wait for it to respawn.', 'bad');
+    return true;
+  }
+
+  // Pass the resource's x,y directly to gathering
+  console.log('[Click] Hit resource ' + resourceId + ' at (' + Math.round(resource.x) + ',' + Math.round(resource.y) + ')');
+  if (g.systems && g.systems.gathering) {
+    return g.systems.gathering.tryStartAt(resource.x, resource.y);
+  }
   return false;
 };
 
