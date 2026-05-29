@@ -4,7 +4,7 @@ const E = window.UnkScape3D;
 
 (function() {
 
-console.log("UnkScape3D: v1.6 - One source of truth: g.entities.resources drives all props");
+console.log("UnkScape3D: v1.7 - One source of truth: g.entities.resources drives all props");
 
 E.active = false;
 E.scene = null;
@@ -222,26 +222,27 @@ function buildPropMesh(res, surfY, TE) {
     }
   } else {
     if (vconf.trunk && vconf.trunkH > 0) {
-      var barkTex = TE ? TE.getProceduralTexture('bark', vconf.trunk, 30) : null;
-      var barkMat = barkTex ? new THREE.MeshLambertMaterial({ map: barkTex }) : getCachedMat(vconf.trunk);
-      var trunkGeo = new THREE.BoxGeometry(TSCALE * 0.25, vconf.trunkH, TSCALE * 0.25);
+      var barkMat = getCachedMat(vconf.trunk);
+      var trunkGeo = new THREE.CylinderGeometry(TSCALE * 0.1, TSCALE * 0.13, vconf.trunkH, 6);
       var trunkMesh = new THREE.Mesh(trunkGeo, barkMat);
       trunkMesh.position.set(0, vconf.trunkH * 0.5, 0);
       trunkMesh.userData.resourceId = res.uid;
       propNode.add(trunkMesh);
     }
-    var canopyGeo = new THREE.BoxGeometry(
-      vconf.canopyR * TSCALE * 0.7,
-      vconf.canopyH * 1.1,
-      vconf.canopyR * TSCALE * 0.7
-    );
-    if (TE && TE.applyLowPolyJitter) TE.applyLowPolyJitter(canopyGeo, 0.1);
-    var leafTex = TE ? TE.getProceduralTexture('grass', vconf.canopy, 25) : null;
-    var leafMat = leafTex ? new THREE.MeshLambertMaterial({ map: leafTex }) : getCachedMat(vconf.canopy);
-    var canopyMesh = new THREE.Mesh(canopyGeo, leafMat);
-    canopyMesh.position.set(0, vconf.trunkH + vconf.canopyH * 0.55, 0);
-    canopyMesh.userData.resourceId = res.uid;
-    propNode.add(canopyMesh);
+    // Stacked cones for a proper low-poly tree canopy
+    var leafMat = getCachedMat(vconf.canopy);
+    var coneR = vconf.canopyR * TSCALE * 0.55;
+    var coneH = vconf.canopyH * 1.2;
+    var cone1Geo = new THREE.ConeGeometry(coneR, coneH, 7);
+    var cone1 = new THREE.Mesh(cone1Geo, leafMat);
+    cone1.position.set(0, vconf.trunkH + coneH * 0.5, 0);
+    cone1.userData.resourceId = res.uid;
+    propNode.add(cone1);
+    var cone2Geo = new THREE.ConeGeometry(coneR * 0.7, coneH * 0.65, 7);
+    var cone2 = new THREE.Mesh(cone2Geo, leafMat);
+    cone2.position.set(0, vconf.trunkH + coneH * 0.98, 0);
+    cone2.userData.resourceId = res.uid;
+    propNode.add(cone2);
   }
   return propNode;
 }
