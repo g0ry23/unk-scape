@@ -10,7 +10,7 @@ if(!g.world){ drawMenuBg(g,ctx); return; }
 
 ctx.save();
 g.camera.apply(ctx);
-// ── Painter's Algorithm depth-sort: ground tiles → world objects → entities → player ──
+// -- Painter's Algorithm depth-sort: ground tiles -> world objects -> entities -> player --
 drawTiles(g,ctx);
 drawZoneOverlays(g,ctx);
 drawTurfClaims(g,ctx);
@@ -44,9 +44,9 @@ y1:Math.min(D.WORLD.h,Math.ceil((cy+reach)/t))
 
 function drawTiles(g,ctx){
 const b=visibleBounds(g), t=D.TILE;
-// ── Isometric diamond tile renderer with Painter's Algorithm depth sort ──
-// Each tile is a 64×32 diamond. drawTerrainVolume/drawTileDepth (flat coords)
-// are REMOVED from the pipeline — drawTiles handles all wall depth here.
+// -- Isometric diamond tile renderer with Painter's Algorithm depth sort --
+// Each tile is a 64-32 diamond. drawTerrainVolume/drawTileDepth (flat coords)
+// are REMOVED from the pipeline - drawTiles handles all wall depth here.
 // isoProject formula: stays inside g.camera.apply(ctx) coordinate space.
 const IW = 64;
 const IH = 32;
@@ -62,7 +62,7 @@ const id=g.world.tiles[y][x]; const tile=D.TILES[id];
 const isoX = (x - y) * (IW / 2);
 const isoY = (x + y) * (IH / 2);
 const cx = isoX, cy = isoY;
-// ── Elevation: read z from mmoWorld chunk data if available ──
+// -- Elevation: read z from mmoWorld chunk data if available --
 const chunkKey = Math.floor(x/32)+'_'+Math.floor(y/32);
 const UW = window.UnkScape && window.UnkScape.World;
 const chunk = UW && UW.loadedChunks && UW.loadedChunks[chunkKey];
@@ -109,7 +109,7 @@ ctx.moveTo(cx - IW*0.25, cy + IH*0.45 + n*3 - elevOffset);
 ctx.quadraticCurveTo(cx, cy + IH*0.30 - elevOffset, cx + IW*0.25, cy + IH*0.45 + n*3 - elevOffset);
 ctx.stroke();
 }
-// ── Side walls: combine tile type + elevation z for stepped cliffs ──
+// -- Side walls: combine tile type + elevation z for stepped cliffs --
 if(id !== 'water'){
 // Base wall from tile type
 const baseWallH = id==='stone'?9 : id==='darkgrass'?5 : id==='dirt'?3 : id==='sand'?2 : 2;
@@ -180,7 +180,7 @@ ctx.strokeStyle=pt.owner?f.color:'rgba(255,255,255,.25)';ctx.lineWidth=3;
 ctx.globalAlpha=.78;circle(ctx,0,0,pt.r);ctx.stroke();ctx.globalAlpha=1;
 ctx.fillStyle='rgba(0,0,0,.32)';ellipse(ctx,0,18,28,8);ctx.fill();
 ctx.fillStyle=f.color||'#f7c65b';circle(ctx,0,0,18);ctx.fill();
-ctx.fillStyle='#fff';ctx.font='18px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(f.icon||'❑',0,0);
+ctx.fillStyle='#fff';ctx.font='18px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(f.icon||'-',0,0);
 const pct=Math.round((pt.progress||0)*100);
 if(D.dist(g.player,pt)<125) label(ctx,(pt.owner?'CLAIMED':'CLAIM')+' '+pct+'%',0,-35,f.color||'#f7c65b');
 ctx.restore();
@@ -251,6 +251,7 @@ ctx.restore();
 function drawResources(g,ctx){
 for(const r of g.entities.resources){
 if(!onScreen(g,r,80) || r.amount<=0) continue;
+    const cfg=r.cfg; if(!cfg) continue;
 const cfg=r.cfg;
 ctx.save(); ctx.translate(r.x,r.y);
 const pulse = r.cooldown>0 ? .55 : 1;
@@ -269,7 +270,7 @@ ctx.fillStyle='rgba(255,255,255,.16)'; poly(ctx,[[-7,-9],[6,-15],[13,-3],[-1,2]]
 }else if(r.type==='fish'){
 ctx.fillStyle='rgba(0,0,0,.22)'; ellipse(ctx,0,12,26,8); ctx.fill();
 ctx.strokeStyle='rgba(120,205,255,.65)'; ctx.lineWidth=3; circle(ctx,0,0,19); ctx.stroke();
-ctx.fillStyle='#7cc7ff'; ctx.font='22px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🐟',0,0);
+ctx.fillStyle='#7cc7ff'; ctx.font='22px serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('--',0,0);
 }else if(r.type==='berry'){
 ctx.fillStyle='#225c39'; circle(ctx,0,0,19); ctx.fill();
 ctx.fillStyle='#7cc7ff'; for(let i=0;i<5;i++) circle(ctx,Math.cos(i)*10,Math.sin(i*2)*8,3.5),ctx.fill();
@@ -335,14 +336,14 @@ ctx.restore();
 function drawPlayer(g,ctx){
 const p=g.player;if(!p)return;
 const speed=Math.hypot(p.vx||0,p.vy||0);
-// ── Stride animation clock ──
+// -- Stride animation clock --
 p.isMoving = speed>8;
 p.animTick = (p.animTick || 0) + (p.isMoving ? 0.22 : 0.04);
-// ── Torso bob ──
+// -- Torso bob --
 let torsoBobY = p.isMoving
 ? Math.abs(Math.sin(p.animTick * 2)) * -3.5
 : Math.sin(p.animTick) * -1.2;
-// ── Pendulum feet ──
+// -- Pendulum feet --
 let leftLegX = -5 + (p.isMoving ? Math.cos(p.animTick) * 5.5 : 0);
 let rightLegX = 5 - (p.isMoving ? Math.cos(p.animTick) * 5.5 : 0);
 const aimAng=p.facingAngle ?? Math.atan2((g.input?.mouse?.worldY||p.y)-p.y,(g.input?.mouse?.worldX||p.x)-p.x);
@@ -432,7 +433,7 @@ if(!onScreen(g,d,60)) continue;
 const it=D.ITEMS[d.id];
 ctx.save();ctx.translate(d.x,d.y);
 ctx.fillStyle='rgba(0,0,0,.25)';ellipse(ctx,0,12,14,5);ctx.fill();
-ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(it?.icon||'❔',0,0);
+ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(it?.icon||'-',0,0);
 if(D.dist(g.player,d)<55) label(ctx,(it?.name||d.id)+(d.qty>1?' x'+d.qty:''),0,-24,'#f7c65b');
 ctx.restore();
 }
@@ -477,7 +478,7 @@ function drawMobEntities(g,ctx){
     circle(ctx, 0, -10, cfg.r || 17); ctx.fill();
     // Icon
     ctx.font = '22px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(cfg.icon || '👾', 0, -10);
+    ctx.fillText(cfg.icon || '--', 0, -10);
     // HP bar
     const w = 42, h = 6, pct = mob.hp / mob.maxHp;
     ctx.fillStyle = 'rgba(0,0,0,0.45)'; round(ctx, -w/2, -34, w, h, 99); ctx.fill();
@@ -492,18 +493,18 @@ function drawMobEntities(g,ctx){
   }
 }
 function drawLighting(g,ctx){
-  // ── Priority 1: UnkScape.Engine.Environment darkness overlay (new apocalypse cycle) ──
+  // -- Priority 1: UnkScape.Engine.Environment darkness overlay (new apocalypse cycle) --
   const Env = window.UnkScape && window.UnkScape.Engine && window.UnkScape.Engine.Environment;
   const darkness = Env ? Env.getDarkness() : 0;
 
-  // ── Fallback: legacy DayNight system ──
+  // -- Fallback: legacy DayNight system --
   const dn = g.systems.daynight;
   const legacyNight = (!Env && dn) ? dn.nightAmount() : 0;
 
   const nightIntensity = Math.max(darkness, legacyNight);
   if (nightIntensity <= 0.02) return;
 
-  // ── Step 1: Draw full-screen darkness layer on an offscreen canvas ──
+  // -- Step 1: Draw full-screen darkness layer on an offscreen canvas --
   // We use a temporary canvas so we can cut torch circles out with destination-out.
   const oc = document.createElement('canvas');
   oc.width  = g.viewW;
@@ -514,7 +515,7 @@ function drawLighting(g,ctx){
   oc2.fillStyle = 'rgba(10,8,20,' + (nightIntensity * 0.82).toFixed(3) + ')';
   oc2.fillRect(0, 0, g.viewW, g.viewH);
 
-  // ── Step 2: Cut transparent torch circle around player via destination-out ──
+  // -- Step 2: Cut transparent torch circle around player via destination-out --
   const p = g.player;
   if (p) {
     const screen = g.camera.worldToScreen(p.x, p.y);
@@ -530,7 +531,7 @@ function drawLighting(g,ctx){
     oc2.fillStyle = grad;
     oc2.fillRect(screen.x - torchRadius, screen.y - torchRadius, torchRadius * 2, torchRadius * 2);
 
-    // ── Step 3: Cut light circles for active campfires in world ──
+    // -- Step 3: Cut light circles for active campfires in world --
     if (g.entities && g.entities.resources) {
       for (const r of g.entities.resources) {
         if (r.type !== 'campfire' || !r.active) continue;
@@ -547,7 +548,7 @@ function drawLighting(g,ctx){
     oc2.globalCompositeOperation = 'source-over';
   }
 
-  // ── Step 4: Blit the darkness+cutout layer onto the main canvas ──
+  // -- Step 4: Blit the darkness+cutout layer onto the main canvas --
   ctx.save();
   ctx.setTransform(1,0,0,1,0,0);  // reset DPR transform for overlay blit
   ctx.drawImage(oc, 0, 0);
@@ -579,7 +580,7 @@ ctx.fillStyle=color;ctx.fillText(text,x,y+1);
 }
 })();
 
-// ── UnkScape.Engine.Renderer shim ──
+// -- UnkScape.Engine.Renderer shim --
 ((U) => {
 U.Engine = U.Engine || {};
 U.Engine.Renderer = {
@@ -610,7 +611,7 @@ window.Duskfall.render(window.Duskfall.game);
   /**
    * PROJECTION MATRIX: Converts 3D Virtual Space (X, Y, Z) into 2D Screen Space.
    * Kept on D namespace so mmoWorld.js / structure renderers can call D.isoProject().
-   * NOTE: Returns coords in iso grid space — only call inside g.camera.apply(ctx) blocks.
+   * NOTE: Returns coords in iso grid space - only call inside g.camera.apply(ctx) blocks.
    */
   D.isoProject = D.isoProject || function(x, y, z) {
     const screenX = (x - y) * (D.TILE_WIDTH  / 2);
@@ -695,6 +696,6 @@ window.Duskfall.render(window.Duskfall.game);
     ctx.restore();
   };
 
-  console.log('[UNK-SCAPE] Dimensional Depth Rendering Pipeline v0.4.7 — D.isoProject / D.renderTurfTile / D.renderWallTile live.');
+  console.log('[UNK-SCAPE] Dimensional Depth Rendering Pipeline v0.4.7 - D.isoProject / D.renderTurfTile / D.renderWallTile live.');
 
 })(window.Duskfall = window.Duskfall || {});
