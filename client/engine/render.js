@@ -44,38 +44,92 @@
 
   function drawTiles(g,ctx){
     const b=visibleBounds(g), t=D.TILE;
+    // ── Isometric diamond tile renderer ──────────────────────────────────
+    // Each tile is drawn as a 64×32 diamond instead of a flat square.
+    // We stay inside g.camera.apply(ctx) so zoom/pitch/shake still apply.
+    // isoProject converts tile-grid coords → pixel world-space, then the
+    // camera transform handles the final screen projection automatically.
+    const IW = 64; // iso diamond width  (matching UnkScape.World constants)
+    const IH = 32; // iso diamond height
+    // Sort Y-ascending so tiles further "back" paint first (painter's algo)
     for(let y=b.y0;y<b.y1;y++) for(let x=b.x0;x<b.x1;x++){
-      const id=g.world.tiles[y][x]; const tile=D.TILES[id];
-      const px=x*t, py=y*t;
-      const grad=ctx.createLinearGradient(px,py,px,py+t);
-      grad.addColorStop(0,shade(tile.color,10));
-      grad.addColorStop(.55,tile.color);
-      grad.addColorStop(1,shade(tile.color,-14));
-      ctx.fillStyle=grad; ctx.fillRect(px,py,t,t);
-      // subtle texture
-      const n=g.world.noise[y][x];
-      ctx.fillStyle=n>.52?tile.variant:'rgba(255,255,255,.018)';
-      ctx.globalAlpha=.32;
-      ctx.fillRect(px+3+(n*13%6),py+4+(n*19%6),Math.max(7,t*.38),Math.max(2,t*.06));
-      ctx.globalAlpha=1;
-      if(id==='water'){
-        ctx.strokeStyle='rgba(120,205,255,.15)'; ctx.lineWidth=2;
-        ctx.beginPath(); ctx.moveTo(px+4,py+t*.42+n*7); ctx.quadraticCurveTo(px+t*.5,py+t*.25,px+t-4,py+t*.42+n*7); ctx.stroke();
-      }
-      if(id==='path'){
-        ctx.fillStyle='rgba(255,255,255,.035)';
-        ctx.fillRect(px+6,py+6,4,3);ctx.fillRect(px+t-14,py+t-15,5,3);
-      }
+        const id=g.world.tiles[y][x]; const tile=D.TILES[id];
+        // ── Convert grid → isometric pixel position ──────────────────────
+        // Formula matches UnkScape.World.isoProject with camera offset stripped
+        // (camera.apply already handled the offset via ctx.translate)
+        const isoX = (x - y) * (IW / 2);
+        const isoY = (x + y) * (IH / 2);
+        // Diamond top-point sits at (isoX, isoY); draw clockwise from top
+        const cx = isoX, cy = isoY;
+        // ── Fill: gradient from top-face highlight to bottom shadow ──────
+        const grad = ctx.createLinearGradient(cx, cy, cx, cy + IH);
+        grad.addColorStop(0,   shade(tile.color, 18));
+        grad.addColorStop(0.5, tile.color);
+        grad.addColorStop(1,   shade(tile.color, -20));
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(cx,          cy);          // top
+        ctx.lineTo(cx + IW/2,   cy + IH/2);  // right
+        ctx.lineTo(cx,          cy + IH);     // bottom
+        ctx.lineTo(cx - IW/2,   cy + IH/2);  // left
+        ctx.closePath();
+        ctx.fill();
+        // ── Thin border to show tile grid ────────────────────────────────
+        ctx.strokeStyle = 'rgba(0,0,0,0.10)';
+        ctx.lineWidth   = 0.5;
+        ctx.stroke();
+        // ── Noise texture overlay ─────────────────────────────────────────
+        const n = g.world.noise[y][x];
+        if(n > 0.52){
+            ctx.fillStyle   = tile.variant || 'rgba(255,255,255,0.06)';
+            ctx.globalAlpha = 0.22;
+            ctx.beginPath();
+            ctx.moveTo(cx,         cy + IH*0.22);
+            ctx.lineTo(cx+IW*0.22, cy + IH*0.55);
+            ctx.lineTo(cx,         cy + IH*0.88);
+            ctx.lineTo(cx-IW*0.22, cy + IH*0.55);
+            ctx.closePath();
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+        // ── Water ripple ─────────────────────────────────────────────────
+        if(id === 'water'){
+            ctx.strokeStyle = 'rgba(120,205,255,0.25)';
+            ctx.lineWidth   = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(cx - IW*0.25, cy + IH*0.45 + n*3);
+            ctx.quadraticCurveTo(cx, cy + IH*0.30, cx + IW*0.25, cy + IH*0.45 + n*3);
+            ctx.stroke();
+        }
+        // ── Left face (south-west side wall, adds 3-D depth) ─────────────
+        if(id !== 'water'){
+            const wallH = id==='stone'?9 : id==='darkgrass'?5 : id==='dirt'?3 : 2;
+            if(wallH > 0){
+                ctx.fillStyle   = shade(tile.color, -38);
+                ctx.globalAlpha = 0.72;
+                ctx.beginPath();
+                ctx.moveTo(cx - IW/2, cy + IH/2);          // left diamond point
+                ctx.lineTo(cx,         cy + IH);             // bottom diamond point
+                ctx.lineTo(cx,         cy + IH + wallH);     // bottom shifted down
+                ctx.lineTo(cx - IW/2, cy + IH/2 + wallH);   // left shifted down
+                ctx.closePath();
+                ctx.fill();
+                // Right face
+                ctx.fillStyle   = shade(tile.color, -22);
+                ctx.beginPath();
+                ctx.moveTo(cx,         cy + IH);
+                ctx.lineTo(cx + IW/2,  cy + IH/2);
+                ctx.lineTo(cx + IW/2,  cy + IH/2 + wallH);
+                ctx.lineTo(cx,         cy + IH + wallH);
+                ctx.closePath();
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
     }
-    // grid fade
-    ctx.strokeStyle='rgba(0,0,0,.045)';ctx.lineWidth=1;
-    if(t>=36){
-      for(let x=b.x0;x<=b.x1;x++){ctx.beginPath();ctx.moveTo(x*t,b.y0*t);ctx.lineTo(x*t,b.y1*t);ctx.stroke();}
-      for(let y=b.y0;y<=b.y1;y++){ctx.beginPath();ctx.moveTo(b.x0*t,y*t);ctx.lineTo(b.x1*t,y*t);ctx.stroke();}
-    }
-  }
+}
 
-  function drawTerrainVolume(g,ctx){
+function drawTerrainVolume(g,ctx){
     const b=visibleBounds(g), t=D.TILE;
     for(let y=b.y0;y<b.y1;y++) for(let x=b.x0;x<b.x1;x++){
       const id=g.world.tiles[y][x], n=g.world.noise[y][x];
@@ -371,7 +425,16 @@ function drawZoneOverlays(g,ctx){
     const style=D.EQUIPMENT[weaponId]?.style || weapon?.combatStyle || 'melee';
     const body=p.equipment.body==='iron_armor'?'#9ea7b8':p.equipment.body==='hide_armor'?'#7a5138':p.equipment.body==='ranger_tunic'?'#2f8f5d':p.equipment.body==='apprentice_robe'?'#6d55d8':'#2f6eea';
     const headGear=p.equipment.head;
-    ctx.save();ctx.translate(p.x,p.y+torsoBobY);
+    // ── Iso-project player onto diamond grid ────────────────────────────
+    // Convert world-pixel coords → iso screen coords using the same formula
+    // as drawTiles, then offset by torsoBobY for the stride animation.
+    const IW_P = 64, IH_P = 32;
+    const _tileSize = D.TILE || 48;
+    const _ptx = p.x / _tileSize;  // fractional tile X
+    const _pty = p.y / _tileSize;  // fractional tile Y
+    const _isoX = (_ptx - _pty) * (IW_P / 2);
+    const _isoY = (_ptx + _pty) * (IH_P / 2);
+    ctx.save();ctx.translate(_isoX, _isoY + torsoBobY);
     ctx.fillStyle='rgba(0,0,0,.34)';ellipse(ctx,0,25-torsoBobY,30,9);ctx.fill();
     const faction=D.FACTIONS[p.factionId]||{};
     ctx.strokeStyle=faction.color||'rgba(106,167,255,.28)';ctx.globalAlpha=.34;ctx.lineWidth=3;circle(ctx,0,0,25+Math.sin(g.time*4)*1.5);ctx.stroke();ctx.globalAlpha=1;
