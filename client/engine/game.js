@@ -215,17 +215,19 @@ this.update(this.fixedDt);
 this.accum -= this.fixedDt;
 }
 }
-D.render(this);
+// D.render(this); // 2D WORLD RENDER DISABLED - 3D engine is active
 // ── UnkScape3D WebGL frame render (Three.js) ──
 if (window.UnkScape3D && window.UnkScape3D.active) {
 window.UnkScape3D.RenderFrame3D(this.player);
 }
 // ────────────────────────────────────────────────
+/* 2D SECONDARY RENDER PASS DISABLED
 // ── UnkScape secondary render pass ──
 const _U = window.UnkScape || {};
 if (_U.Engine && _U.Engine.Renderer && this.world && this.player) {
 _U.Engine.Renderer.renderFrame(this.world, this.player, this.camera);
 }
+*/
 if(this.state !== 'loading') this.ui.update();
 requestAnimationFrame(t=>this.loop(t));
 };
