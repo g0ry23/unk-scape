@@ -1,4 +1,4 @@
-(function(){
+—(function(){
 const D = window.Duskfall = window.Duskfall || {};
 D.Game = function(){
 this.canvas = document.getElementById('game');
@@ -79,6 +79,10 @@ const U = window.UnkScape || {};
 if (U.Engine && U.Engine.Input) { U.Engine.Input.init(); }
 if (U.Engine && U.Engine.Renderer && typeof U.Engine.Renderer.init === 'function') { U.Engine.Renderer.init('game'); }
 if (U.UI) { U.UI.init(); } // also calls toggleHUDDisplay(false) at boot
+  // ── Attach UnkScape environment clock and mob AI ──
+  if (U.Engine && U.Engine.Environment) { U.Engine.Environment.attach(this); }
+  if (U.AI && U.AI.MobEngine) { U.AI.MobEngine.attach(this); }
+  // ─────────────────────────────────────────────────────────────────────────────
 // ─────────────────────────────────────────────────────────────────────────
 this.ui.log('Preview booted. Audio starts after your first click/key press.', 'gold');
 this.running = true;
@@ -228,6 +232,11 @@ _UW.World.updateLoadedChunks(this.player.x, this.player.y);
 }
 // ─────────────────────────────────────────────────────────────────────────
 this.systems.ai.update(dt);
+  // ── UnkScape environment clock tick + mob AI update ──
+  const _UEnv = window.UnkScape;
+  if (_UEnv && _UEnv.Engine && _UEnv.Engine.Environment) { _UEnv.Engine.Environment.update(dt); }
+  if (_UEnv && _UEnv.AI && _UEnv.AI.MobEngine) { _UEnv.AI.MobEngine.update(dt); }
+  // ─────────────────────────────────────────────────────────────────────────────
 if(this.systems.gathering) this.systems.gathering.update(dt);
 this.systems.combat.update(dt);
 this.systems.dungeon.update(dt);
