@@ -84,12 +84,12 @@ const E = window.UnkScape3D;
         // Dedicated WebGL canvas — must not reuse the canvas that has 2d context
         const webglCanvas         = document.createElement('canvas');
         webglCanvas.id            = 'game-webgl';
-        webglCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;';
-        gameCanvas.parentElement.appendChild(webglCanvas);
+        webglCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;';
+        gameCanvas.parentElement.insertBefore(webglCanvas, gameCanvas); // insert before 2D canvas so 3D is background layer
 
         // Scene + sky
         E.scene            = new THREE.Scene();
-        E.scene.background = new THREE.Color('#0b0e1a');
+        E.scene.background = null; // transparent — lets 2D canvas layer beneath
 
         // Perspective camera
         const aspect = window.innerWidth / window.innerHeight;
@@ -97,12 +97,13 @@ const E = window.UnkScape3D;
         E.camera.position.set(0, 25, 30);
 
         // WebGL renderer
-        E.renderer = new THREE.WebGLRenderer({ canvas: webglCanvas, antialias: true });
+        E.renderer = new THREE.WebGLRenderer({ canvas: webglCanvas, antialias: true, alpha: true });
+	E.renderer.setClearColor(0x000000, 0); // fully transparent clear
         E.renderer.setSize(window.innerWidth, window.innerHeight);
 
         // Lighting: ambient + warm directional sun
-        E.scene.add(new THREE.AmbientLight('#ffffff', 0.55));
-        const sun = new THREE.DirectionalLight('#ffe8c0', 0.9);
+        E.scene.add(new THREE.AmbientLight('#ffffff', 1.0)); // boosted for clear visibility
+        const sun = new THREE.DirectionalLight('#ffe8c0', 1.2);
         sun.position.set(80, 120, 60);
         E.scene.add(sun);
 
