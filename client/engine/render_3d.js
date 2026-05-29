@@ -152,6 +152,25 @@ E.Initialize3D = function() {
 
   E.active = true;
 
+  // ── Middle-mouse orbit + scroll zoom ─────────────────────────
+  var _orbitDragging = false;
+  var _orbitLastX = 0, _orbitLastY = 0;
+  window.addEventListener('mousedown', function(ev) {
+    if (ev.button === 1) { _orbitDragging = true; _orbitLastX = ev.clientX; _orbitLastY = ev.clientY; ev.preventDefault(); }
+  });
+  window.addEventListener('mousemove', function(ev) {
+    if (!_orbitDragging) return;
+    var dx = ev.clientX - _orbitLastX;
+    var dy = ev.clientY - _orbitLastY;
+    E.cameraOrbitAngle += dx * 0.01;
+    E.cameraOrbitPhi    = Math.max(0.15, Math.min(1.2, E.cameraOrbitPhi - dy * 0.005));
+    _orbitLastX = ev.clientX; _orbitLastY = ev.clientY;
+  });
+  window.addEventListener('mouseup', function(ev) {
+    if (ev.button === 1) _orbitDragging = false;
+  });
+  // ─────────────────────────────────────────────────────────────
+
   window.addEventListener('resize', function() {
     E.camera.aspect = window.innerWidth / window.innerHeight;
     E.camera.updateProjectionMatrix();
@@ -288,13 +307,21 @@ E.RenderFrame3D = function(playerData) {
     if (Math.abs(vx) > 0.5 || Math.abs(vy) > 0.5) {
       E.playerVisual.rotation.y = Math.atan2(vx, vy);
     }
-    var camTargetX = target3X;
-    var camTargetY = playerY + 12.0;
-    var camTargetZ = target3Z + 24.0;
+    // ── Orbit + zoom camera positioning ──────────────────────────
+    var zoom   = E.cameraZoomOffset;
+    var oa     = E.cameraOrbitAngle;
+    var op     = E.cameraOrbitPhi;
+    var camOffX = zoom * Math.sin(oa) * Math.cos(op);
+    var camOffY = zoom * Math.sin(op) + 12.0;
+    var camOffZ = zoom * Math.cos(oa) * Math.cos(op) + 8.0;
+    var camTargetX = target3X + camOffX;
+    var camTargetY = playerY  + camOffY;
+    var camTargetZ = target3Z + camOffZ;
     E.camera.position.x += (camTargetX - E.camera.position.x) * 0.08;
     E.camera.position.y += (camTargetY - E.camera.position.y) * 0.08;
     E.camera.position.z += (camTargetZ - E.camera.position.z) * 0.08;
-    E.camera.lookAt(E.playerVisual.position);
+    E.camera.lookAt(target3X, playerY, target3Z);
+    // ─────────────────────────────────────────────────────────────
     var D = window.Duskfall;
     if (D && D.CharacterVisuals && D.CharacterVisuals.animateMesh) {
       var velocity = Math.hypot(vx, vy);
