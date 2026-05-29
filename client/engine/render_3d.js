@@ -118,7 +118,7 @@ E.Initialize3D = function() {
     var snapZ = (p.y || 0) * SCALE;
     var snapGH = getTileHeight(Math.floor((p.x||0)/TILE), Math.floor((p.y||0)/TILE));
     var snapPY = 1 + snapGH;
-    E.camera.position.set(snapX, snapPY + 18, snapZ + 22);
+    E.camera.position.set(snapX, snapPY + 12.0, snapZ + 24.0);
     E.camera.lookAt(snapX, snapPY, snapZ);
   } else {
     E.camera.position.set(0, 25, 30);
@@ -198,10 +198,10 @@ E.Update3DTerrain = function(pxX, pxY) {
       var finalHeight = Math.max(0.4, 1 + heightCalc);
       var noiseLevel  = (tileType === 'stonepath') ? 35 : 20;
       var blockMat    = getTexMat(tileType, hexColor, noiseLevel);
-      var blockGeo    = new THREE.BoxGeometry(TSCALE, 1, TSCALE);
+      var blockGeo    = new THREE.BoxGeometry(TSCALE, 2.5, TSCALE);
       var blockMesh   = new THREE.Mesh(blockGeo, blockMat);
-      blockMesh.scale.set(1, finalHeight, 1);
-      blockMesh.position.set(tx * TSCALE, finalHeight * 0.5, tz * TSCALE);
+      blockMesh.scale.set(1, 1, 1);
+      blockMesh.position.set(tx * TSCALE, finalHeight - 1.25, tz * TSCALE);
       E.terrainGroup.add(blockMesh);
     }
   }
@@ -289,8 +289,8 @@ E.RenderFrame3D = function(playerData) {
       E.playerVisual.rotation.y = Math.atan2(vx, vy);
     }
     var camTargetX = target3X;
-    var camTargetY = playerY + 18;
-    var camTargetZ = target3Z + 22;
+    var camTargetY = playerY + 12.0;
+    var camTargetZ = target3Z + 24.0;
     E.camera.position.x += (camTargetX - E.camera.position.x) * 0.08;
     E.camera.position.y += (camTargetY - E.camera.position.y) * 0.08;
     E.camera.position.z += (camTargetZ - E.camera.position.z) * 0.08;
