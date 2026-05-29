@@ -16,6 +16,9 @@ E.terrainGroup = null;
 E.propGroup    = null;
 E.lastChunkX   = -9999;
 E.lastChunkY   = -9999;
+E.cameraZoomOffset = 24.0;
+E.cameraOrbitAngle = 0;
+E.cameraOrbitPhi   = 0.5;
 
 var SCALE  = 0.1;
 var TILE   = 32;
@@ -308,9 +311,9 @@ E.RenderFrame3D = function(playerData) {
       E.playerVisual.rotation.y = Math.atan2(vx, vy);
     }
     // ── Orbit + zoom camera positioning ──────────────────────────
-    var zoom   = E.cameraZoomOffset;
-    var oa     = E.cameraOrbitAngle;
-    var op     = E.cameraOrbitPhi;
+    var zoom   = (E.cameraZoomOffset !== undefined) ? E.cameraZoomOffset : 24.0;
+    var oa     = (E.cameraOrbitAngle !== undefined) ? E.cameraOrbitAngle : 0;
+    var op     = (E.cameraOrbitPhi !== undefined) ? E.cameraOrbitPhi : 0.5;
     var camOffX = zoom * Math.sin(oa) * Math.cos(op);
     var camOffY = zoom * Math.sin(op) + 12.0;
     var camOffZ = zoom * Math.cos(oa) * Math.cos(op) + 8.0;
