@@ -300,6 +300,14 @@ E.RenderFrame3D = function(playerData) {
       var velocity = Math.hypot(vx, vy);
       var time = performance.now() * 0.001;
       D.CharacterVisuals.animateMesh(E.playerVisual, velocity, time);
+    // ── Weapon attachment: reads equipped weapon or active hotbar slot ──
+    if (D && D.CharacterVisuals && D.CharacterVisuals.updateWeapon) {
+      var weaponId = D.game && D.game.player ?
+        ((D.game.player.equipment && D.game.player.equipment.weapon) ||
+         (D.game.hotbar && D.game.hotbar.slots ? D.game.hotbar.slots[D.game.hotbar.selected || 0] : null))
+        : null;
+      D.CharacterVisuals.updateWeapon(E.playerVisual, weaponId);
+    }
     }
   }
   E.renderer.render(E.scene, E.camera);
