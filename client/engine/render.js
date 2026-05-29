@@ -252,7 +252,6 @@ function drawResources(g,ctx){
 for(const r of g.entities.resources){
 if(!onScreen(g,r,80) || r.amount<=0) continue;
     const cfg=r.cfg; if(!cfg) continue;
-const cfg=r.cfg;
 ctx.save(); ctx.translate(r.x,r.y);
 const pulse = r.cooldown>0 ? .55 : 1;
 ctx.globalAlpha=pulse;
