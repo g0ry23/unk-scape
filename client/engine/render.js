@@ -364,14 +364,7 @@ const weapon=D.ITEMS[weaponId];
 const style=D.EQUIPMENT[weaponId]?.style || weapon?.combatStyle || 'melee';
 const body=p.equipment.body==='iron_armor'?'#9ea7b8':p.equipment.body==='hide_armor'?'#7a5138':p.equipment.body==='ranger_tunic'?'#2f8f5d':p.equipment.body==='apprentice_robe'?'#6d55d8':'#2f6eea';
 const headGear=p.equipment.head;
-// ── Iso-project player onto diamond grid ──
-const IW_P = 64, IH_P = 32;
-const _tileSize = D.TILE || 48;
-const _ptx = p.x / _tileSize;
-const _pty = p.y / _tileSize;
-const _isoX = (_ptx - _pty) * (IW_P / 2);
-const _isoY = (_ptx + _pty) * (IH_P / 2);
-ctx.save();ctx.translate(_isoX, _isoY + torsoBobY);
+ctx.save();ctx.translate(p.x, p.y + torsoBobY);
 ctx.fillStyle='rgba(0,0,0,.34)';ellipse(ctx,0,25-torsoBobY,30,9);ctx.fill();
 const faction=D.FACTIONS[p.factionId]||{};
 ctx.strokeStyle=faction.color||'rgba(106,167,255,.28)';ctx.globalAlpha=.34;ctx.lineWidth=3;circle(ctx,0,0,25+Math.sin(g.time*4)*1.5);ctx.stroke();ctx.globalAlpha=1;
