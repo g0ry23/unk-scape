@@ -18,7 +18,11 @@ const E = window.UnkScape3D;
 
     /**
 
-     * Initializes the true 3D WebGL framework over the existing game canvas
+     * Initializes the true 3D WebGL framework.
+
+     * Creates a dedicated WebGL canvas layered OVER the existing 2D game canvas
+
+     * so both can coexist (2D canvas keeps its context, WebGL gets its own).
 
      */
 
@@ -32,6 +36,7 @@ const E = window.UnkScape3D;
 
         }
 
+        // Reference the existing game container
         const gameCanvas = document.getElementById("game");
 
         if (!gameCanvas) {
@@ -42,13 +47,36 @@ const E = window.UnkScape3D;
 
         }
 
-        // 1. Setup Scene & Sky Background Color
+        // 1. Create a NEW dedicated WebGL canvas (layered over the 2D canvas)
+        //    The 2D canvas already holds a '2d' context — we cannot share it with WebGL.
+
+        const webglCanvas = document.createElement('canvas');
+
+        webglCanvas.id = 'game-webgl';
+
+        webglCanvas.style.position = 'absolute';
+
+        webglCanvas.style.top = '0';
+
+        webglCanvas.style.left = '0';
+
+        webglCanvas.style.width = '100%';
+
+        webglCanvas.style.height = '100%';
+
+        webglCanvas.style.pointerEvents = 'none'; // Let clicks pass through to 2D canvas
+
+        webglCanvas.style.zIndex = '1'; // Above 2D canvas but below HUD (z-index:10)
+
+        gameCanvas.parentElement.appendChild(webglCanvas);
+
+        // 2. Setup Scene & Sky Background Color
 
         E.scene = new THREE.Scene();
 
         E.scene.background = new THREE.Color('#0b0e1a');
 
-        // 2. Perspective Camera (True depth camera projection)
+        // 3. Perspective Camera (True depth camera projection)
 
         const aspect = window.innerWidth / window.innerHeight;
 
@@ -56,19 +84,17 @@ const E = window.UnkScape3D;
 
         E.camera.position.set(0, 25, 30); // Raised and looking downward at an angle
 
-        // 3. WebGL Renderer utilizing the EXACT existing canvas element
+        // 4. WebGL Renderer on the dedicated new canvas
 
-        E.renderer = new THREE.WebGLRenderer({ canvas: gameCanvas, antialias: true });
+        E.renderer = new THREE.WebGLRenderer({ canvas: webglCanvas, antialias: true });
 
         E.renderer.setSize(window.innerWidth, window.innerHeight);
 
-        // 4. Environmental Lighting
+        // 5. Environmental Lighting
 
         const ambientLight = new THREE.AmbientLight('#ffffff', 0.5);
 
         E.scene.add(ambientLight);
-
-        
 
         const dirLight = new THREE.DirectionalLight('#ffffff', 0.8);
 
@@ -76,7 +102,7 @@ const E = window.UnkScape3D;
 
         E.scene.add(dirLight);
 
-        // 5. Build Player Avatar Placeholder (3D Cylinder)
+        // 6. Build Player Avatar Placeholder (3D Cylinder)
 
         const geometry = new THREE.CylinderGeometry(0.8, 0.8, 3, 16);
 
@@ -88,7 +114,7 @@ const E = window.UnkScape3D;
 
         E.scene.add(E.playerMesh);
 
-        // 6. Build a Basic Ground Floor to show depth instantly
+        // 7. Build a Basic Ground Floor to show depth instantly
 
         const floorGeo = new THREE.BoxGeometry(100, 1, 100);
 
@@ -104,8 +130,6 @@ const E = window.UnkScape3D;
 
         E.active = true;
 
-        
-
         // Handle window resizing
 
         window.addEventListener('resize', () => {
@@ -118,7 +142,7 @@ const E = window.UnkScape3D;
 
         });
 
-        console.log("UnkScape3D: 3D Render Bridge successfully bound to canvas.");
+        console.log("UnkScape3D: 3D Render Bridge successfully bound to canvas. WebGL canvas id=game-webgl created.");
 
     };
 
@@ -141,8 +165,6 @@ const E = window.UnkScape3D;
             const targetZ = (playerData.y || 0) * 0.1;
 
             E.playerMesh.position.set(targetX, 1.5, targetZ);
-
-            
 
             // Keep the third-person camera locked tightly over the character
 
