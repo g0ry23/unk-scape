@@ -600,3 +600,107 @@ window.Duskfall.render(window.Duskfall.game);
 }
 };
 })(window.UnkScape = window.UnkScape || {});
+
+
+// ============================================================
+// UNK-SCAPE: DIMENSIONAL DEPTH RENDERING PIPELINE v0.4.7
+// Exposes D.isoProject, D.renderTurfTile, D.renderWallTile
+// on the global Duskfall namespace for use by world generators
+// and structure renderers outside the main drawTiles() loop.
+// ============================================================
+((D) => {
+  D.TILE_WIDTH  = D.TILE_WIDTH  || 64;
+  D.TILE_HEIGHT = D.TILE_HEIGHT || 32;
+  D.WALL_HEIGHT = D.WALL_HEIGHT || 44; // Vertical screenspace extrusion for roofs/cliffs
+
+  /**
+   * PROJECTION MATRIX: Converts 3D Virtual Space (X, Y, Z) into 2D Screen Space.
+   * Kept on D namespace so mmoWorld.js / structure renderers can call D.isoProject().
+   * NOTE: Returns coords in iso grid space — only call inside g.camera.apply(ctx) blocks.
+   */
+  D.isoProject = D.isoProject || function(x, y, z) {
+    const screenX = (x - y) * (D.TILE_WIDTH  / 2);
+    const screenY = (x + y) * (D.TILE_HEIGHT / 2);
+    return {
+      x: screenX,
+      y: screenY - (z || 0)  // Pulls drawing UP based on height value
+    };
+  };
+
+  /**
+   * Renders a 3D Elevated Terrain Tile (The Turf) with per-corner slope support.
+   * tileConfig: { z00, z10, z01, z11, color }
+   * All four corner Z values allow smooth slope interpolation between elevation tiers.
+   */
+  D.renderTurfTile = function(ctx, worldX, worldY, tileConfig) {
+    const z00 = tileConfig.z00 || 0;
+    const z10 = tileConfig.z10 || 0;
+    const z01 = tileConfig.z01 || 0;
+    const z11 = tileConfig.z11 || 0;
+
+    const p1 = D.isoProject(worldX,     worldY,     z00);
+    const p2 = D.isoProject(worldX + 1, worldY,     z10);
+    const p3 = D.isoProject(worldX + 1, worldY + 1, z11);
+    const p4 = D.isoProject(worldX,     worldY + 1, z01);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.lineTo(p3.x, p3.y);
+    ctx.lineTo(p4.x, p4.y);
+    ctx.closePath();
+    ctx.fillStyle   = tileConfig.color || '#27ae60';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+    ctx.lineWidth   = 0.5;
+    ctx.stroke();
+    ctx.restore();
+  };
+
+  /**
+   * Renders an Extruded Wall/Structure with Bounding-Box Height Projection.
+   * Draws left face (south-west) and right face (south-east shadow drop).
+   * baseZ: elevation of the floor the wall sits on (in tile units).
+   */
+  D.renderWallTile = function(ctx, worldX, worldY, baseZ, wallColor) {
+    const b1 = D.isoProject(worldX,     worldY,     baseZ);
+    const b2 = D.isoProject(worldX + 1, worldY,     baseZ);
+    const b3 = D.isoProject(worldX,     worldY + 1, baseZ);
+
+    const t1 = { x: b1.x, y: b1.y - D.WALL_HEIGHT };
+    const t2 = { x: b2.x, y: b2.y - D.WALL_HEIGHT };
+    const t3 = { x: b3.x, y: b3.y - D.WALL_HEIGHT };
+
+    ctx.save();
+    ctx.lineWidth   = 0.5;
+    ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+
+    // Left wall face (south-west)
+    ctx.fillStyle = wallColor || '#7f8c8d';
+    ctx.beginPath();
+    ctx.moveTo(b1.x, b1.y);
+    ctx.lineTo(b3.x, b3.y);
+    ctx.lineTo(t3.x, t3.y);
+    ctx.lineTo(t1.x, t1.y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Right wall face with shadow drop (south-east)
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.beginPath();
+    ctx.moveTo(b1.x, b1.y);
+    ctx.lineTo(b2.x, b2.y);
+    ctx.lineTo(t2.x, t2.y);
+    ctx.lineTo(t1.x, t1.y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+  };
+
+  console.log('[UNK-SCAPE] Dimensional Depth Rendering Pipeline v0.4.7 — D.isoProject / D.renderTurfTile / D.renderWallTile live.');
+
+})(window.Duskfall = window.Duskfall || {});
