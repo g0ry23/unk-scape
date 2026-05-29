@@ -210,6 +210,12 @@ this.time += dt;
     this.systems.audio.update(dt);
     if(this.settings.hungerEnabled) this.systems.survival.update(dt); else if(this.player) this.player.hunger = this.player.maxHunger;
     this.player.update(dt);
+// ── Stream world chunks centred on player position ───────────────────────
+const _UW = window.UnkScape;
+if (_UW && _UW.World && typeof _UW.World.updateLoadedChunks === 'function') {
+  _UW.World.updateLoadedChunks(this.player.x, this.player.y);
+}
+// ────────────────────────────────────────────────────────────────────────
     this.systems.ai.update(dt);
     if(this.systems.gathering) this.systems.gathering.update(dt);
     this.systems.combat.update(dt);
