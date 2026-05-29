@@ -238,7 +238,7 @@ E.Update3DTerrain = function(pxX, pxY) {
 
   if (resources && resources.length) {
     // Prop render radius slightly tighter to keep draw calls low
-    var propRadius = renderRadius * TILE; // in pixel units
+    var propRadius = renderRadius * TILE * 4; // wider scan: ~1800px ensures resources appear in sparse zones
 
     for (var ri = 0; ri < resources.length; ri++) {
       var res = resources[ri];
@@ -291,6 +291,7 @@ E.Update3DTerrain = function(pxX, pxY) {
       }
 
       E.propGroup.add(propNode);
+      if (E.propGroup.children.length >= 80) break; // cap for performance
     }
   }
 
