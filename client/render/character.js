@@ -124,8 +124,12 @@
     console.log("UnkScape3D: CharacterVisuals system loaded.");
 })();
 
+// Fix: D not in scope outside IIFE — use window.Duskfall
+(function() {
+var D = window.Duskfall = window.Duskfall || {};
+
 /**
- * Weapon style classifier — returns style string from item ID.
+ * Weapon style classifier -- returns style string from item ID.
  */
 D.CharacterVisuals.getWeaponStyle = function(itemId) {
   if (!itemId) return null;
@@ -206,4 +210,4 @@ D.CharacterVisuals.updateWeapon = function(playerMesh, weaponId) {
     playerMesh.userData.weaponMesh = wMesh;
   }
 };
-
+})();
