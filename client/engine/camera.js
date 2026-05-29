@@ -29,7 +29,7 @@
     this.targetZoom=D.clamp(this.targetZoom+delta,this.minZoom,this.maxZoom);
     if(this.game.ui && !silent) this.game.ui.toast('Camera Zoom', Math.round(this.targetZoom*100)+'%', 'good');
   };
-  D.Camera.prototype.modeLabel=function(){return this.game.settings.cameraMode==='iso'?'2.5D Aerial':'Overhead';};
+  D.Camera.prototype.modeLabel=function(){return this.game.settings.cameraMode==='iso'?'UNK-SCAPE Sandbox MMORPG':'Overhead';};
   D.Camera.prototype.toggleMode=function(){
     if(this.game.settings.cameraMode==='iso') this.setOverhead();
     else this.setIso();
@@ -39,7 +39,7 @@
     this.targetAngle=0;
     this.targetPitch=.78;
     this.targetZoom=Math.max(this.targetZoom,1.05);
-    this.game.ui.toast('Camera Mode','Centered 2.5D aerial view enabled. Use Q/E only when you want to rotate.', 'gold');
+    this.game.ui.toast('Camera Mode','UNK-SCAPE Sandbox MMORPG — Isometric view active. Use Q/E to rotate.', 'gold');
   };
   D.Camera.prototype.setOverhead=function(){
     this.game.settings.cameraMode='top';
