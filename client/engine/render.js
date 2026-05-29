@@ -44,60 +44,39 @@ y1:Math.min(D.WORLD.h,Math.ceil((cy+reach)/t))
 
 function drawTiles(g,ctx){
 const b=visibleBounds(g), t=D.TILE;
-// -- Isometric diamond tile renderer with Painter's Algorithm depth sort --
-// Each tile is a 64-32 diamond. drawTerrainVolume/drawTileDepth (flat coords)
-// are REMOVED from the pipeline - drawTiles handles all wall depth here.
-// isoProject formula: stays inside g.camera.apply(ctx) coordinate space.
-const IW = 64;
-const IH = 32;
-// Build a depth-sorted list: iso depth = x+y (painter's algo: back rows first)
 const sortedTiles = [];
 for(let y=b.y0;y<b.y1;y++) for(let x=b.x0;x<b.x1;x++){
 sortedTiles.push({x, y});
 }
-// Sort ascending by (x+y) so tiles further back in iso view render first
 sortedTiles.sort((a,b) => (a.x+a.y) - (b.x+b.y));
 for(const {x,y} of sortedTiles){
 const id=g.world.tiles[y][x]; const tile=D.TILES[id];
-const isoX = (x - y) * (IW / 2);
-const isoY = (x + y) * (IH / 2);
-const cx = isoX, cy = isoY;
-// -- Elevation: read z from mmoWorld chunk data if available --
+const px = x * t;
+const py = y * t;
+// Elevation offset
 const chunkKey = Math.floor(x/32)+'_'+Math.floor(y/32);
 const UW = window.UnkScape && window.UnkScape.World;
 const chunk = UW && UW.loadedChunks && UW.loadedChunks[chunkKey];
 const localX = x % 32, localY = y % 32;
 const chunkTile = chunk && chunk[localX] && chunk[localX][localY];
 const elevZ = (chunkTile && chunkTile.z) ? chunkTile.z : 0;
-const elevOffset = elevZ * 44; // 44px per unit height (OSRS cliff thickness)
-// Top-face gradient
-const grad = ctx.createLinearGradient(cx, cy - elevOffset, cx, cy + IH - elevOffset);
+const elevOffset = elevZ * 14;
+// Top face gradient
+const grad = ctx.createLinearGradient(px, py - elevOffset, px, py + t - elevOffset);
 grad.addColorStop(0, shade(tile.color, 18));
 grad.addColorStop(0.5, tile.color);
 grad.addColorStop(1, shade(tile.color, -20));
 ctx.fillStyle = grad;
-ctx.beginPath();
-ctx.moveTo(cx, cy - elevOffset);
-ctx.lineTo(cx + IW/2, cy + IH/2 - elevOffset);
-ctx.lineTo(cx, cy + IH - elevOffset);
-ctx.lineTo(cx - IW/2, cy + IH/2 - elevOffset);
-ctx.closePath();
-ctx.fill();
+ctx.fillRect(px, py - elevOffset, t, t);
 ctx.strokeStyle = 'rgba(0,0,0,0.10)';
 ctx.lineWidth = 0.5;
-ctx.stroke();
+ctx.strokeRect(px, py - elevOffset, t, t);
 // Noise texture overlay
 const n = g.world.noise[y][x];
 if(n > 0.52){
 ctx.fillStyle = tile.variant || 'rgba(255,255,255,0.06)';
 ctx.globalAlpha = 0.22;
-ctx.beginPath();
-ctx.moveTo(cx, cy + IH*0.22 - elevOffset);
-ctx.lineTo(cx+IW*0.22, cy + IH*0.55 - elevOffset);
-ctx.lineTo(cx, cy + IH*0.88 - elevOffset);
-ctx.lineTo(cx-IW*0.22, cy + IH*0.55 - elevOffset);
-ctx.closePath();
-ctx.fill();
+ctx.fillRect(px + t*0.15, py + t*0.15 - elevOffset, t*0.7, t*0.7);
 ctx.globalAlpha = 1;
 }
 // Water ripple
@@ -105,37 +84,18 @@ if(id === 'water'){
 ctx.strokeStyle = 'rgba(120,205,255,0.25)';
 ctx.lineWidth = 1.2;
 ctx.beginPath();
-ctx.moveTo(cx - IW*0.25, cy + IH*0.45 + n*3 - elevOffset);
-ctx.quadraticCurveTo(cx, cy + IH*0.30 - elevOffset, cx + IW*0.25, cy + IH*0.45 + n*3 - elevOffset);
+ctx.moveTo(px + t*0.1, py + t*0.5 + n*3 - elevOffset);
+ctx.quadraticCurveTo(px + t*0.5, py + t*0.3 - elevOffset, px + t*0.9, py + t*0.5 + n*3 - elevOffset);
 ctx.stroke();
 }
-// -- Side walls: combine tile type + elevation z for stepped cliffs --
+// Side wall (depth only for non-water elevated tiles)
 if(id !== 'water'){
-// Base wall from tile type
-const baseWallH = id==='stone'?9 : id==='darkgrass'?5 : id==='dirt'?3 : id==='sand'?2 : 2;
-// Add elevation thickness for cliff height (elevZ * 12 px extra wall depth)
-const wallH = baseWallH + elevZ * 12;
+const baseWallH = id==='stone'?5 : id==='darkgrass'?3 : 2;
+const wallH = baseWallH + elevZ * 8;
 if(wallH > 0){
-const bottomY = cy + IH - elevOffset;
-// Left face (south-west)
 ctx.fillStyle = shade(tile.color, -38);
 ctx.globalAlpha = 0.72;
-ctx.beginPath();
-ctx.moveTo(cx - IW/2, cy + IH/2 - elevOffset);
-ctx.lineTo(cx, bottomY);
-ctx.lineTo(cx, bottomY + wallH);
-ctx.lineTo(cx - IW/2, cy + IH/2 - elevOffset + wallH);
-ctx.closePath();
-ctx.fill();
-// Right face
-ctx.fillStyle = shade(tile.color, -22);
-ctx.beginPath();
-ctx.moveTo(cx, bottomY);
-ctx.lineTo(cx + IW/2, cy + IH/2 - elevOffset);
-ctx.lineTo(cx + IW/2, cy + IH/2 - elevOffset + wallH);
-ctx.lineTo(cx, bottomY + wallH);
-ctx.closePath();
-ctx.fill();
+ctx.fillRect(px, py + t - elevOffset, t, wallH);
 ctx.globalAlpha = 1;
 }
 }
