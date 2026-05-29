@@ -512,13 +512,18 @@ function drawZoneOverlays(g,ctx){
 // ── UnkScape.Engine.Renderer (new additive namespace — does not replace D.render) ─────
 // This object is available for future use. The active renderer is D.render() above.
 ((U) => {
-    U.Engine = U.Engine || {};
-    U.Engine.Renderer = {
-        // Proxy into the active Duskfall render pipeline
-        renderFrame(world, player, camera) {
-            if (window.Duskfall && window.Duskfall.game) {
-                window.Duskfall.render(window.Duskfall.game);
-            }
-        }
-    };
+U.Engine = U.Engine || {};
+U.Engine.Renderer = {
+  // init: called by game.js — no-op here since D.render() is the active pipeline
+  init(canvasId) {
+    // D.render() handles rendering; this shim satisfies the init() call from game.js
+    this._canvasId = canvasId || 'game';
+  },
+  // Proxy into the active Duskfall render pipeline
+  renderFrame(world, player, camera) {
+    if (window.Duskfall && window.Duskfall.game) {
+      window.Duskfall.render(window.Duskfall.game);
+    }
+  }
+};
 })(window.UnkScape = window.UnkScape || {});
