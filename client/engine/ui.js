@@ -239,16 +239,15 @@ const catalogue = [
 ];
 
 const rows = catalogue.map(item => {
-const canAfford = coins >= item.price;
-const btnStyle = canAfford
-? 'background:#27ae60; border:none; color:#fff; font-family:inherit; font-size:10px; padding:4px 8px; border-radius:2px; cursor:pointer;'
-: 'background:#4a4060; border:none; color:#888; font-family:inherit; font-size:10px; padding:4px 8px; border-radius:2px; cursor:not-allowed;';
-return '<div style="background:#120e1a; padding:8px; border:1px solid #332742; border-radius:4px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">'
-+ '<div style="flex:1;">'+item.label+'<br><span style="color:#eab308; font-size:11px;">Price: '+item.price+' GP</span></div>'
-+ '<button style="'+btnStyle+'" onclick="window._unkGEBuy('' + item.id + '', '+item.price+', ''+(item.label.replace(/'/g,''))+'')">'
-+ (canAfford ? 'BUY' : 'NO GP')
-+ '</button></div>';
-}).join('');
+      const canAfford = coins >= item.price;
+      const btnStyle = canAfford
+        ? 'background:#27ae60; border:none; color:#fff; font-family:inherit; font-size:10px; padding:4px 8px; border-radius:2px; cursor:pointer;'
+        : 'background:#4a4060; border:none; color:#888; font-family:inherit; font-size:10px; padding:4px 8px; border-radius:2px; cursor:not-allowed;';
+      const onclickFn = "window._unkGEBuy('" + item.id + "', " + item.price + ", '" + item.label.replace(/'/g,'') + "')";
+      return '<div style="background:#120e1a; padding:8px; border:1px solid #332742; border-radius:4px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">'
+        + '<div style="flex:1;">'+item.label+'<br><span style="color:#eab308; font-size:11px;">Price: '+item.price+' GP</span></div>'
+        + '<button style="'+btnStyle+'" onclick="'+onclickFn+'">'+( canAfford ? 'BUY' : 'NO GP')+'</button></div>';
+    }).join('');
 
 return '<h3 style="color:#f1c40f; margin-top:0; font-size:14px; letter-spacing:1px;">GRAND EXCHANGE</h3>'
 + '<hr style="border:0; border-top:1px solid #47385a; margin-bottom:8px;">'
