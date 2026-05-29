@@ -1,4 +1,4 @@
-→(function(){
+(function(){
   const D = window.Duskfall = window.Duskfall || {};
   D.createProjectile=function(x,y,tx,ty,opts={}){
     const ang=Math.atan2(ty-y,tx-x), speed=opts.speed||360;
