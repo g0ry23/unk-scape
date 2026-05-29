@@ -138,6 +138,11 @@ game.ui.closeAll();
 game.ui.toast('Welcome to UNK-SCAPE', game.player.zoneName+' • '+game.player.factionName, 'gold');
 game.systems.audio.startWorldAudio();
 game.ui.log('Your boots hit the dirt. Dusk will come soon.', 'gold');
+// ── Boot UnkScape3D WebGL engine on first game start ──
+if (window.UnkScape3D && typeof window.UnkScape3D.Initialize3D === 'function' && !window.UnkScape3D.active) {
+window.UnkScape3D.Initialize3D();
+}
+// ─────────────────────────────────────────────────────
 // ── Show HUD now that we are in-game ──
 const _U = window.UnkScape;
 if (_U && _U.UI && typeof _U.UI.toggleHUDDisplay === 'function') {
@@ -184,6 +189,11 @@ game.paused = false;
 game.state = 'play';
 game.ui.closeAll();
 game.ui.toast('Game Loaded', 'Welcome back to the dusk.', 'good');
+// ── Boot UnkScape3D WebGL engine on first game start ──
+if (window.UnkScape3D && typeof window.UnkScape3D.Initialize3D === 'function' && !window.UnkScape3D.active) {
+window.UnkScape3D.Initialize3D();
+}
+// ─────────────────────────────────────────────────────
 // ── Show HUD on loaded game ──
 const _U = window.UnkScape;
 if (_U && _U.UI && typeof _U.UI.toggleHUDDisplay === 'function') {
@@ -206,6 +216,11 @@ this.accum -= this.fixedDt;
 }
 }
 D.render(this);
+// ── UnkScape3D WebGL frame render (Three.js) ──
+if (window.UnkScape3D && window.UnkScape3D.active) {
+window.UnkScape3D.RenderFrame3D(this.player);
+}
+// ────────────────────────────────────────────────
 // ── UnkScape secondary render pass ──
 const _U = window.UnkScape || {};
 if (_U.Engine && _U.Engine.Renderer && this.world && this.player) {
