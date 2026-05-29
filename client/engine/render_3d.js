@@ -10,7 +10,8 @@ const E = window.UnkScape3D;
     E.scene        = null;
     E.camera       = null;
     E.renderer     = null;
-    E.playerMesh   = null;
+    E.playerMesh   = null; // legacy alias
+    E.playerVisual = null; // modular CharacterVisuals group
     E.terrainGroup = null;
     E.lastChunkX   = -9999;
     E.lastChunkY   = -9999;
@@ -45,7 +46,6 @@ const E = window.UnkScape3D;
 
     // ── PRIVATE HELPERS ───────────────────────────────────────────────
 
-    // Resolve the best available color for tile (tx, ty)
     function getTileColor(tx, ty) {
         const D = window.Duskfall;
         if (D && D.game && D.game.world && D.game.world.tiles && D.game.world.w) {
@@ -53,11 +53,9 @@ const E = window.UnkScape3D;
             const type = D.game.world.tiles[idx];
             if (type && TILE_COLORS[type]) return TILE_COLORS[type];
         }
-        // Procedural checkerboard fallback
         return (tx + ty) % 2 === 0 ? '#2d6a3f' : '#36854f';
     }
 
-    // Resolve elevation for tile (tx, ty) — sine-wave proc-gen via GetTerrainAt
     function getTileHeight(tx, ty) {
         const D = window.Duskfall;
         if (D && typeof D.GetTerrainAt === 'function') {
@@ -81,40 +79,53 @@ const E = window.UnkScape3D;
             return;
         }
 
-        // Dedicated WebGL canvas — must not reuse the canvas that has 2d context
-        const webglCanvas         = document.createElement('canvas');
-        webglCanvas.id            = 'game-webgl';
+        // Dedicated WebGL canvas — inserted BEFORE game canvas so 3D is background layer
+        const webglCanvas = document.createElement('canvas');
+        webglCanvas.id = 'game-webgl';
         webglCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;';
-        gameCanvas.parentElement.insertBefore(webglCanvas, gameCanvas); // insert before 2D canvas so 3D is background layer
+        gameCanvas.parentElement.insertBefore(webglCanvas, gameCanvas);
 
-        // Scene + sky
-        E.scene            = new THREE.Scene();
-        E.scene.background = null; // transparent — lets 2D canvas layer beneath
+        // Transparent scene — 2D canvas layers on top
+        E.scene = new THREE.Scene();
+        E.scene.background = null;
 
         // Perspective camera
         const aspect = window.innerWidth / window.innerHeight;
-        E.camera     = new THREE.PerspectiveCamera(60, aspect, 0.1, 2000);
+        E.camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 2000);
         E.camera.position.set(0, 25, 30);
 
-        // WebGL renderer
+        // Alpha WebGL renderer
         E.renderer = new THREE.WebGLRenderer({ canvas: webglCanvas, antialias: true, alpha: true });
-	E.renderer.setClearColor(0x000000, 0); // fully transparent clear
+        E.renderer.setClearColor(0x000000, 0);
         E.renderer.setSize(window.innerWidth, window.innerHeight);
 
-        // Lighting: ambient + warm directional sun
-        E.scene.add(new THREE.AmbientLight('#ffffff', 1.0)); // boosted for clear visibility
+        // Lighting — boosted for crisp visibility
+        E.scene.add(new THREE.AmbientLight('#ffffff', 1.0));
         const sun = new THREE.DirectionalLight('#ffe8c0', 1.2);
         sun.position.set(80, 120, 60);
         E.scene.add(sun);
 
-        // Player avatar — gold cylinder placeholder
-        const pGeo     = new THREE.CylinderGeometry(0.8, 0.8, 3, 16);
-        const pMat     = new THREE.MeshLambertMaterial({ color: '#f1c40f' });
-        E.playerMesh   = new THREE.Mesh(pGeo, pMat);
-        E.playerMesh.position.set(0, 1.5, 0);
-        E.scene.add(E.playerMesh);
+        // ── Character mesh: use CharacterVisuals if loaded, else cylinder fallback ──
+        const D = window.Duskfall;
+        if (D && D.CharacterVisuals && D.CharacterVisuals.createModularMesh) {
+            const playerData   = D.game?.player || {};
+            E.playerVisual     = D.CharacterVisuals.createModularMesh(playerData);
+            E.playerVisual.position.set(0, 1.5, 0);
+            E.scene.add(E.playerVisual);
+            E.playerMesh = E.playerVisual; // legacy alias
+            console.log("UnkScape3D: CharacterVisuals mesh instantiated.");
+        } else {
+            // Fallback yellow cylinder until character.js loads
+            const pGeo   = new THREE.CylinderGeometry(0.8, 0.8, 3, 16);
+            const pMat   = new THREE.MeshLambertMaterial({ color: '#f1c40f' });
+            E.playerMesh = new THREE.Mesh(pGeo, pMat);
+            E.playerMesh.position.set(0, 1.5, 0);
+            E.scene.add(E.playerMesh);
+            E.playerVisual = E.playerMesh;
+            console.log("UnkScape3D: Fallback cylinder active — load character.js to upgrade.");
+        }
 
-        E.camera.lookAt(E.playerMesh.position);
+        E.camera.lookAt(E.playerVisual.position);
         E.active = true;
 
         window.addEventListener('resize', function() {
@@ -127,30 +138,17 @@ const E = window.UnkScape3D;
     };
 
     // ── TERRAIN GENERATOR ────────────────────────────────────────────
-    /**
-     * Procedural 3D Tile Grid Renderer
-     * Builds elevated block columns around the player position.
-     * Regenerates only when the player crosses a new 5-tile chunk boundary.
-     * Disposes old geometry to prevent GPU memory leaks.
-     *
-     * @param {number} pxX  player pixel X (e.g. 6000)
-     * @param {number} pxY  player pixel Y (e.g. 6000)
-     */
     E.Update3DTerrain = function(pxX, pxY) {
         if (!E.scene) return;
 
-        // Convert pixel coords to tile grid coords
-        const tileX = Math.floor(pxX / TILE);
-        const tileY = Math.floor(pxY / TILE);
-
-        // Regenerate only when entering a new 5-tile chunk
+        const tileX  = Math.floor(pxX / TILE);
+        const tileY  = Math.floor(pxY / TILE);
         const chunkX = Math.floor(tileX / 5);
         const chunkY = Math.floor(tileY / 5);
         if (chunkX === E.lastChunkX && chunkY === E.lastChunkY) return;
         E.lastChunkX = chunkX;
         E.lastChunkY = chunkY;
 
-        // Dispose old terrain group — prevents GPU memory leaks
         if (E.terrainGroup) {
             E.scene.remove(E.terrainGroup);
             E.terrainGroup.traverse(function(child) {
@@ -163,8 +161,6 @@ const E = window.UnkScape3D;
         }
 
         E.terrainGroup = new THREE.Group();
-
-        // Reuse one BoxGeometry blueprint for all blocks (good for low-spec)
         const renderRadius = 14;
         const blockGeo     = new THREE.BoxGeometry(TSCALE, 1, TSCALE);
 
@@ -180,18 +176,8 @@ const E = window.UnkScape3D;
 
                 var blockMat  = new THREE.MeshLambertMaterial({ color: hexColor });
                 var blockMesh = new THREE.Mesh(blockGeo, blockMat);
-
-                // Scale Y to represent elevation column height
                 blockMesh.scale.set(1, finalHeight, 1);
-
-                // Position: tile coord * TSCALE aligns with player 3D position
-                // Y: half-height so block base sits flush at world y=0
-                blockMesh.position.set(
-                    tx * TSCALE,
-                    finalHeight * 0.5,
-                    ty * TSCALE
-                );
-
+                blockMesh.position.set(tx * TSCALE, finalHeight * 0.5, ty * TSCALE);
                 E.terrainGroup.add(blockMesh);
             }
         }
@@ -201,34 +187,52 @@ const E = window.UnkScape3D;
     };
 
     // ── FRAME RENDER LOOP ────────────────────────────────────────────
-    /**
-     * Called every frame from game.js loop via E.RenderFrame3D(this.player)
-     */
     E.RenderFrame3D = function(playerData) {
         if (!E.active || !E.renderer) return;
 
-        if (playerData) {
+        if (playerData && E.playerVisual) {
             var pxX = playerData.x || 0;
             var pxY = playerData.y || 0;
 
-            // Regenerate terrain chunks around current player tile
+            // Regenerate terrain chunks around player
             E.Update3DTerrain(pxX, pxY);
 
-            // Convert pixel coords to 3D world units (same SCALE as terrain blocks)
+            // Convert pixel coords to 3D world units
             var target3X = pxX * SCALE;
             var target3Z = pxY * SCALE;
 
-            // Sample ground height at player tile so cylinder rides slopes smoothly
+            // Sample ground height so character rides terrain elevation
             var tileX   = Math.floor(pxX / TILE);
             var tileY   = Math.floor(pxY / TILE);
             var groundH = getTileHeight(tileX, tileY);
-            var playerY = 1 + groundH + 1.5; // block top + half-height of cylinder
+            var playerY = 1 + groundH; // sit on terrain surface
 
-            E.playerMesh.position.set(target3X, playerY, target3Z);
+            // ── Sync character mesh to player world position ──
+            E.playerVisual.position.set(target3X, playerY, target3Z);
 
-            // Third-person camera: 18 units above player, 20 units behind
-            E.camera.position.set(target3X, playerY + 18, target3Z + 20);
-            E.camera.lookAt(E.playerMesh.position);
+            // ── Face direction of movement ──
+            var vx = playerData.vx || 0;
+            var vy = playerData.vy || 0;
+            if (Math.abs(vx) > 0.5 || Math.abs(vy) > 0.5) {
+                E.playerVisual.rotation.y = Math.atan2(vx, vy);
+            }
+
+            // ── Smooth camera lerp — third-person tracking ──
+            var camTargetX = target3X;
+            var camTargetY = playerY + 18;
+            var camTargetZ = target3Z + 22;
+            E.camera.position.x += (camTargetX - E.camera.position.x) * 0.08;
+            E.camera.position.y += (camTargetY - E.camera.position.y) * 0.08;
+            E.camera.position.z += (camTargetZ - E.camera.position.z) * 0.08;
+            E.camera.lookAt(E.playerVisual.position);
+
+            // ── Character limb animation ──
+            var D = window.Duskfall;
+            if (D && D.CharacterVisuals && D.CharacterVisuals.animateMesh) {
+                var velocity = Math.hypot(vx, vy);
+                var time     = performance.now() * 0.001;
+                D.CharacterVisuals.animateMesh(E.playerVisual, velocity, time);
+            }
         }
 
         E.renderer.render(E.scene, E.camera);
