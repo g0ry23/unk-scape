@@ -5,6 +5,7 @@ D.render = function(g){
 const ctx=g.ctx;
 ctx.setTransform(g.dpr,0,0,g.dpr,0,0);
 ctx.clearRect(0,0,g.viewW,g.viewH);
+ctx.fillStyle='#0b0e1a';ctx.fillRect(0,0,g.viewW,g.viewH);
 if(!g.world){ drawMenuBg(g,ctx); return; }
 
 ctx.save();
@@ -566,7 +567,7 @@ function drawLighting(g,ctx){
 }
 function drawVignette(g,ctx){
 const grad=ctx.createRadialGradient(g.viewW/2,g.viewH/2,Math.min(g.viewW,g.viewH)*.25,g.viewW/2,g.viewH/2,Math.max(g.viewW,g.viewH)*.72);
-grad.addColorStop(0,'rgba(0,0,0,0)');grad.addColorStop(1,'rgba(0,0,0,.38)');ctx.fillStyle=grad;ctx.fillRect(0,0,g.viewW,g.viewH);
+grad.addColorStop(0,'rgba(0,0,0,0)');grad.addColorStop(1,'rgba(0,0,0,.12)');ctx.fillStyle=grad;ctx.fillRect(0,0,g.viewW,g.viewH);
 }
 function drawMenuBg(g,ctx){
 const grd=ctx.createLinearGradient(0,0,0,g.viewH);grd.addColorStop(0,'#101827');grd.addColorStop(1,'#05070c');ctx.fillStyle=grd;ctx.fillRect(0,0,g.viewW,g.viewH);
