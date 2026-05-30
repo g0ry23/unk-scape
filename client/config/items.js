@@ -1,6 +1,7 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
-  D.ITEMS = {
+  window.Duskfall = window.Duskfall || {};
+const US = window.UnkScape = window.Duskfall;
+  US.ITEMS = {
     coin:{name:'Gold Coin',icon:'🪙',stack:true,type:'currency',desc:'The old world still loves shiny things.',value:1},
     arrow:{name:'Arrow',icon:'➶',stack:true,type:'ammo',desc:'Basic ranged ammo. Most fired arrows can be recovered from the ground.',value:1},
     class_token:{name:'Class Token',icon:'🎟️',stack:true,type:'quest',tier:1,rarity:'rare',desc:'A proof-of-training token used by class trainers.',value:25},
