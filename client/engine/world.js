@@ -123,4 +123,4 @@ return {            z00: h00, z10: h10, z01: h01, z11: h11,
 
     console.log('[UNK-SCAPE] World Matrix & Entity Bridge v0.4.9 — US.GetTerrainAt / US.RenderIsometricScene live.');
 
-})(window.Duskfall = window.Duskfall || {});
+})(window.UnkScape = window.UnkScape || {});
