@@ -145,8 +145,8 @@ window.UnkScape3D.Initialize3D();
 // ─────────────────────────────────────────────────────
 // ── Show HUD now that we are in-game ──
 const _U = window.UnkScape;
-if (_U && _U.UI && typeof _U.TabUI.toggleHUDDisplayU.TabUI.toggleHUDDisplay === 'function') {
-_U.TabUI.toggleHUDDisplayU.TabUI.toggleHUDDisplay(true);
+if (_U && _U.TabUI && typeof _U.TabUI.toggleHUDDisplay === 'function') {
+_U.TabUI.toggleHUDDisplay(true);
 }
 // ──────────────────────────────────────────
 }, 200);
@@ -196,8 +196,8 @@ window.UnkScape3D.Initialize3D();
 // ─────────────────────────────────────────────────────
 // ── Show HUD on loaded game ──
 const _U = window.UnkScape;
-if (_U && _U.UI && typeof _U.TabUI.toggleHUDDisplayU.TabUI.toggleHUDDisplay === 'function') {
-_U.TabUI.toggleHUDDisplayU.TabUI.toggleHUDDisplay(true);
+        if (_U && _U.TabUI && typeof _U.TabUI.toggleHUDDisplay === 'function') {
+          _U.TabUI.toggleHUDDisplay(true);
 }
 // ──────────────────────────────────────
 }, 200);
