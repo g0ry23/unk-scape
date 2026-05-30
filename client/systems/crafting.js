@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.CraftingSystem=function(game){this.game=game;};
   US.CraftingSystem.prototype.canCraft=function(recipe){
     const p=this.game.player;
