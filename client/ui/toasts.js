@@ -1,6 +1,7 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
-  D.UI.prototype.toast=function(title,msg,type=''){
+  window.Duskfall = window.Duskfall || {};
+const US = window.UnkScape = window.Duskfall;
+  US.UI.prototype.toast=function(title,msg,type=''){
     const root=document.getElementById('toast-container'), id=++this.toastId;
     if(!root) return;
     const div=document.createElement('div');div.className='toast '+type;div.dataset.id=id;div.innerHTML=`<b>${title}</b>${msg}`;root.appendChild(div);
