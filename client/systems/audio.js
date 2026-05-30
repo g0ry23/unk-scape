@@ -1,8 +1,9 @@
-(function(){
-const D = window.Duskfall = window.Duskfall || {};
+—→(function(){
+window.Duskfall = window.Duskfall || {};
+const US = window.UnkScape = window.Duskfall;
 
 // AudioSystem - procedural Web Audio API sound engine
-D.AudioSystem = function(game) {
+US.AudioSystem = function(game) {
   this.game = game;
   this.ctx = null;
   this.enabled = true;
@@ -16,13 +17,13 @@ D.AudioSystem = function(game) {
   document.addEventListener('mousedown', tryInit, { once: true });
 };
 
-D.AudioSystem.prototype._init = function() {
+US.AudioSystem.prototype._init = function() {
   try {
     this.ctx = new (window.AudioContext || window.webkitAudioContext)();
   } catch(e) { this.enabled = false; }
 };
 
-D.AudioSystem.prototype._gain = function(vol) {
+US.AudioSystem.prototype._gain = function(vol) {
   if (!this.ctx) return null;
   const g = this.ctx.createGain();
   g.gain.value = vol * this.volumes.master;
@@ -30,7 +31,7 @@ D.AudioSystem.prototype._gain = function(vol) {
   return g;
 };
 
-D.AudioSystem.prototype._beep = function(freq, type, duration, vol, delay) {
+US.AudioSystem.prototype._beep = function(freq, type, duration, vol, delay) {
   if (!this.ctx || !this.enabled) return;
   try {
     const osc = this.ctx.createOscillator();
@@ -47,7 +48,7 @@ D.AudioSystem.prototype._beep = function(freq, type, duration, vol, delay) {
   } catch(e) {}
 };
 
-D.AudioSystem.prototype.play = function(sound) {
+US.AudioSystem.prototype.play = function(sound) {
   if (!this.ctx || !this.enabled) return;
   const sfxVol = this.volumes.sfx;
   switch(sound) {
@@ -64,11 +65,11 @@ D.AudioSystem.prototype.play = function(sound) {
   }
 };
 
-D.AudioSystem.prototype.startWorldAudio = function() {
+US.AudioSystem.prototype.startWorldAudio = function() {
   // No-op stub - ambient audio would go here
 };
 
-D.AudioSystem.prototype.applyVolumes = function() {
+US.AudioSystem.prototype.applyVolumes = function() {
   const a = this.game.settings.audio;
   if (a) {
     this.volumes.master    = a.master    ?? this.volumes.master;
@@ -79,12 +80,12 @@ D.AudioSystem.prototype.applyVolumes = function() {
   }
 };
 
-D.AudioSystem.prototype.setEnabled = function(val) {
+US.AudioSystem.prototype.setEnabled = function(val) {
   this.enabled = !!val;
   this.game.settings.audio.enabled = this.enabled;
 };
 
-D.AudioSystem.prototype.update = function(dt) {
+US.AudioSystem.prototype.update = function(dt) {
   // Sync volumes each frame in case settings changed
   this.applyVolumes();
 };
