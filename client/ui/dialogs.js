@@ -1,5 +1,5 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
+  const US = window.UnkScape = window.UnkScape || {};const D = US;
   D.UI.prototype.openDialog=function(npc){this.dialogNpc=npc;this.game.paused=true;this.clearInputLocks();document.getElementById('dialog').classList.add('show');this.renderDialog();this.syncLayoutState();};
   D.UI.prototype.closeDialog=function(){this.dialogNpc=null;document.getElementById('dialog').classList.remove('show');this.game.paused=false;this.clearInputLocks();this.syncLayoutState();};
   D.UI.prototype.renderDialog=function(){
