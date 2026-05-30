@@ -1,6 +1,6 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  window.UnkScape = window.UnkScape || {};
+const US = window.UnkScape = window.UnkScape;
   US.UI.prototype.togglePanel=function(name){if(this.panel===name){this.closePanel();return;}this.openPanel(name);};
   US.UI.prototype.openPanel=function(name){this.panel=name;this.game.paused=true;this.clearInputLocks();document.getElementById('panel').classList.add('show');document.getElementById('dialog').classList.remove('show');this.dialogNpc=null;this.renderPanel();this.syncLayoutState();};
   US.UI.prototype.closePanel=function(){this.panel=null;document.getElementById('panel').classList.remove('show');this.game.paused=false;this.clearInputLocks();this.syncLayoutState();};
