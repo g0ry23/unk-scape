@@ -29,7 +29,7 @@ cameraMode:'iso',
 display:{uiScale:'normal',showWorldLabels:true,reducedFx:false,screenShake:true,floatingText:true},
 audio:{enabled:true,master:.55,music:.22,ambient:.34,sfx:.62,footsteps:.32},
 keybinds:{
-inventory:'tab', stats:'p', skills:'k', crafting:'c', quests:'v', bank:'b', map:'m', interact:'f', attack:' ', pause:'escape', zoomIn:'=', zoomOut:'-', save:'f5', cameraToggle:'r', cameraOverhead:'o', rotateLeft:'q', rotateRight:'e', buildToggle:'g', buildCycle:'t'
+inventory:'tab', stats:'p', skills:'k', crafting:'c', quests:'v', bank:'b', map:'m', interact:'f', attack:' ', pause:'escape', zoomIn:'=', zoomOut:'-', save:'f5', buildToggle:'g', buildCycle:'t'
 }
 };
 this.menuMode = 'main';
