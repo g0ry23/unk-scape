@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.BuildSystem=function(game){
     this.game=game;
     this.palette=['woodfloor','fence','stonepath','farmland'];
