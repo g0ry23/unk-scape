@@ -7,6 +7,7 @@
  */
 (function() {
   var D = window.Duskfall = window.Duskfall || {};
+const US = window.UnkScape = window.Duskfall;
 
   US.Camera = function(game) {
     this.game   = game;
