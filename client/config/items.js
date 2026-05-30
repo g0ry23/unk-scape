@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.ITEMS = {
     coin:{name:'Gold Coin',icon:'🪙',stack:true,type:'currency',desc:'The old world still loves shiny things.',value:1},
     arrow:{name:'Arrow',icon:'➶',stack:true,type:'ammo',desc:'Basic ranged ammo. Most fired arrows can be recovered from the ground.',value:1},
