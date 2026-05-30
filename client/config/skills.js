@@ -1,6 +1,7 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
-  D.SKILLS = {
+  window.Duskfall = window.Duskfall || {};
+const US = window.UnkScape = window.Duskfall;
+  US.SKILLS = {
     combat: {
       name:'Combat', icon:'⚔️', color:'#ff5c7a',
       desc:'Melee fighting, damage, and survivability.',
@@ -38,7 +39,7 @@
     }
   };
 
-  D.xpForLevel = function(level){
+  US.xpForLevel = function(level){
     // RuneScape-ish exponential, but tuned for prototype.
     if(level <= 1) return 0;
     let points = 0;
@@ -46,13 +47,13 @@
     return Math.floor(points / 4);
   };
 
-  D.levelForXp = function(xp){
+  US.levelForXp = function(xp){
     let lvl=1;
-    while(lvl < 99 && xp >= D.xpForLevel(lvl+1)) lvl++;
+    while(lvl < 99 && xp >= US.xpForLevel(lvl+1)) lvl++;
     return lvl;
   };
 
-  D.rollSkillSuccess = function(level, difficulty){
+  US.rollSkillSuccess = function(level, difficulty){
     // difficulty 1..100. Higher level improves odds.
     const chance = Math.max(.08, Math.min(.95, .45 + (level*0.035) - (difficulty*0.008)));
     return Math.random() < chance;
