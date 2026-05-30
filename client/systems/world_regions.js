@@ -1,4 +1,4 @@
-—→/**
+/**
  * UNK-SCAPE World Region & Territory Manager
  * Path: client/systems/world_regions.js
  * Namespace: window.Duskfall.WorldRegions (US.WorldRegions)
