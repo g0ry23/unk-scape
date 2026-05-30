@@ -15,7 +15,7 @@ function getR3D() {
   return D.r3d || null;
 }
 
-var NEAR_MISS_RADIUS = 192;
+var NEAR_MISS_RADIUS = 80;
 var GATHER_RANGE     = 200;
 
 function logClick(screenX, screenY, hitInfo, result) {
@@ -166,12 +166,18 @@ function resolveResourceClick(inp, resourceId, screenX, screenY, game) {
 }
 
 function resolveResourceClickDirect(inp, res, screenX, screenY, game) {
+  // Guard: if a chop is already running on this same resource, do not restart it.
+  var gs = game.systems && game.systems.gathering;
+  if (gs && gs.active && gs.active.uid === res.uid && gs.timer > 0) {
+    logClick(screenX, screenY, res.uid, 'already-chopping-no-restart');
+    return;
+  }
   var player = game.player;
   var dist = Math.hypot(player.x - res.x, player.y - res.y);
   if (dist <= GATHER_RANGE) {
     logClick(screenX, screenY, res.uid, 'gathering-started');
     if (game.systems && game.systems.gathering && typeof game.systems.gathering.tryStartAt === 'function') {
-      game.systems.gathering.tryStartAt(res);
+      game.systems.gathering.tryStartAt(res.x, res.y);
     } else {
       feedback('Gathering system not ready.', 'bad');
     }
@@ -336,7 +342,7 @@ D.Input.prototype.update = function(dt) {
             if (resources[i].uid === ct.resourceId) { res = resources[i]; break; }
           }
         }
-        if (res) game.systems.gathering.tryStartAt(res);
+        if (res) game.systems.gathering.tryStartAt(res.x, res.y);
       }
       player._clickTarget = null;
     } else {
