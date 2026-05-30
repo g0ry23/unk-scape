@@ -1,11 +1,12 @@
-/**
+—→/**
  * UNK-SCAPE World Region & Territory Manager
  * Path: client/systems/world_regions.js
- * Namespace: window.Duskfall.WorldRegions (D.WorldRegions)
+ * Namespace: window.Duskfall.WorldRegions (US.WorldRegions)
  */
 (function() {
-    const D = window.Duskfall = window.Duskfall || {};
-    D.WorldRegions = {};
+    window.Duskfall = window.Duskfall || {};
+const US = window.UnkScape = window.Duskfall;
+    US.WorldRegions = {};
 
     // In-memory runtime tracking state for territory control
     const territoryState = {
@@ -50,7 +51,7 @@
      * @param {number} y - Underlying tile game state coordinate Y
      * @returns {Object} Region configuration object
      */
-    D.WorldRegions.getRegionByCoords = function(x, y) {
+    US.WorldRegions.getRegionByCoords = function(x, y) {
         var boundedX = Math.max(0, Math.min(1999, x));
         var boundedY = Math.max(0, Math.min(1999, y));
 
@@ -71,7 +72,7 @@
      * @param {string} regionId
      * @returns {Object} Current ownership and dynamic tax state data
      */
-    D.WorldRegions.getTerritoryState = function(regionId) {
+    US.WorldRegions.getTerritoryState = function(regionId) {
         return territoryState[regionId] || { currentOwner: 'neutral', taxRate: 0.00, guardSpawnActive: false };
     };
 
@@ -80,7 +81,7 @@
      * @param {string} regionId - Target region identifier string
      * @param {string} newFactionOwnerId - The claiming faction ID
      */
-    D.WorldRegions.flipTerritoryControl = function(regionId, newFactionOwnerId) {
+    US.WorldRegions.flipTerritoryControl = function(regionId, newFactionOwnerId) {
         if (territoryState[regionId] && territoryState[regionId].currentOwner !== 'protected') {
             var oldOwner = territoryState[regionId].currentOwner;
             territoryState[regionId].currentOwner = newFactionOwnerId;
