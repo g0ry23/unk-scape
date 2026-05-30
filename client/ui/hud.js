@@ -1,6 +1,6 @@
 (function(){
-window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+window.UnkScape = window.UnkScape || {};
+const US = window.UnkScape = window.UnkScape;
 US.UI.prototype.renderHUD=function(){
 const g=this.game, root=document.getElementById('hud');
 if(!root) return;
