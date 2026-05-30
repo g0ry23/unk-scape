@@ -15,7 +15,7 @@
  * - Called with false on menu/login state, true when game starts
  */
 ((U) => {
-U.UI = {
+U.TabUI = {
 
 currentTab: 'skills',
 _refreshTimer: null,
