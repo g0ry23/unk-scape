@@ -1,4 +1,4 @@
-—→(function(){
+(function(){
   window.Duskfall = window.Duskfall || {};
 const US = window.UnkScape = window.Duskfall;
   US.DungeonSystem=function(game){this.game=game;this.inside=false;this.returnPos=null;};
