@@ -64,7 +64,7 @@ function getCachedMat(color) {
 }
 
 function getTexMat(tileType, hexColor, noiseIntensity) {
-  var D = window.Duskfall;
+  var D = window.UnkScape;
   if (D && D.TextureEngine && D.TextureEngine.getProceduralTexture) {
     var tex = D.TextureEngine.getProceduralTexture(tileType, hexColor, noiseIntensity);
     if (tex) return new THREE.MeshLambertMaterial({ map: tex });
@@ -73,7 +73,7 @@ function getTexMat(tileType, hexColor, noiseIntensity) {
 }
 
 function getTileType(tx, ty) {
-  var D = window.Duskfall;
+  var D = window.UnkScape;
   if (D && D.game && D.game.world && D.game.world.tiles) {
     var row = D.game.world.tiles[ty];
     if (row && row[tx]) return row[tx];
@@ -87,7 +87,7 @@ function getTileColor(tx, ty) {
 }
 
 function getTileHeight(tx, ty) {
-  var D = window.Duskfall;
+  var D = window.UnkScape;
   if (D && typeof D.GetTerrainAt === 'function') {
     var td = D.GetTerrainAt(tx, ty);
     return (td.z00 || 0) * 0.3;
@@ -121,7 +121,7 @@ E.Initialize3D = function() {
   var aspect = window.innerWidth / window.innerHeight;
   E.camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 2000);
 
-  var D = window.Duskfall;
+  var D = window.UnkScape;
   var p = D && D.game && D.game.player;
   if (p) {
     var snapX = (p.x || 0) * SCALE;
@@ -144,7 +144,7 @@ E.Initialize3D = function() {
   sun.position.set(80, 120, 60);
   E.scene.add(sun);
 
-  var D2 = window.Duskfall;
+  var D2 = window.UnkScape;
   if (D2 && D2.CharacterVisuals && D2.CharacterVisuals.createModularMesh) {
     var playerData = D2.game ? (D2.game.player || {}) : {};
     E.playerVisual = D2.CharacterVisuals.createModularMesh(playerData);
@@ -246,7 +246,7 @@ E.RebuildProps = function(pxX, pxY) {
   E.lastPropX = pxX;
   E.lastPropY = pxY;
 
-  var D = window.Duskfall;
+  var D = window.UnkScape;
   var TE = D && D.TextureEngine;
   var resources = D && D.game && D.game.entities && D.game.entities.resources;
   if (!resources || !resources.length) {
@@ -372,7 +372,7 @@ E.RenderFrame3D = function(playerData) {
     E.camera.position.z += (camTargetZ - E.camera.position.z) * 0.08;
     E.camera.lookAt(target3X, playerY, target3Z);
 
-    var D = window.Duskfall;
+    var D = window.UnkScape;
     if (D && D.CharacterVisuals && D.CharacterVisuals.animateMesh) {
       var velocity = Math.hypot(vx, vy);
       var time = performance.now() * 0.001;
