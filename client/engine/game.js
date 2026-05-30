@@ -78,7 +78,7 @@ this.ui.showMenu();
 const U = window.UnkScape || {};
 if (U.Engine && U.Engine.Input) { U.Engine.Input.init(); }
 if (U.Engine && U.Engine.Renderer && typeof U.Engine.Renderer.init === 'function') { U.Engine.Renderer.init('game'); }
-if (U.UI) { U.UI.init(); } // also calls toggleHUDDisplay(false) at boot
+if (U.UI && typeof U.UI.init === 'function') { U.UI.init(); } // guarded: D.UI has no static init
   // ── Attach UnkScape environment clock and mob AI ──
   if (U.Engine && U.Engine.Environment) { U.Engine.Environment.attach(this); }
   if (U.AI && U.AI.MobEngine) { U.AI.MobEngine.attach(this); }
