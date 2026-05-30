@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.AISystem=function(game){this.game=game;this.spawnTimer=4;};
   US.AISystem.prototype.update=function(dt){
     const g=this.game,p=g.player;if(!p)return;
