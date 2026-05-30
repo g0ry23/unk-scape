@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.PRICES = {
     berry:5,cooked_berry:16,health_salve:35,torch:12,
     log:4,pine_log:9,yew_log:24,stone:3,herb:12,copper_ore:12,iron_ore:22,silver_ore:30,gold_ore:55,raw_fish:8,raw_trout:18,emerald:75,ruby:125,hide:10,bone:8,dusk_essence:55,
