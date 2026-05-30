@@ -1,6 +1,7 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
-  D.ENEMIES = {
+  window.Duskfall = window.Duskfall || {};
+const US = window.UnkScape = window.Duskfall;
+  US.ENEMIES = {
     rat:{
       name:'Giant Rat', icon:'🐀', color:'#8b6f5a',
       hp:18, attack:2, defense:0, accuracy:.48, speed:54, aggro:105, attackRange:32, attackCooldown:1.45,
@@ -33,7 +34,7 @@
     }
   };
 
-  D.SPAWN_TABLES = {
+  US.SPAWN_TABLES = {
     day:[
       {id:'rat',w:82},
       {id:'goblin',w:18}
@@ -47,7 +48,7 @@
     ]
   };
 
-  D.weightedPick = function(list){
+  US.weightedPick = function(list){
     const total = list.reduce((a,b)=>a+b.w,0);
     let r = Math.random()*total;
     for(const it of list){ r -= it.w; if(r<=0) return it.id; }
