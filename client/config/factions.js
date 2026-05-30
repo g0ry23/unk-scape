@@ -1,9 +1,10 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
-  // Extend D.FACTIONS (defined in classes.js) with the two overarching warring factions
-  D.FACTIONS = D.FACTIONS || {};
+  window.Duskfall = window.Duskfall || {};
+const US = window.UnkScape = window.Duskfall;
+  // Extend US.FACTIONS (defined in classes.js) with the two overarching warring factions
+  US.FACTIONS = US.FACTIONS || {};
 
-  D.FACTIONS.blood_oath = {
+  US.FACTIONS.blood_oath = {
     id: "blood_oath",
     name: "Blood-Oath Clans",
     primaryColor: "#c0392b",
@@ -18,7 +19,7 @@
     buff: { attack: 4, moveSpeed: 0.10 }
   };
 
-  D.FACTIONS.iron_crown = {
+  US.FACTIONS.iron_crown = {
     id: "iron_crown",
     name: "Iron-Crown Accord",
     primaryColor: "#2980b9",
@@ -33,8 +34,8 @@
     buff: { defense: 5 }
   };
 
-  D.applyFactionTheme = function(factionId) {
-    const f = D.FACTIONS[factionId];
+  US.applyFactionTheme = function(factionId) {
+    const f = US.FACTIONS[factionId];
     if (!f) return;
     document.body.classList.remove('theme-blood-oath', 'theme-iron-crown');
     if (f.themeClass) document.body.classList.add(f.themeClass);
