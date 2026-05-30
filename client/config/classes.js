@@ -25,7 +25,7 @@
     melee:{
       name:'Melee', icon:'⚔️', archetype:'melee',
       desc:'Sword-and-shield survivor built for close combat and holding territory.',
-      items:{crude_sword:1,wooden_shield:1,bronze_helm:1,health_salve:2,coin:20},
+      items:{crude_sword:1,wooden_shield:1,bronze_helm:1,stone_hatchet:1,iron_pickaxe:1,health_salve:2,coin:20},
       skills:{combat:80,survival:25,crafting:10},
       equipment:{weapon:'crude_sword',offhand:'wooden_shield',head:'bronze_helm'},
       perks:['thick_skin'],
@@ -34,7 +34,7 @@
     range:{
       name:'Range', icon:'🏹', archetype:'range',
       desc:'Bow-focused scout built for kiting mobs, hunting resources, and controlling forests.',
-      items:{training_bow:1,leather_hood:1,ranger_tunic:1,arrow:35,berry:4,coin:20},
+      items:{training_bow:1,leather_hood:1,ranger_tunic:1,stone_hatchet:1,iron_pickaxe:1,arrow:35,berry:4,coin:20},
       skills:{combat:55,foraging:40,survival:25},
       equipment:{weapon:'training_bow',head:'leather_hood',body:'ranger_tunic'},
       perks:['keen_eye'],
@@ -43,17 +43,17 @@
     mage:{
       name:'Mage', icon:'🔮', archetype:'mage',
       desc:'Staff-wielding caster built around distance, burst damage, and ancient ruins.',
-      items:{oak_staff:1,apprentice_hood:1,apprentice_robe:1,herb:3,torch:2,coin:20},
+      items:{oak_staff:1,apprentice_hood:1,apprentice_robe:1,stone_hatchet:1,iron_pickaxe:1,herb:3,torch:2,coin:20},
       skills:{combat:55,crafting:35,survival:20,foraging:20},
       equipment:{weapon:'oak_staff',head:'apprentice_hood',body:'apprentice_robe'},
       perks:['herbalist'],
       start:{x:600,y:1027}, zone:'Moonspire Ruins'
     },
-    wanderer:{name:'Wanderer', icon:'🧭',archetype:'hybrid',desc:'Balanced survivor with supplies and flexible growth.',items:{log:3,berry:4,torch:2,coin:25},skills:{survival:30,foraging:20},equipment:{},perks:['light_footed'],start:{x:600,y:600},zone:'Central Crossroads'},
-    brawler:{name:'Brawler', icon:'🥊',archetype:'melee',desc:'Tougher start with a crude sword and salves.',items:{crude_sword:1,health_salve:2,coin:10},skills:{combat:60,survival:15},equipment:{weapon:'crude_sword'},perks:['thick_skin'],start:{x:200,y:1000},zone:'Bloodoak Pits'},
+    wanderer:{name:'Wanderer', icon:'🧭',archetype:'hybrid',desc:'Balanced survivor with supplies and flexible growth.',items:{log:3,berry:4,torch:2,stone_hatchet:1,iron_pickaxe:1,coin:25},skills:{survival:30,foraging:20},equipment:{},perks:['light_footed'],start:{x:600,y:600},zone:'Central Crossroads'},
+    brawler:{name:'Brawler', icon:'🥊',archetype:'melee',desc:'Tougher start with a crude sword and salves.',items:{crude_sword:1,stone_hatchet:1,iron_pickaxe:1,health_salve:2,coin:10},skills:{combat:60,survival:15},equipment:{weapon:'crude_sword'},perks:['thick_skin'],start:{x:200,y:1000},zone:'Bloodoak Pits'},
     gatherer:{name:'Gatherer', icon:'🌲',archetype:'range',desc:'Skilling-heavy start for crafting and resource progress.',items:{stone_hatchet:1,log:5,stone:5,berry:3,coin:15},skills:{woodcutting:45,mining:25,crafting:20},equipment:{tool:'stone_hatchet'},perks:['keen_eye'],start:{x:1000,y:1000},zone:'Greenroot Grove'},
-    prospector:{name:'Prospector', icon:'⛏️',archetype:'support',roleType:'skiller',desc:'Mining and money-focused start near ancient stone routes.',items:{stone:8,iron_ore:2,berry:2,coin:35},skills:{mining:55,crafting:15},equipment:{},perks:['coin_sense'],start:{x:187,y:600},zone:'Stonehook Quarry'},
-    cleric:{name:'Cleric', icon:'✨', archetype:'healer', roleType:'healer',desc:'Healer/support starter built for group survival, buffs, salves, and holy staff play.',items:{oak_staff:1,apprentice_hood:1,apprentice_robe:1,health_salve:3,herb:5,coin:25},skills:{combat:35,foraging:35,crafting:30,survival:25},equipment:{weapon:'oak_staff',head:'apprentice_hood',body:'apprentice_robe'},perks:['herbalist'],start:{x:1013,y:600}, zone:'Sanctum Shoals'},
+    prospector:{name:'Prospector', icon:'⛏️',archetype:'support',roleType:'skiller',desc:'Mining and money-focused start near ancient stone routes.',items:{stone:8,iron_ore:2,berry:2,stone_hatchet:1,iron_pickaxe:1,coin:35},skills:{mining:55,crafting:15},equipment:{},perks:['coin_sense'],start:{x:187,y:600},zone:'Stonehook Quarry'},
+    cleric:{name:'Cleric', icon:'✨', archetype:'healer', roleType:'healer',desc:'Healer/support starter built for group survival, buffs, salves, and holy staff play.',items:{oak_staff:1,apprentice_hood:1,apprentice_robe:1,stone_hatchet:1,iron_pickaxe:1,health_salve:3,herb:5,coin:25},skills:{combat:35,foraging:35,crafting:30,survival:25},equipment:{weapon:'oak_staff',head:'apprentice_hood',body:'apprentice_robe'},perks:['herbalist'],start:{x:1013,y:600}, zone:'Sanctum Shoals'},
     warden:{name:'Warden', icon:'🌿', archetype:'support', roleType:'tank',desc:'Tank/support defender built to protect groups, claim turf, and hold boss pressure.',items:{wooden_shield:1,stone_hatchet:1,hide_armor:1,log:4,health_salve:2,coin:20},skills:{combat:45,woodcutting:35,survival:35,crafting:20},equipment:{offhand:'wooden_shield',body:'hide_armor',tool:'stone_hatchet'},perks:['thick_skin','lumberjack'],start:{x:600,y:187}, zone:'Verdant Bulwark'}
   };
 
