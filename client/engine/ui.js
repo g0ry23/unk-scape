@@ -64,7 +64,7 @@ this.refreshActiveTab();
  * Safe accessor — returns the live Duskfall game instance or null
  */
 _game() {
-const D = window.Duskfall;
+const D = window.UnkScape;
 return (D && D.game && D.game.player) ? D.game : null;
 },
 
@@ -74,7 +74,7 @@ return (D && D.game && D.game.player) ? D.game : null;
 _skillLevel(skillKey) {
 const g = this._game();
 if (!g) return 1;
-const D = window.Duskfall;
+const D = window.UnkScape;
 const skillData = g.player.skills[skillKey];
 if (!skillData) return 1;
 // Use the engine's live D.levelForXp() — same function combat/gather use
@@ -95,7 +95,7 @@ return g ? g.systems.inventory.count('coin') : 0;
  * Skills tab — reads live XP from player.skills[key] via D.levelForXp()
  */
 _renderSkills() {
-const D = window.Duskfall;
+const D = window.UnkScape;
 const g = this._game();
 
 // Full skill roster pulled directly from D.SKILLS config
@@ -145,7 +145,7 @@ return '<h3 style="color:#f1c40f; margin-top:0; font-size:14px; letter-spacing:1
  * Quests tab — reads live progress from game.systems.quests.active
  */
 _renderQuests() {
-const D = window.Duskfall;
+const D = window.UnkScape;
 const g = this._game();
 const QS = (D && D.QUESTS) ? D.QUESTS : {};
 
@@ -204,7 +204,7 @@ return '<h3 style="color:#f1c40f; margin-top:0; font-size:14px; letter-spacing:1
  * G.E. tab — BUY wires into inventory.remove('coin') + inventory.add(item)
  */
 _renderGE() {
-const D = window.Duskfall;
+const D = window.UnkScape;
 const g = this._game();
 
 window._unkGEBuy = (itemId, price, lbl) => {
