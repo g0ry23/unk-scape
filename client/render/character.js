@@ -64,18 +64,24 @@
         rightLeg.position.set(0.14 * scale.body[0], 0.2, 0);
         playerGroup.add(rightLeg);
 
-        // Left arm
-        const armGeo  = new THREE.BoxGeometry(0.15, 0.5, 0.15);
-        const leftArm = new THREE.Mesh(armGeo, factionMat);
-        leftArm.position.set(-0.42 * scale.body[0], 0.65, 0);
-        playerGroup.add(leftArm);
+        	// Left arm -- pivot at shoulder so rotation swings the arm like a pendulum
+	const armGeo = new THREE.BoxGeometry(0.15, 0.5, 0.15);
+	// Left arm pivot group: positioned at shoulder
+	const leftArmPivot = new THREE.Group();
+	leftArmPivot.position.set(-0.42 * scale.body[0], 0.9, 0);
+	const leftArm = new THREE.Mesh(armGeo, factionMat);
+	leftArm.position.set(0, -0.25, 0); // arm hangs below shoulder pivot
+	leftArmPivot.add(leftArm);
+	playerGroup.add(leftArmPivot);
 
-        // Right arm
-        const rightArm = new THREE.Mesh(armGeo, factionMat);
-        rightArm.position.set(0.42 * scale.body[0], 0.65, 0);
-        playerGroup.add(rightArm);
-
-        // Boots on left leg
+	// Right arm pivot group: positioned at shoulder
+	const rightArmPivot = new THREE.Group();
+	rightArmPivot.position.set(0.42 * scale.body[0], 0.9, 0);
+	const rightArm = new THREE.Mesh(armGeo, factionMat);
+	rightArm.position.set(0, -0.25, 0); // arm hangs below shoulder pivot
+	rightArmPivot.add(rightArm);
+	playerGroup.add(rightArmPivot);
+// Boots on left leg
         const bootGeo   = new THREE.BoxGeometry(0.2, 0.15, 0.22);
         const leftBoot  = new THREE.Mesh(bootGeo, bootMat);
         leftBoot.position.set(-0.14 * scale.body[0], 0.075, 0.02);
@@ -84,15 +90,15 @@
         rightBoot.position.set(0.14 * scale.body[0], 0.075, 0.02);
         playerGroup.add(rightBoot);
 
-        // Store limb refs for animation
-        playerGroup.userData = {
-            leftLeg, rightLeg,
-            leftArm, rightArm,
-            torsoMesh, headMesh,
-            classId, factionId
-        };
-
-        return playerGroup;
+        	// Store limb refs for animation -- animate the PIVOT groups, not the mesh
+	playerGroup.userData = {
+		leftLeg, rightLeg,
+		leftArm: leftArmPivot,
+		rightArm: rightArmPivot,
+		torsoMesh, headMesh,
+		classId, factionId
+	};
+return playerGroup;
     };
 
     /**
