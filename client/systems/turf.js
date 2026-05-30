@@ -1,4 +1,4 @@
-—→(function(){
+(function(){
   const US = window.UnkScape = window.UnkScape || {};
   US.TurfSystem=function(game){this.game=game;this.points=[];this.capture=null;this.seeded=false;this.owner={};};
   US.TurfSystem.prototype.ensure=function(){
