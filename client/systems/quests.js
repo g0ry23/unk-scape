@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.QuestSystem=function(game){this.game=game;this.active={};this.completed={};};
   US.QuestSystem.prototype.init=function(){
     this.active={};this.completed={};
