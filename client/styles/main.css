@@ -59,10 +59,11 @@ button,input,select{font-family:inherit}
 /* Combat / Interface Upgrade */
 #combat-ui{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);pointer-events:none;z-index:4}
 #hotbar{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);pointer-events:none;z-index:5}
-#action-hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:6;display:none;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;background:linear-gradient(180deg,rgba(13,18,31,.90),rgba(7,10,17,.82));border:1px solid rgba(247,198,91,.30);box-shadow:0 18px 60px rgba(0,0,0,.45);backdrop-filter:blur(12px);font:900 12px/1 var(--mono);color:#e9f0ff;white-space:nowrap}
-#action-hint.show{display:flex}
-#action-hint b{color:var(--gold)}
-#action-hint .hint-dot{width:8px;height:8px;border-radius:99px;background:var(--gold);box-shadow:0 0 18px rgba(247,198,91,.5)}
+#action-hint{position:fixed;left:0;top:0;transform:none;pointer-events:none;z-index:9999;display:none;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;background:rgba(10,12,20,0.82);border:1px solid rgba(247,198,91,0.4);backdrop-filter:blur(4px);color:#e9f0ff;font-size:12px;font-family:'Courier New',monospace;white-space:nowrap;max-width:280px;box-shadow:0 2px 8px rgba(0,0,0,0.4);}
+#action-hint.show{display:flex;}
+#action-hint b{color:var(--gold);}
+#action-hint .hint-dot{width:7px;height:7px;border-radius:99px;background:var(--gold);flex-shrink:0;}
+
 .hotbar-card{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:20px;background:linear-gradient(180deg,rgba(13,18,31,.88),rgba(7,10,17,.82));border:1px solid rgba(255,255,255,.14);box-shadow:var(--shadow);backdrop-filter:blur(12px)}
 .hotbar-slot{width:58px;height:58px;border-radius:16px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.055);display:grid;place-items:center;position:relative;color:var(--text);font-weight:900}
 .hotbar-slot.selected{border-color:rgba(247,198,91,.72);background:rgba(247,198,91,.16);box-shadow:0 0 24px rgba(247,198,91,.16)}
@@ -144,11 +145,8 @@ button,input,select{font-family:inherit}
 }
 
 /* Action hint box — kept compact and floating */
-#action-hint {
-    max-width: 240px !important;
-    white-space: normal !important;
-    word-wrap: break-word !important;
-}
+/* action-hint max-width handled in base rule */
+
 
 /* Faction-colored accents on interactive elements */
 .big-btn:hover, .small-btn:hover {
