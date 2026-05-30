@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.ENEMIES = {
     rat:{
       name:'Giant Rat', icon:'🐀', color:'#8b6f5a',
