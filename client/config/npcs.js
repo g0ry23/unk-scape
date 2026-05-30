@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.NPCS = {
     elder:{
       name:'Elder Rowan', icon:'🧙', role:'Guide',
