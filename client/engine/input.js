@@ -1,6 +1,6 @@
 /**
  * input.js -- PHASE 3 REBUILD
- * ONE namespace: window.Duskfall (D) only.
+ * ONE namespace: window.UnkScape (D) only.
  * ONE mousedown, ONE mousemove, ONE mouseup, ONE wheel, ONE keydown, ONE keyup.
  * 3D-native raycaster click path. No silent misses. No old 2D code.
  * Camera orbit angle feeds WASD so W always moves away from camera.
@@ -24,14 +24,14 @@ function logClick(screenX, screenY, hitInfo, result) {
     + " | hit=" + (hitInfo || "miss")
     + " | result=" + result;
   console.log(msg);
-  var D2 = window.Duskfall;
+  var D2 = window.UnkScape;
   if (D2 && D2.game && D2.game.ui && D2.game.ui.log) {
     D2.game.ui.log(msg, 'gold');
   }
 }
 
 function feedback(msg, type) {
-  var D2 = window.Duskfall;
+  var D2 = window.UnkScape;
   if (!D2 || !D2.game) return;
   var g = D2.game;
   if (g.ui && g.ui.toast) g.ui.toast(msg, '', type || 'gold');
@@ -417,7 +417,7 @@ US.displayKey = function(k) {
   return k === " " ? "SPACE" : k === "escape" ? "ESC" : k === "tab" ? "TAB" : String(k).toUpperCase();
 };
 
-})(window.Duskfall = window.Duskfall || {});
+})(window.UnkScape = window.UnkScape || {});
 
 /*
  * PHASE 3 REBUILD COMPLETE -- Listener inventory:
