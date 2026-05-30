@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.CombatSystem=function(game){this.game=game;this.heavyThreshold=.72;this.maxCharge=1.25;this.baseCritChance=.08;this.baseCritMult=1.65;this.headshotRadius=20;};
   US.CombatSystem.prototype.weaponStyle=function(player){
     const w=player?.equipment?.weapon;
