@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.FACTIONS = {
     ironbound:{name:'Ironbound Order',icon:'🛡️',color:'#9ea7b8',desc:'Fortify land, hold roads, and win through discipline.',buff:{defense:2}},
     bloodoak:{name:'Bloodoak Clan',icon:'🪓',color:'#ff5c7a',desc:'Aggressive melee raiders who claim turf by force.',buff:{attack:1}},
