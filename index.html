@@ -12,6 +12,8 @@
     <script src="client/engine/render_3d.js?v=19"></script>
         <script src="client/render/character.js?v=8"></script></head>
 <body>
+    <!-- NAMESPACE BRIDGE: establish canonical UnkScape = Duskfall before any scripts load -->
+    <script>window.Duskfall = window.Duskfall || {}; window.UnkScape = window.Duskfall;</script>
 
 <!-- ============================================================ -->
 <!-- UNK-SCAPE GAME SHELL                                       -->
