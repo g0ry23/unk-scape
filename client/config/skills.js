@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.SKILLS = {
     combat: {
       name:'Combat', icon:'⚔️', color:'#ff5c7a',
