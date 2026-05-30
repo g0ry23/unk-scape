@@ -1,12 +1,12 @@
 /**
  * UNK-SCAPE 3D Procedural Texture & Geometry Factory
  * Path: client/render/textures.js
- * Namespace: window.Duskfall.TextureEngine (D.TextureEngine)
+ * Namespace: window.UnkScape.TextureEngine (US.TextureEngine)US.
  */
 (function() {
-  const D = window.Duskfall = window.Duskfall || {};
+  const US = window.UnkScape = window.UnkScape || {};
 
-  D.TextureEngine = {};
+  US.TextureEngine = {};
 
   // Internal cache to prevent memory leaks and duplicate texture allocations
   const textureCache = {};
@@ -18,7 +18,7 @@
    * @param {number} noiseIntensity - Amount of grit/grain variance (0 to 255)
    * @returns {THREE.CanvasTexture} High-performance, low-poly optimized texture map
    */
-  D.TextureEngine.getProceduralTexture = function(type, baseColorHex, noiseIntensity) {
+  US.TextureEngine.getProceduralTexture = function(type, baseColorHex, noiseIntensity) {
     noiseIntensity = noiseIntensity !== undefined ? noiseIntensity : 25;
 
     // THREE may not be loaded yet at parse time — guard here
@@ -85,7 +85,7 @@
    * @param {THREE.BufferGeometry} geometry - Target geometric mesh primitive
    * @param {number} jitterAmount - Vertices dispersion factor
    */
-  D.TextureEngine.applyLowPolyJitter = function(geometry, jitterAmount) {
+  US.TextureEngine.applyLowPolyJitter = function(geometry, jitterAmount) {
     jitterAmount = jitterAmount !== undefined ? jitterAmount : 0.08;
 
     var position = geometry.attributes.position;
