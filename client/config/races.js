@@ -1,5 +1,5 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
+  const US = window.UnkScape = window.UnkScape || {};const D = US;
 
   // === RACES CONFIG ===
   // Race selection is separate from class. Race provides baseline stat bonuses
