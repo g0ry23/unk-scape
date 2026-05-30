@@ -1,25 +1,25 @@
 (function(){
-const D = window.Duskfall = window.Duskfall || {};
+const US = window.UnkScape = window.UnkScape || {};
 // GatheringSystem v3: progress bar + too-far toast + tight seeding
-D.GatheringSystem = function(game) {
+US.GatheringSystem = function(game) {
   this.game = game; this.nodes = []; this.active = null;
   this.timer = 0; this.duration = 3; this.respawnTime = 10; this.seeded = false;
 };
-D.GatheringSystem.prototype.nodeLabel = function(node) {
+US.GatheringSystem.prototype.nodeLabel = function(node) {
   if (!node) return "Gathering";
   if (node.cfg) return (node.cfg.action || "Gather") + ": " + node.cfg.name;
   if (node.structure && node.structure.resource)
     return "Harvest: " + node.structure.resource.charAt(0).toUpperCase() + node.structure.resource.slice(1);
   return "Chop: Harvest Tree";
 };
-D.GatheringSystem.prototype.gatherDuration = function(node) {
+US.GatheringSystem.prototype.gatherDuration = function(node) {
   if (!node || !node.cfg) return 3;
   const p = this.game.player;
-  const lvl = D.levelForXp(p.skills[node.cfg.skill] ? p.skills[node.cfg.skill].xp || 0 : 0);
+  const lvl = US.levelForXp(p.skills[node.cfg.skill] ? p.skills[node.cfg.skill].xp || 0 : 0);
   const tool = p.stats()[node.cfg.skill] || 0;
-  return D.clamp(3.4 + (node.cfg.tier || 1) * 0.45 - (lvl + tool) * 0.10, 1.3, 5.2);
+  return US.clamp(3.4 + (node.cfg.tier || 1) * 0.45 - (lvl + tool) * 0.10, 1.3, 5.2);
 };
-D.GatheringSystem.prototype.ensureNodes = function() {
+US.GatheringSystem.prototype.ensureNodes = function() {
   const g = this.game;
   if (this.seeded || !g.world || !g.player) return;
   this.seeded = true;
@@ -31,8 +31,8 @@ D.GatheringSystem.prototype.ensureNodes = function() {
   var ANGLES = [0.4, 1.2, 2.5, 4.0];
   var seeded = ANGLES.map(function(angle, idx) {
     return {
-      x: D.clamp(px + Math.cos(angle) * (80 + idx * 20), D.TILE * 3, D.WORLD.pxW - D.TILE * 3),
-      y: D.clamp(py + Math.sin(angle) * (80 + idx * 20), D.TILE * 3, D.WORLD.pxH - D.TILE * 3)
+      x: US.clamp(px + Math.cos(angle) * (80 + idx * 20), US.TILE * 3, US.WORLD.pxW - US.TILE * 3),
+      y: US.clamp(py + Math.sin(angle) * (80 + idx * 20), US.TILE * 3, US.WORLD.pxH - US.TILE * 3)
     };
   });
   seeded.forEach(function(pos, idx) {
@@ -47,7 +47,7 @@ D.GatheringSystem.prototype.ensureNodes = function() {
   var E = window.UnkScape3D;
   if (E && E.RebuildProps) E.RebuildProps(px, py);
 };
-D.GatheringSystem.prototype._checkToolPermission = function(node) {
+US.GatheringSystem.prototype._checkToolPermission = function(node) {
   var g = this.game, p = g.player;
   var req = (node.structure && node.structure.toolReq) || (node.cfg && node.cfg.toolReq) || null;
   if (!req) return true;
@@ -56,12 +56,12 @@ D.GatheringSystem.prototype._checkToolPermission = function(node) {
   var allowed = UP.canUseTool(req, p.skills);
   if (!allowed) {
     var tier = UP.TOOL_TIERS[req] || {};
-    var skillName = (D.SKILLS[tier.skill] || {}).name || tier.skill || "skill";
+    var skillName = (US.SKILLS[tier.skill] || {}).name || tier.skill || "skill";
     g.ui.toast("Tool too weak", "You need a " + req.replace(/_/g," ") + " or better (" + skillName + " Lv." + tier.level + ").", "bad");
   }
   return allowed;
 };
-D.GatheringSystem.prototype._showProgress = function() {
+US.GatheringSystem.prototype._showProgress = function() {
   var hint = document.getElementById("action-hint");
   if (!hint || !this.active) { this._clearProgress(); return; }
   var pct = Math.min(1, this.timer / this.duration);
@@ -70,11 +70,11 @@ D.GatheringSystem.prototype._showProgress = function() {
   hint.style.cssText = "position:fixed;bottom:180px;left:50%;transform:translateX(-50%);background:rgba(14,11,20,0.92);border:2px solid #47385a;border-radius:6px;padding:8px 16px;color:#f1c40f;font-family:Courier New,monospace;font-size:13px;z-index:9999;min-width:220px;text-align:center;pointer-events:none;";
   hint.innerHTML = "<div style='margin-bottom:6px;'>" + label + "</div><div style='background:#120e1a;border-radius:3px;height:8px;width:160px;margin:0 auto;'><div style='background:#2ecc71;width:" + barW + "px;height:8px;border-radius:3px;'></div></div>";
 };
-D.GatheringSystem.prototype._clearProgress = function() {
+US.GatheringSystem.prototype._clearProgress = function() {
   var hint = document.getElementById("action-hint");
   if (hint) { hint.style.cssText = ""; hint.innerHTML = ""; }
 };
-D.GatheringSystem.prototype.tryStartAt = function(x, y) {
+US.GatheringSystem.prototype.tryStartAt = function(x, y) {
   this.ensureNodes();
   var g = this.game, p = g.player;
   if (!p) return false;
@@ -95,9 +95,9 @@ D.GatheringSystem.prototype.tryStartAt = function(x, y) {
     var node = resourceAtPos;
     if (node.cfg) {
       var skillXp = p.skills[node.cfg.skill] ? p.skills[node.cfg.skill].xp || 0 : 0;
-      var level = D.levelForXp(skillXp);
+      var level = US.levelForXp(skillXp);
       if (level < node.cfg.level) {
-        g.ui.toast("Level too low", node.cfg.name + " requires " + D.SKILLS[node.cfg.skill].name + " level " + node.cfg.level + ".", "bad");
+        g.ui.toast("Level too low", node.cfg.name + " requires " + US.SKILLS[node.cfg.skill].name + " level " + node.cfg.level + ".", "bad");
         return true;
       }
     }
@@ -110,18 +110,18 @@ D.GatheringSystem.prototype.tryStartAt = function(x, y) {
   }
   return false;
 };
-D.GatheringSystem.prototype.cancel = function() {
+US.GatheringSystem.prototype.cancel = function() {
   if (this.game.player) this.game.player.gathering = false;
   this.active = null; this.timer = 0; this._clearProgress();
 };
-D.GatheringSystem.prototype.finish = function() {
+US.GatheringSystem.prototype.finish = function() {
   var g = this.game, node = this.active;
   if (!node) { this.cancel(); return; }
   if (node.cfg) {
     var p = g.player, cfg = node.cfg;
-    var lvl = D.levelForXp(p.skills[cfg.skill] ? p.skills[cfg.skill].xp || 0 : 0);
+    var lvl = US.levelForXp(p.skills[cfg.skill] ? p.skills[cfg.skill].xp || 0 : 0);
     var tool = p.stats()[cfg.skill] || 0;
-    var ok = D.rollSkillSuccess(lvl + tool, cfg.difficulty);
+    var ok = US.rollSkillSuccess(lvl + tool, cfg.difficulty);
     if (!ok) {
       g.ui.floatText(p.x, p.y - 35, "Failed", "#9aa8c7");
       if (g.systems.skills) g.systems.skills.addXp(cfg.skill, Math.max(1, Math.floor(cfg.xp * 0.15)));
@@ -138,7 +138,7 @@ D.GatheringSystem.prototype.finish = function() {
     _logXpGain(g, cfg.skill, xpGained);
     if (g.systems.quests) g.systems.quests.notify("gather", item, qty);
     g.stats.resourcesGathered += qty;
-    g.ui.floatText(p.x, p.y - 42, "+" + qty + " " + (D.ITEMS[item] ? D.ITEMS[item].name : item), "#38d978");
+    g.ui.floatText(p.x, p.y - 42, "+" + qty + " " + (US.ITEMS[item] ? US.ITEMS[item].name : item), "#38d978");
     if (node.amount <= 0) { node.cooldown = cfg.respawn; g.ui.log(cfg.name + " depleted.", "gold"); }
   } else if (node.structure && node.structure.xpReward) {
     var p2 = g.player, str = node.structure;
@@ -167,11 +167,11 @@ D.GatheringSystem.prototype.finish = function() {
   this.cancel();
 };
 function _logXpGain(g, skillKey, amount) {
-  var skillDef = (window.Duskfall && window.Duskfall.SKILLS && window.Duskfall.SKILLS[skillKey]) || {};
+  var skillDef = (window.UnkScape && window.UnkScape.SKILLS && window.UnkScape.SKILLS[skillKey]) || {};
   var name = skillDef.name || (skillKey.charAt(0).toUpperCase() + skillKey.slice(1));
   g.ui.log("+" + amount + " " + name + " XP gained.", "gold");
 }
-D.GatheringSystem.prototype.update = function(dt) {
+US.GatheringSystem.prototype.update = function(dt) {
   this.ensureNodes();
   var g = this.game, p = g.player;
   var resources = g.entities && g.entities.resources;
