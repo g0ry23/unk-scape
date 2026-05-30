@@ -1,11 +1,5 @@
 (function(){
-// === PHASE 2: Bridge — UnkScape is canonical namespace ===
-// save.js runs after all game scripts, so Duskfall already has all game data.
-// We alias UnkScape → Duskfall here so save system can use canonical name.
-// Full migration happens in Phase 3. The canonical bridge lives in index.html.
-window.Duskfall = window.Duskfall || {};
-window.UnkScape = window.Duskfall;
-const US = window.UnkScape;
+const US = window.UnkScape = window.UnkScape || {};
 
 // === SAVE SYSTEM v3 — UnkScape canonical namespace, _migrateInventory fixed ===
 // Storage keys are namespaced to avoid collisions
