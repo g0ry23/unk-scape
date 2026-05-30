@@ -78,7 +78,7 @@ this.ui.showMenu();
 const U = window.UnkScape || {};
 if (U.Engine && U.Engine.Input) { U.Engine.Input.init(); }
 if (U.Engine && U.Engine.Renderer && typeof U.Engine.Renderer.init === 'function') { U.Engine.Renderer.init('game'); }
-if (U.UI && typeof U.UI.init === 'function') { U.UI.init(); } // guarded: D.UI has no static init
+if (U.UI && typeof U.TabUI.init === 'function') { U.TabUI.init(); } // guarded: D.UI has no static init
   // ── Attach UnkScape environment clock and mob AI ──
   if (U.Engine && U.Engine.Environment) { U.Engine.Environment.attach(this); }
   if (U.AI && U.AI.MobEngine) { U.AI.MobEngine.attach(this); }
@@ -145,8 +145,8 @@ window.UnkScape3D.Initialize3D();
 // ─────────────────────────────────────────────────────
 // ── Show HUD now that we are in-game ──
 const _U = window.UnkScape;
-if (_U && _U.UI && typeof _U.UI.toggleHUDDisplay === 'function') {
-_U.UI.toggleHUDDisplay(true);
+if (_U && _U.UI && typeof _U.TabUI.toggleHUDDisplayU.TabUI.toggleHUDDisplay === 'function') {
+_U.TabUI.toggleHUDDisplayU.TabUI.toggleHUDDisplay(true);
 }
 // ──────────────────────────────────────────
 }, 200);
@@ -196,8 +196,8 @@ window.UnkScape3D.Initialize3D();
 // ─────────────────────────────────────────────────────
 // ── Show HUD on loaded game ──
 const _U = window.UnkScape;
-if (_U && _U.UI && typeof _U.UI.toggleHUDDisplay === 'function') {
-_U.UI.toggleHUDDisplay(true);
+if (_U && _U.UI && typeof _U.TabUI.toggleHUDDisplayU.TabUI.toggleHUDDisplay === 'function') {
+_U.TabUI.toggleHUDDisplayU.TabUI.toggleHUDDisplay(true);
 }
 // ──────────────────────────────────────
 }, 200);
