@@ -1,6 +1,6 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
-  D.PERKS = {
+  const US = window.UnkScape = window.UnkScape || {};
+  US.PERKS = {
     light_footed:{name:'Light Footed',icon:'👟',desc:'+5% movement speed.', apply:p=>p.mods.moveSpeed=(p.mods.moveSpeed||0)+.05},
     thick_skin:{name:'Thick Skin',icon:'💪',desc:'+3 defense.', apply:p=>p.mods.defense=(p.mods.defense||0)+3},
     keen_eye:{name:'Keen Eye',icon:'👁️',desc:'+10% chance for extra gathered resources.', apply:p=>p.mods.extraGather=(p.mods.extraGather||0)+.10},
@@ -13,7 +13,7 @@
     stoneblood:{name:'Stoneblood',icon:'🪨',desc:'+1 mining tool power and +1 defense.', apply:p=>{p.mods.mining=(p.mods.mining||0)+1;p.mods.defense=(p.mods.defense||0)+1}}
   };
 
-  D.PERK_LEVELS = [
+  US.PERK_LEVELS = [
     {skill:'combat',level:3,perk:'iron_grip'},
     {skill:'combat',level:5,perk:'stoneblood'},
     {skill:'survival',level:3,perk:'night_owl'},
