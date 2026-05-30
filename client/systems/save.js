@@ -152,7 +152,8 @@
            characterId = active.characterId;
      }
      const saves = this.getAllSaves();
-     return saves.find(s => s.worldId === worldId && s.characterId === characterId) || null;
+     var found = saves.find(s => s.worldId === worldId && s.characterId === characterId) || null;
+return found ? this._migrateInventory(found) : null;
  };
 
  // ── delete one character save ─────────────────────────
@@ -183,4 +184,18 @@
      const active = this._read(this.keys.active);
      if (active) this.deleteCharacter(active.worldId, active.characterId);
  };
-})();
+})();// ── inventory migration: ensure tools always present ─────────────
+D.SaveSystem.prototype._migrateInventory = function(saveData) {
+  // Ensure stone_hatchet and iron_pickaxe exist in every save
+  // Added in classes.js update -- old saves pre-date this
+  if (!saveData || !saveData.inventory) return saveData;
+  var TOOLS = ['stone_hatchet', 'iron_pickaxe'];
+  TOOLS.forEach(function(tool) {
+    if (!saveData.inventory[tool] || saveData.inventory[tool] < 1) {
+      saveData.inventory[tool] = 1;
+    }
+  });
+  return saveData;
+};
+
+
