@@ -3,7 +3,7 @@
 // File: client/engine/ui_overlay.js
 // Version: v0.4.7 (Modular UI Core)
 // ============================================================
-// Exposes on window.Duskfall (D):
+// Exposes on window.UnkScape (D):
 //   US.UIState            - shared UI flag + faction color dict
 //   US.RenderPlayerHUD()  - top-left floating HP/MP status board
 //   US.RenderStatsWindow()- centered character attributes window
@@ -208,4 +208,4 @@ const US = D;
     US.UIState.showStatsWindow = !US.UIState.showStatsWindow;
   };
 
-})(window.Duskfall = window.Duskfall || {});
+})(window.UnkScape = window.UnkScape || {});
