@@ -1,8 +1,6 @@
 (function() {
     const D = window.Duskfall = window.Duskfall || {};
     D.CharacterVisuals = {};
-
-    // Maps player factionId to 3D mesh color
     const FACTION_COLORS = {
         'blood_oath':    0xc0392b,  // Crimson Red
         'iron_crown':    0x2980b9,  // Cobalt Blue
@@ -103,39 +101,64 @@
      * time: performance.now() * 0.001
      */
     D.CharacterVisuals.animateMesh = function(playerMesh, velocity, time) {
-if (!playerMesh || !playerMesh.userData.leftLeg) return;
-var limbs = playerMesh.userData;
-// Read gathering state -- pure read, no logic change
-var D2 = window.Duskfall;
-var gs = D2 && D2.game && D2.game.systems && D2.game.systems.gathering;
-var isChopping = gs && gs.active && gs.timer > 0;
-if (isChopping) {
-// Chop swing: repeating raise-and-strike on right arm, ~2 cycles/sec
-var chopSpeed = 6.0;
-var swing = Math.sin(time * chopSpeed);
-var chopAngle = swing * -1.2;
-limbs.rightArm.rotation.x = chopAngle;
-limbs.leftArm.rotation.x = swing * 0.25;
-limbs.leftLeg.rotation.x = 0;
-limbs.rightLeg.rotation.x = 0;
-limbs.torsoMesh.rotation.y = swing * 0.15;
-} else if (velocity > 0.5) {
-// Walk cycle
-var swingSpeed = 8;
-var angle = Math.sin(time * swingSpeed) * 0.45;
-limbs.leftLeg.rotation.x = angle;
-limbs.rightLeg.rotation.x = -angle;
-limbs.leftArm.rotation.x = -angle * 0.7;
-limbs.rightArm.rotation.x = angle * 0.7;
-limbs.torsoMesh.rotation.y = 0;
-} else {
-// Idle -- return to rest
-limbs.leftLeg.rotation.x = 0;
-limbs.rightLeg.rotation.x = 0;
-limbs.leftArm.rotation.x = 0;
-limbs.rightArm.rotation.x = 0;
-limbs.torsoMesh.rotation.y = 0;
-}
+  if (!playerMesh || !playerMesh.userData.leftLeg) return;
+  var limbs = playerMesh.userData;
+  // Read gathering state -- pure read, no logic change
+  var D2 = window.Duskfall;
+  var gs = D2 && D2.game && D2.game.systems && D2.game.systems.gathering;
+  var isChopping = gs && gs.active && gs.timer > 0;
+  if (isChopping) {
+    // Face toward the tree being chopped
+    var node = gs.active;
+    var player = D2.game.player;
+    if (node && player) {
+      var dx = node.x - player.x;
+      var dy = node.y - player.y;
+      // 3D: x maps to world x, y maps to -z (forward in Three.js iso view)
+      // Angle from player to tree, adjusted for camera iso orientation
+      var treeAngle = Math.atan2(dx, -dy);
+      playerMesh.rotation.y = treeAngle;
+    }
+    // Overhead chop swing: raise arm back then strike forward-down
+    // ~3 full chops/sec (chopSpeed=3*PI gives ~1.5 up-down cycles/sec, feels right)
+    var chopPhase = Math.sin(time * 9.0); // fast enough to see, slow enough to read
+    // chopPhase: -1 = arm raised overhead, +1 = arm struck down
+    // rotation.x: negative = arm raised back (overhead), positive = arm forward (strike)
+    var raiseAngle = -1.8;   // arm raised up/back overhead
+    var strikeAngle = 0.6;   // arm swung forward and down into the tree
+    var chopX = raiseAngle + (strikeAngle - raiseAngle) * ((chopPhase + 1) * 0.5);
+    limbs.rightArm.rotation.x = chopX;
+    // Slight inward lean at shoulder for realism
+    limbs.rightArm.rotation.z = -0.25;
+    // Left arm counter-balances (opposite, smaller)
+    limbs.leftArm.rotation.x = -chopX * 0.3;
+    limbs.leftArm.rotation.z = 0;
+    // Legs planted during chop
+    limbs.leftLeg.rotation.x = 0;
+    limbs.rightLeg.rotation.x = 0;
+    // Torso twists into the swing
+    limbs.torsoMesh.rotation.y = chopPhase * 0.2;
+  } else if (velocity > 0.5) {
+    // Walk cycle
+    var swingSpeed = 8;
+    var angle = Math.sin(time * swingSpeed) * 0.45;
+    limbs.leftLeg.rotation.x = angle;
+    limbs.rightLeg.rotation.x = -angle;
+    limbs.leftArm.rotation.x = -angle * 0.7;
+    limbs.rightArm.rotation.x = angle * 0.7;
+    limbs.rightArm.rotation.z = 0;
+    limbs.leftArm.rotation.z = 0;
+    limbs.torsoMesh.rotation.y = 0;
+  } else {
+    // Idle -- return to rest
+    limbs.leftLeg.rotation.x = 0;
+    limbs.rightLeg.rotation.x = 0;
+    limbs.leftArm.rotation.x = 0;
+    limbs.rightArm.rotation.x = 0;
+    limbs.rightArm.rotation.z = 0;
+    limbs.leftArm.rotation.z = 0;
+    limbs.torsoMesh.rotation.y = 0;
+  }
 };
  console.log("UnkScape3D: CharacterVisuals system loaded.");
 })();
@@ -165,6 +188,14 @@ D.CharacterVisuals.getWeaponStyle = function(itemId) {
  */
 D.CharacterVisuals.updateWeapon = function(playerMesh, weaponId) {
   if (!playerMesh || !playerMesh.userData.rightArm) return;
+  // Gathering tool override: show correct tool during chop/mine
+  var _D = window.Duskfall;
+  var _gs = _D && _D.game && _D.game.systems && _D.game.systems.gathering;
+  if (_gs && _gs.active && _gs.timer > 0 && _gs.active.cfg && _gs.active.cfg.skill) {
+    var _skill = _gs.active.cfg.skill;
+    if (_skill === 'woodcutting') weaponId = 'stone_hatchet';
+    else if (_skill === 'mining') weaponId = 'iron_pickaxe';
+  }
   var arm = playerMesh.userData.rightArm;
   var current = playerMesh.userData.weaponId || null;
   if (current === weaponId) return;
