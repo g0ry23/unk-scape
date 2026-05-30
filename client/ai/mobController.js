@@ -1,4 +1,4 @@
-—→// client/ai/mobController.js
+// client/ai/mobController.js
 // UnkScape.AI.MobEngine — Hostile PvE Mob Pursuit Vector AI
 // Reads mobSpawns[] from UnkScape.World, loops every frame tick,
 // switches IDLE → PURSUIT when player enters aggro radius,
