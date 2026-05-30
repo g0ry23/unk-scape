@@ -4,28 +4,29 @@
  * The 3D engine (render_3d.js / window.UnkScape3D) handles all rendering.
  *
  * This file keeps only:
- *  1. D.render() no-op stub (game.js may still reference it)
- *  2. D.isoProject / D.renderTurfTile / D.renderWallTile - kept for mmoWorld.js compatibility
+ *  1. US.render() no-op stub (game.js may still reference it)
+ *  2. US.isoProject / US.renderTurfTile / US.renderWallTile - kept for mmoWorld.js compatibility
  *  3. UnkScape.Engine.Renderer stub - game.js init calls Renderer.init()
  */
 
-// ── D.render no-op ────────────────────────────────────────────────────────
+// ── US.render no-op ────────────────────────────────────────────────────────
 (function() {
-  var D = window.Duskfall = window.Duskfall || {};
+  window.Duskfall = window.Duskfall || {};
+const US = window.UnkScape = window.Duskfall;
 
-  D.render = function() {};
+  US.render = function() {};
 
   // isoProject stub - kept so mmoWorld.js data builders don't crash if called
-  D.TILE_WIDTH  = D.TILE_WIDTH  || 64;
-  D.TILE_HEIGHT = D.TILE_HEIGHT || 32;
-  D.WALL_HEIGHT = D.WALL_HEIGHT || 44;
+  US.TILE_WIDTH  = US.TILE_WIDTH  || 64;
+  US.TILE_HEIGHT = US.TILE_HEIGHT || 32;
+  US.WALL_HEIGHT = US.WALL_HEIGHT || 44;
 
-  D.isoProject = D.isoProject || function(x, y, z) {
-    return { x: (x - y) * (D.TILE_WIDTH / 2), y: (x + y) * (D.TILE_HEIGHT / 2) - (z || 0) };
+  US.isoProject = US.isoProject || function(x, y, z) {
+    return { x: (x - y) * (US.TILE_WIDTH / 2), y: (x + y) * (US.TILE_HEIGHT / 2) - (z || 0) };
   };
 
-  D.renderTurfTile = D.renderTurfTile || function() {};
-  D.renderWallTile = D.renderWallTile || function() {};
+  US.renderTurfTile = US.renderTurfTile || function() {};
+  US.renderWallTile = US.renderWallTile || function() {};
 
 })();
 
