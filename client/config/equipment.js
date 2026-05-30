@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.EQUIPMENT = {
     fists:{name:'Fists',slot:'weapon',attack:1,accuracy:.62,speed:1.15,range:42},
     crude_sword:{name:'Crude Sword',slot:'weapon',attack:4,accuracy:.72,speed:1.0,range:50},
