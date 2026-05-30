@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.createPlayer=function(game,classId,factionId=null){
     const cls=US.CLASSES[classId]||US.CLASSES.wanderer;
     const allowedFactions=US.getClassFactions(classId);
