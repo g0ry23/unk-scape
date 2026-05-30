@@ -4,7 +4,7 @@ const E = window.UnkScape3D;
 
 (function() {
 
-console.log("UnkScape3D: v1.7 - One source of truth: g.entities.resources drives all props");
+console.log("UnkScape3D: v1.8 - One source of truth: g.entities.resources drives all props");
 
 E.active = false;
 E.scene = null;
@@ -161,25 +161,7 @@ E.Initialize3D = function() {
     E.playerVisual = E.playerMesh;
   }
 
-  E.active = true;
-
-  var _orbitDragging = false;
-  var _orbitLastX = 0, _orbitLastY = 0;
-  window.addEventListener('mousedown', function(ev) {
-    if (ev.button === 1) { _orbitDragging = true; _orbitLastX = ev.clientX; _orbitLastY = ev.clientY; ev.preventDefault(); }
-  });
-  window.addEventListener('mousemove', function(ev) {
-    if (!_orbitDragging) return;
-    var dx = ev.clientX - _orbitLastX;
-    var dy = ev.clientY - _orbitLastY;
-    E.cameraOrbitAngle += dx * 0.01;
-    E.cameraOrbitPhi = Math.max(0.15, Math.min(1.2, E.cameraOrbitPhi - dy * 0.005));
-    _orbitLastX = ev.clientX; _orbitLastY = ev.clientY;
-  });
-  window.addEventListener('mouseup', function(ev) {
-    if (ev.button === 1) _orbitDragging = false;
-  });
-
+// [Phase 2] Orbit drag listeners removed -- Phase 3 adds them inside D.Input
   window.addEventListener('resize', function() {
     E.camera.aspect = window.innerWidth / window.innerHeight;
     E.camera.updateProjectionMatrix();
