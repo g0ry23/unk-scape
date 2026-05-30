@@ -1,6 +1,5 @@
 (function(){
-window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+const US = window.UnkScape = window.UnkScape || {};
 
 // ── createResource factory (entity spawn helper) ─────────────────────────
 US.createResource = US.createResource || function(type, x, y, id) {
