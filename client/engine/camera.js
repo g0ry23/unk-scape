@@ -2,13 +2,13 @@
  * UNK-SCAPE Camera Stub
  * The 3D camera is fully managed by render_3d.js (UnkScape3D).
  * This stub exists to satisfy smoke tests and legacy game.js init
- * that calls: this.camera = new D.Camera(this)
+ * that calls: this.camera = new US.Camera(this)
  * All actual camera work (position, FOV, orbit, zoom) is in render_3d.js.
  */
 (function() {
   var D = window.Duskfall = window.Duskfall || {};
 
-  D.Camera = function(game) {
+  US.Camera = function(game) {
     this.game   = game;
     this.x      = 0;
     this.y      = 0;
@@ -26,32 +26,32 @@
   };
 
   // No-ops — 3D camera handled by render_3d.js
-  D.Camera.prototype.update      = function() {};
-  D.Camera.prototype.apply       = function() {};
-  D.Camera.prototype.setIso      = function() {};
-  D.Camera.prototype.setOverhead = function() {};
-  D.Camera.prototype.toggleMode  = function() {};
-  D.Camera.prototype.rotate      = function() {};
-  D.Camera.prototype.setZoom     = function() {};
-  D.Camera.prototype.bump        = function() {};
-  D.Camera.prototype.clamp       = function() {};
-  D.Camera.prototype.modeLabel   = function() { return 'UNK-SCAPE 3D'; };
+  US.Camera.prototype.update      = function() {};
+  US.Camera.prototype.apply       = function() {};
+  US.Camera.prototype.setIso      = function() {};
+  US.Camera.prototype.setOverhead = function() {};
+  US.Camera.prototype.toggleMode  = function() {};
+  US.Camera.prototype.rotate      = function() {};
+  US.Camera.prototype.setZoom     = function() {};
+  US.Camera.prototype.bump        = function() {};
+  US.Camera.prototype.clamp       = function() {};
+  US.Camera.prototype.modeLabel   = function() { return 'UNK-SCAPE 3D'; };
 
-  D.Camera.prototype.snapTo = function(x, y) {
+  US.Camera.prototype.snapTo = function(x, y) {
     this.x = x;
     this.y = y;
   };
 
   // worldToScreen stub: maps pixel world coords roughly to screen center
   // Only used by 2D drawing code that no longer runs - safe to return 0,0
-  D.Camera.prototype.worldToScreen = function(wx, wy) {
+  US.Camera.prototype.worldToScreen = function(wx, wy) {
     var vw = this.game ? (this.game.viewW || window.innerWidth)  : window.innerWidth;
     var vh = this.game ? (this.game.viewH || window.innerHeight) : window.innerHeight;
     return { x: vw / 2, y: vh / 2 };
   };
 
   // screenToWorld stub: no longer needed with 3D raycaster
-  D.Camera.prototype.screenToWorld = function(sx, sy) {
+  US.Camera.prototype.screenToWorld = function(sx, sy) {
     return { x: this.x + sx, y: this.y + sy };
   };
 
