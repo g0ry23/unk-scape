@@ -1,6 +1,6 @@
 (function() {
-    const D = window.Duskfall = window.Duskfall || {};
-    D.CharacterVisuals = {};
+    const US = window.UnkScape = window.UnkScape || {};
+    US.CharacterVisuals = {};
     const FACTION_COLORS = {
         'blood_oath':    0xc0392b,  // Crimson Red
         'iron_crown':    0x2980b9,  // Cobalt Blue
@@ -26,7 +26,7 @@
      * playerData fields read: factionId, classId
      * Returns a THREE.Group with userData.leftLeg, leftArm, rightArm, torsoMesh, headMesh
      */
-    D.CharacterVisuals.createModularMesh = function(playerData) {
+    US.CharacterVisuals.createModularMesh = function(playerData) {
         const playerGroup = new THREE.Group();
 
         const factionId = playerData?.factionId || 'neutral';
@@ -106,11 +106,11 @@ return playerGroup;
      * velocity: scalar speed (px/s converted) — use Math.hypot(vx,vy)
      * time: performance.now() * 0.001
      */
-    D.CharacterVisuals.animateMesh = function(playerMesh, velocity, time) {
+    US.CharacterVisuals.animateMesh = function(playerMesh, velocity, time) {
   if (!playerMesh || !playerMesh.userData.leftLeg) return;
   var limbs = playerMesh.userData;
   // Read gathering state -- pure read, no logic change
-  var D2 = window.Duskfall;
+  var D2 = window.UnkScape;
   var gs = D2 && D2.game && D2.game.systems && D2.game.systems.gathering;
   var isChopping = gs && gs.active && gs.timer > 0;
   if (isChopping) {
@@ -169,14 +169,14 @@ return playerGroup;
  console.log("UnkScape3D: CharacterVisuals system loaded.");
 })();
 
-// Fix: D not in scope outside IIFE — use window.Duskfall
+// Fix: US not in scope outside IIFE — use window.UnkScape
 (function() {
-var D = window.Duskfall = window.Duskfall || {};
+var US = window.UnkScape = window.UnkScape || {};
 
 /**
  * Weapon style classifier -- returns style string from item ID.
  */
-D.CharacterVisuals.getWeaponStyle = function(itemId) {
+US.CharacterVisuals.getWeaponStyle = function(itemId) {
   if (!itemId) return null;
   var id = itemId.toLowerCase();
   if (id.indexOf('bow') > -1) return 'bow';
@@ -192,10 +192,10 @@ D.CharacterVisuals.getWeaponStyle = function(itemId) {
  * Called from RenderFrame3D each frame with the current weaponId.
  * Only rebuilds mesh when weaponId changes.
  */
-D.CharacterVisuals.updateWeapon = function(playerMesh, weaponId) {
+US.CharacterVisuals.updateWeapon = function(playerMesh, weaponId) {
   if (!playerMesh || !playerMesh.userData.rightArm) return;
   // Gathering tool override: show correct tool during chop/mine
-  var _D = window.Duskfall;
+  var _D = window.UnkScape;
   var _gs = _D && _D.game && _D.game.systems && _D.game.systems.gathering;
   if (_gs && _gs.active && _gs.timer > 0 && _gs.active.cfg && _gs.active.cfg.skill) {
     var _skill = _gs.active.cfg.skill;
@@ -214,7 +214,7 @@ D.CharacterVisuals.updateWeapon = function(playerMesh, weaponId) {
 
   if (!weaponId) return;
 
-  var style = D.CharacterVisuals.getWeaponStyle(weaponId);
+  var style = US.CharacterVisuals.getWeaponStyle(weaponId);
   var mat = new THREE.MeshLambertMaterial({ color: 0xc0c0c0 });
   var wGeo, wMesh;
 
