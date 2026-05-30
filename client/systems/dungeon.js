@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.DungeonSystem=function(game){this.game=game;this.inside=false;this.returnPos=null;};
   US.DungeonSystem.prototype.enter=function(id){
     const g=this.game;if(id!=='dungeon')return;
