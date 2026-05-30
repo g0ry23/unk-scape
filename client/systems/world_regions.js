@@ -88,8 +88,8 @@
             console.log('[TERRITORY] ' + regionId + ' has flipped from ' + oldOwner + ' to ' + newFactionOwnerId + '!');
 
             // Dispatch global message alert to UI chat logging element
-            if (window.Duskfall.UI && window.Duskfall.UI.addSystemMessage) {
-                window.Duskfall.UI.addSystemMessage('The local territory power has shifted to ' + newFactionOwnerId + '!', '#f1c40f');
+            if (window.UnkScape.UI && window.UnkScape.UI.addSystemMessage) {
+                window.UnkScape.UI.addSystemMessage('The local territory power has shifted to ' + newFactionOwnerId + '!', '#f1c40f');
             }
         }
     };
