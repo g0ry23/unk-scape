@@ -1,6 +1,5 @@
 (function(){
-window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+const US = window.UnkScape = window.UnkScape || {};
 US.Game = function(){
 this.canvas = document.getElementById('game');
 this.ctx = null; // 2D context removed - 3D engine handles all rendering
