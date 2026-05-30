@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.BankSystem=function(game){this.game=game;this.items={};};
   US.BankSystem.prototype.deposit=function(id,qty=1){
     const inv=this.game.systems.inventory;if(!inv.has(id,qty))return false;
