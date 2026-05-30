@@ -1,5 +1,5 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
+  const US = window.UnkScape = window.UnkScape || {};const D = US;
   D.QUESTS = {
     first_night:{
       name:'Survive the First Night', icon:'🌙',
