@@ -168,6 +168,8 @@ E.Initialize3D = function() {
     E.renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
+  E.active = true;
+  E.active = true;
   console.log("UnkScape3D: v1.6 live - resource-driven props, one source of truth.");
 };
 
