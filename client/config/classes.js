@@ -1,6 +1,7 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
-  D.FACTIONS = {
+  window.Duskfall = window.Duskfall || {};
+const US = window.UnkScape = window.Duskfall;
+  US.FACTIONS = {
     ironbound:{name:'Ironbound Order',icon:'🛡️',color:'#9ea7b8',desc:'Fortify land, hold roads, and win through discipline.',buff:{defense:2}},
     bloodoak:{name:'Bloodoak Clan',icon:'🪓',color:'#ff5c7a',desc:'Aggressive melee raiders who claim turf by force.',buff:{attack:1}},
     thornwatch:{name:'Thornwatch Rangers',icon:'🏹',color:'#63e6a4',desc:'Scouts and hunters who control forests and crossings.',buff:{accuracy:.03}},
@@ -8,7 +9,7 @@
     embercourt:{name:'Ember Court',icon:'🔥',color:'#ffcf6e',desc:'Battle mages who dominate ruins with fire and claim magic.',buff:{attack:1,accuracy:.02}},
     moonveil:{name:'Moonveil Circle',icon:'🌙',color:'#b98cff',desc:'Mystic defenders who grow stronger around claimed territory.',buff:{defense:1,accuracy:.02}}
   };
-  D.CLASS_FACTIONS = {
+  US.CLASS_FACTIONS = {
     melee:['ironbound','bloodoak'],
     range:['thornwatch','ashveil'],
     mage:['embercourt','moonveil'],
@@ -19,9 +20,9 @@
     cleric:['embercourt','moonveil'],
     warden:['ironbound','thornwatch']
   };
-  D.getClassFactions = id => D.CLASS_FACTIONS[id] || ['ironbound','thornwatch'];
+  US.getClassFactions = id => US.CLASS_FACTIONS[id] || ['ironbound','thornwatch'];
 
-  D.CLASSES = {
+  US.CLASSES = {
     melee:{
       name:'Melee', icon:'⚔️', archetype:'melee',
       desc:'Sword-and-shield survivor built for close combat and holding territory.',
@@ -57,7 +58,7 @@
     warden:{name:'Warden', icon:'🌿', archetype:'support', roleType:'tank',desc:'Tank/support defender built to protect groups, claim turf, and hold boss pressure.',items:{wooden_shield:1,stone_hatchet:1,hide_armor:1,log:4,health_salve:2,coin:20},skills:{combat:45,woodcutting:35,survival:35,crafting:20},equipment:{offhand:'wooden_shield',body:'hide_armor',tool:'stone_hatchet'},perks:['thick_skin','lumberjack'],start:{x:600,y:187}, zone:'Verdant Bulwark'}
   };
 
-  D.STARTER_ZONES = {
+  US.STARTER_ZONES = {
     melee:{name:'Ironwake Hold',icon:'⚔️',x:280,y:280,r:226,biome:'stone',road:'stonepath',accent:'plaza',resourceBias:['rock','copper','iron'],desc:'Huge layered martial highlands with fortified ridges, quarry shelves, and sword-and-shield training roads.'},
     range:{name:'Thornfall Wilds',icon:'🏹',x:1453,y:293,r:253,biome:'darkgrass',road:'path',accent:'farmland',resourceBias:['tree','pine','berry','herb'],desc:'Large hunting forest with long sightlines, scout paths, raised tree lines, and ranged skirmish lanes.'},
     mage:{name:'Moonspire Ruins',icon:'🔮',x:867,y:1467,r:240,biome:'stone',road:'stonepath',accent:'plaza',resourceBias:['silver','gem','herb'],desc:'Massive ruin basin with stepped stone platforms, gem pockets, ritual roads, and enchantment materials.'},
@@ -68,9 +69,9 @@
     cleric:{name:'Sanctum Shoals',icon:'✨',x:1480,y:867,r:233,biome:'sand',road:'stonepath',accent:'plaza',resourceBias:['herb','fish','silver'],desc:'Sacred shoreline region with healing gardens, tide roads, herb pockets, and support-class safe routes.'},
     warden:{name:'Verdant Bulwark',icon:'🌿',x:867,y:253,r:240,biome:'darkgrass',road:'path',accent:'fence',resourceBias:['tree','herb','rock'],desc:'Northern defensive forest wall with layered watch paths, tank/support claim zones, and guardian resources.'}
   };
-  D.getStarterZone = id => D.STARTER_ZONES[id] || D.STARTER_ZONES.wanderer;
+  US.getStarterZone = id => US.STARTER_ZONES[id] || US.STARTER_ZONES.wanderer;
 
-  D.CLASS_STORIES = {
+  US.CLASS_STORIES = {
     melee:{title:'The Ironwake Oath',theme:'Hold the line, protect the roads, and prove who owns the battlefield.',starterQuest:'class_melee_oath'},
     range:{title:'The Thornfall Hunt',theme:'Scout the wilds, recover arrows, and control forest routes before the enemy does.',starterQuest:'class_range_hunt'},
     mage:{title:'The Moonspire Spark',theme:'Study the ruins, gather channeling materials, and unlock the first taste of old magic.',starterQuest:'class_mage_spark'},
@@ -81,9 +82,9 @@
     cleric:{title:'Sanctum Light',theme:'Keep people alive, gather herbs, and prepare the support path for future group content.',starterQuest:'class_cleric_light'},
     warden:{title:'Verdant Watch',theme:'Defend the grove roads, gather wood, and become the shield between town and chaos.',starterQuest:'class_warden_watch'}
   };
-  D.getClassStory = id => D.CLASS_STORIES[id] || D.CLASS_STORIES.wanderer;
+  US.getClassStory = id => US.CLASS_STORIES[id] || US.CLASS_STORIES.wanderer;
 
-  D.ZONE_FEATURES = {
+  US.ZONE_FEATURES = {
     melee:{trainer:'Marshal Bren',trainerIcon:'🛡️',trainingMob:'goblin',arena:'Ironwake Champion Yard',landmark:'Twin Anvil Gate'},
     range:{trainer:'Scout Veya',trainerIcon:'🏹',trainingMob:'rat',arena:'Thornfall Hunt Ring',landmark:'The Watcher Pines'},
     mage:{trainer:'Archivist Sol',trainerIcon:'🔮',trainingMob:'husk',arena:'Moonspire Ritual Ring',landmark:'The Broken Spire'},
@@ -95,9 +96,9 @@
     warden:{trainer:'Keeper Orin',trainerIcon:'🌿',trainingMob:'goblin',arena:'Verdant Bulwark Ring',landmark:'The Living Wall'}
   };
 
-  D.getZoneFeature = id => D.ZONE_FEATURES[id] || D.ZONE_FEATURES.wanderer;
+  US.getZoneFeature = id => US.ZONE_FEATURES[id] || US.ZONE_FEATURES.wanderer;
 
-  D.CLASS_QUESTS = {
+  US.CLASS_QUESTS = {
     class_melee_oath:{name:'The Ironwake Oath',icon:'⚔️',classId:'melee',desc:'Your melee path begins by arming up, gathering field supplies, and clearing the first threat near Ironwake Hold.',steps:[{type:'collect',id:'log',qty:2,text:'Collect 2 Oak Logs for weapon maintenance'},{type:'kill',id:'goblin',qty:2,text:'Defeat 2 Goblin Raiders near Ironwake'}],rewards:{xp:{combat:90,survival:35},items:{coin:60,health_salve:1}}},
     class_range_hunt:{name:'The Thornfall Hunt',icon:'🏹',classId:'range',desc:'Your ranger path begins with forest supplies, arrow discipline, and a controlled hunt around Thornfall Wilds.',steps:[{type:'collect',id:'berry',qty:3,text:'Gather 3 Wild Berries for trail food'},{type:'kill',id:'rat',qty:3,text:'Defeat 3 training beasts from range'}],rewards:{xp:{combat:75,foraging:55},items:{coin:55,arrow:15}}},
     class_mage_spark:{name:'The Moonspire Spark',icon:'🔮',classId:'mage',desc:'Your mage path begins by gathering herbs and testing your first spells against the dusk-touched dead.',steps:[{type:'collect',id:'herb',qty:2,text:'Collect 2 Bitter Herbs for spell focus'},{type:'kill',id:'husk',qty:1,text:'Defeat 1 Husk near Moonspire'}],rewards:{xp:{combat:80,crafting:45},items:{coin:60,dusk_essence:1}}},
