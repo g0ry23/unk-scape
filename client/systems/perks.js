@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.PerkSystem=function(game){this.game=game;};
   US.PerkSystem.prototype.reapply=function(){
     const p=this.game.player;if(!p)return;p.mods={};
