@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.UI.prototype.toast=function(title,msg,type=''){
     const root=document.getElementById('toast-container'), id=++this.toastId;
     if(!root) return;
