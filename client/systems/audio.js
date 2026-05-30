@@ -1,4 +1,4 @@
-—→(function(){
+(function(){
 window.Duskfall = window.Duskfall || {};
 const US = window.UnkScape = window.Duskfall;
 
