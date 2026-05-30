@@ -11,8 +11,7 @@
 
 // ── US.render no-op ────────────────────────────────────────────────────────
 (function() {
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
 
   US.render = function() {};
 
