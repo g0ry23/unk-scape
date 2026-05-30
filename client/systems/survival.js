@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.SurvivalSystem=function(game){this.game=game;this.timer=0;};
   US.SurvivalSystem.prototype.update=function(dt){
     const g=this.game,p=g.player;if(!p||p.dead)return;
