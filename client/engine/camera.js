@@ -6,8 +6,7 @@
  * All actual camera work (position, FOV, orbit, zoom) is in render_3d.js.
  */
 (function() {
-  var D = window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
 
   US.Camera = function(game) {
     this.game   = game;
