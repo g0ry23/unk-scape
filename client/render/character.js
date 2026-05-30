@@ -103,25 +103,41 @@
      * time: performance.now() * 0.001
      */
     D.CharacterVisuals.animateMesh = function(playerMesh, velocity, time) {
-        if (!playerMesh || !playerMesh.userData.leftLeg) return;
-        const limbs = playerMesh.userData;
-        if (velocity > 0.5) {
-            const swingSpeed = 8;
-            const angle = Math.sin(time * swingSpeed) * 0.45;
-            limbs.leftLeg.rotation.x  =  angle;
-            limbs.rightLeg.rotation.x = -angle;
-            limbs.leftArm.rotation.x  = -angle * 0.7;
-            limbs.rightArm.rotation.x =  angle * 0.7;
-        } else {
-            // Idle — return to rest
-            limbs.leftLeg.rotation.x  = 0;
-            limbs.rightLeg.rotation.x = 0;
-            limbs.leftArm.rotation.x  = 0;
-            limbs.rightArm.rotation.x = 0;
-        }
-    };
-
-    console.log("UnkScape3D: CharacterVisuals system loaded.");
+if (!playerMesh || !playerMesh.userData.leftLeg) return;
+var limbs = playerMesh.userData;
+// Read gathering state -- pure read, no logic change
+var D2 = window.Duskfall;
+var gs = D2 && D2.game && D2.game.systems && D2.game.systems.gathering;
+var isChopping = gs && gs.active && gs.timer > 0;
+if (isChopping) {
+// Chop swing: repeating raise-and-strike on right arm, ~2 cycles/sec
+var chopSpeed = 6.0;
+var swing = Math.sin(time * chopSpeed);
+var chopAngle = swing * -1.2;
+limbs.rightArm.rotation.x = chopAngle;
+limbs.leftArm.rotation.x = swing * 0.25;
+limbs.leftLeg.rotation.x = 0;
+limbs.rightLeg.rotation.x = 0;
+limbs.torsoMesh.rotation.y = swing * 0.15;
+} else if (velocity > 0.5) {
+// Walk cycle
+var swingSpeed = 8;
+var angle = Math.sin(time * swingSpeed) * 0.45;
+limbs.leftLeg.rotation.x = angle;
+limbs.rightLeg.rotation.x = -angle;
+limbs.leftArm.rotation.x = -angle * 0.7;
+limbs.rightArm.rotation.x = angle * 0.7;
+limbs.torsoMesh.rotation.y = 0;
+} else {
+// Idle -- return to rest
+limbs.leftLeg.rotation.x = 0;
+limbs.rightLeg.rotation.x = 0;
+limbs.leftArm.rotation.x = 0;
+limbs.rightArm.rotation.x = 0;
+limbs.torsoMesh.rotation.y = 0;
+}
+};
+ console.log("UnkScape3D: CharacterVisuals system loaded.");
 })();
 
 // Fix: D not in scope outside IIFE — use window.Duskfall
