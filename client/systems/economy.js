@@ -1,5 +1,5 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
+  const US = window.UnkScape = window.UnkScape || {};const D = US;
   D.EconomySystem=function(game){this.game=game;};
   D.EconomySystem.prototype.buy=function(id){
     const price=D.priceOf(id), inv=this.game.systems.inventory;
