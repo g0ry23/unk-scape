@@ -7,7 +7,7 @@
 
     console.log('[UNK-SCAPE] World Matrix & Entity Bridge v0.4.9 loading...');
 
-    D.WorldConfig = D.WorldConfig || {
+    US.WorldConfig = US.WorldConfig || {
         mapSize: 2000,
         tileW: 64,
         tileH: 32
@@ -17,7 +17,7 @@
      * Safe procedural terrain fetcher — gives each tile 3D height corners
      * using sine/cosine wave generation so terrain slopes like RuneScape hills.
      */
-    D.GetTerrainAt = function(x, y) {
+    US.GetTerrainAt = function(x, y) {
         const h00 = Math.max(0, Math.floor(Math.sin(x * 0.15) * Math.cos(y * 0.15) * 8));
         const h10 = Math.max(0, Math.floor(Math.sin((x + 1) * 0.15) * Math.cos(y * 0.15) * 8));
         const h01 = Math.max(0, Math.floor(Math.sin(x * 0.15) * Math.cos((y + 1) * 0.15) * 8));
@@ -40,21 +40,21 @@
      * @param {object} player   — Duskfall player object (player.x / player.y in tile units)
      * @param {object} gameEntities — g.entities (resources, enemies, etc.)
      */
-    D.RenderIsometricScene = function(ctx, canvasWidth, canvasHeight, player, gameEntities) {
+    US.RenderIsometricScene = function(ctx, canvasWidth, canvasHeight, player, gameEntities) {
         if (!ctx) return;
-        if (typeof D.isoProject !== 'function') return;  // render.js must load first
-        if (typeof D.renderTurfTile !== 'function') return;
+        if (typeof US.isoProject !== 'function') return;  // render.js must load first
+        if (typeof US.renderTurfTile !== 'function') return;
 
         // Fallback coordinates if player isn't initialised yet
-        const TILE = D.TILE || 32;
+        const TILE = US.TILE || 32;
         const pX = player ? (player.x / TILE) : 100;
         const pY = player ? (player.y / TILE) : 100;
 
         const viewRadius = 20; // tiles rendered in each direction from player
         const startX = Math.max(0, Math.floor(pX) - viewRadius);
-        const endX   = Math.min(D.WorldConfig.mapSize, Math.floor(pX) + viewRadius);
+        const endX   = Math.min(US.WorldConfig.mapSize, Math.floor(pX) + viewRadius);
         const startY = Math.max(0, Math.floor(pY) - viewRadius);
-        const endY   = Math.min(D.WorldConfig.mapSize, Math.floor(pY) + viewRadius);
+        const endY   = Math.min(US.WorldConfig.mapSize, Math.floor(pY) + viewRadius);
 
         const cX = canvasWidth  / 2;
         const cY = canvasHeight / 2;
@@ -70,17 +70,17 @@
 
         // --- STEP 2: RENDER TERRAIN TILES ---
         for (const t of tileList) {
-            const terr = D.GetTerrainAt(t.x, t.y);
+            const terr = US.GetTerrainAt(t.x, t.y);
             const relX = t.x - pX;
             const relY = t.y - pY;
 
             // isoProject gives screen-space offset from the iso origin
-            const screenPos = D.isoProject(relX, relY, terr.z00);
+            const screenPos = US.isoProject(relX, relY, terr.z00);
 
             ctx.save();
             ctx.translate(cX + screenPos.x, cY + screenPos.y);
             // Pass a flat tile config (z all 0) — elevation is already in translate
-            D.renderTurfTile(ctx, 0, 0, {
+            US.renderTurfTile(ctx, 0, 0, {
                 z00: 0, z10: terr.z10 - terr.z00,
                 z01: terr.z01 - terr.z00, z11: terr.z11 - terr.z00,
                 color: terr.color
@@ -89,8 +89,8 @@
         }
 
         // --- STEP 3: PLAYER CHARACTER (iso-centred circle + body) ---
-        const playerTerr = D.GetTerrainAt(Math.floor(pX), Math.floor(pY));
-        const playerPos  = D.isoProject(0, 0, playerTerr.z00);
+        const playerTerr = US.GetTerrainAt(Math.floor(pX), Math.floor(pY));
+        const playerPos  = US.isoProject(0, 0, playerTerr.z00);
 
         ctx.save();
         ctx.translate(cX + playerPos.x, cY + playerPos.y);
@@ -121,6 +121,6 @@
         ctx.restore();
     };
 
-    console.log('[UNK-SCAPE] World Matrix & Entity Bridge v0.4.9 — D.GetTerrainAt / D.RenderIsometricScene live.');
+    console.log('[UNK-SCAPE] World Matrix & Entity Bridge v0.4.9 — US.GetTerrainAt / US.RenderIsometricScene live.');
 
 })(window.Duskfall = window.Duskfall || {});
