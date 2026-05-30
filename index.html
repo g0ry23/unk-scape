@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- SNAPSHOT: pre-duskfall-purge -- 2026-05-30 -->
+<!-- SNAPSHOT: pre-unkscape-migration -- 2026-05-30 -->
 <html lang="en">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UNK-SCAPE — Survival RPG</title>
@@ -10,8 +10,7 @@
     <script src="client/engine/render_3d.js?v=19"></script>
         <script src="client/render/character.js?v=8"></script></head>
 <body>
-    <!-- NAMESPACE BRIDGE: establish canonical UnkScape = Duskfall before any scripts load -->
-    <script>window.Duskfall = window.Duskfall || {}; window.UnkScape = window.Duskfall;</script>
+        <script>window.UnkScape = window.UnkScape || {};</script>
 
 <!-- ============================================================ -->
 <!-- UNK-SCAPE GAME SHELL                                       -->
@@ -44,7 +43,7 @@
 
 </div><!-- /unkscape-hud-layer -->
 
-<!-- Legacy DOM hooks required by the Duskfall game engine -->
+<!-- Legacy DOM hooks required by the UnkScape game engine -->
 <div id="ui-root"></div>
 <div id="hud"></div>
 <div id="panel"></div>
@@ -131,11 +130,11 @@
 <!-- ============================================================ -->
 <script src="client/ui/ui.js?v=2"></script>
 <script src="client/ui/hud.js?v=2"></script>
-<script src="client/ui/panels.js"></script>
+<script src="client/ui/panels.js?v=2"></script>
 <script src="client/ui/dialogs.js"></script>
 <script src="client/ui/toasts.js"></script>
 <script src="client/ui/log.js"></script>
-<script src="client/ui/menu.js"></script>
+<script src="client/ui/menu.js?v=2"></script>
 
 <!-- ============================================================ -->
 <!-- AI                                                           -->
