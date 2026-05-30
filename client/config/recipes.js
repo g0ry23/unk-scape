@@ -1,6 +1,6 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
-  D.RECIPES = [
+  const US = window.UnkScape = window.UnkScape || {};
+  US.RECIPES = [
     {
       id:'campfire', name:'Campfire Kit', icon:'🏕️', skill:'survival', level:1, xp:12,
       requires:{log:2,stone:1}, produces:{campfire:1}, station:null,
@@ -78,5 +78,5 @@
     }
   ];
 
-  D.getRecipe = id => D.RECIPES.find(r=>r.id===id);
+  US.getRecipe = id => US.RECIPES.find(r=>r.id===id);
 })();
