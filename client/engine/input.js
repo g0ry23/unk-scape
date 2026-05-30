@@ -7,12 +7,13 @@
  */
 (function(D) {
 "use strict";
+const US = D;
 
 function getR3D() {
-  if (!D.r3d && window.UnkScape3D && window.UnkScape3D.active) {
-    D.r3d = window.UnkScape3D;
+  if (!US.r3d && window.UnkScape3D && window.UnkScape3D.active) {
+    US.r3d = window.UnkScape3D;
   }
-  return D.r3d || null;
+  return US.r3d || null;
 }
 
 var NEAR_MISS_RADIUS = 80;
@@ -187,7 +188,7 @@ function resolveResourceClickDirect(inp, res, screenX, screenY, game) {
   }
 }
 
-D.Input = function(game) {
+US.Input = function(game) {
   this.game = game;
   this.keys    = {};
   this.pressed = {};
@@ -204,7 +205,7 @@ D.Input = function(game) {
   console.log("[Input] Phase 3 rebuild active.");
 };
 
-D.Input.prototype._init = function() {
+US.Input.prototype._init = function() {
   var self = this;
   var game = this.game;
 
@@ -298,7 +299,7 @@ D.Input.prototype._init = function() {
   console.log("[Input] Listeners up: 1 keydown, 1 keyup, 1 mousedown, 1 mousemove, 1 mouseup, 1 wheel.");
 };
 
-D.Input.prototype.axis = function() {
+US.Input.prototype.axis = function() {
   var k = this.keys;
   var raw = { x: 0, y: 0 };
   if (k['w'] || k['arrowup'])    raw.y -= 1;
@@ -322,7 +323,7 @@ D.Input.prototype.axis = function() {
   };
 };
 
-D.Input.prototype.update = function(dt) {
+US.Input.prototype.update = function(dt) {
   if (this.mouse.leftDown)
     this.mouse.leftHeld = (performance.now() - this.mouse.leftStarted) / 1000;
 
@@ -355,7 +356,7 @@ D.Input.prototype.update = function(dt) {
   this.pressed = {};
 };
 
-D.Input.prototype._handleHotkey = function(e, k) {
+US.Input.prototype._handleHotkey = function(e, k) {
   var game = this.game;
   if (!game || !game.ui) return;
   var kb = game.settings && game.settings.keybinds;
@@ -403,16 +404,16 @@ D.Input.prototype._handleHotkey = function(e, k) {
   }
 };
 
-D.Input.prototype._cleanKey = function(k) {
+US.Input.prototype._cleanKey = function(k) {
   return k === " " ? " " : String(k || "").toLowerCase();
 };
 
-D.Input.prototype.startRebind = function(action) {
+US.Input.prototype.startRebind = function(action) {
   this.waitingForBind = action;
   if (this.game.ui) this.game.ui.renderMenu();
 };
 
-D.displayKey = function(k) {
+US.displayKey = function(k) {
   return k === " " ? "SPACE" : k === "escape" ? "ESC" : k === "tab" ? "TAB" : String(k).toUpperCase();
 };
 
@@ -420,14 +421,14 @@ D.displayKey = function(k) {
 
 /*
  * PHASE 3 REBUILD COMPLETE -- Listener inventory:
- *   keydown:   1  (D.Input._onKeyDown)
- *   keyup:     1  (D.Input._onKeyUp)
- *   mousedown: 1  (window capture-phase, D.Input._onMouseDown)
- *   mousemove: 1  (D.Input._onMouseMove)
- *   mouseup:   1  (D.Input._onMouseUp)
- *   wheel:     1  (D.Input._onWheel)
+ *   keydown:   1  (US.Input._onKeyDown)
+ *   keyup:     1  (US.Input._onKeyUp)
+ *   mousedown: 1  (window capture-phase, US.Input._onMouseDown)
+ *   mousemove: 1  (US.Input._onMouseMove)
+ *   mouseup:   1  (US.Input._onMouseUp)
+ *   wheel:     1  (US.Input._onWheel)
  *   resize:    1  (render_3d.js -- untouched)
- * D.r3d alias exposes renderer -- zero direct UnkScape3D crossings.
+ * US.r3d alias exposes renderer -- zero direct UnkScape3D crossings.
  * WASD rotated by E.cameraOrbitAngle -- W = away from camera always.
  * Every click logs screen coords + hit + result -- never silent.
  * Near-miss resolves to nearest resource within 192px.
