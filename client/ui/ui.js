@@ -1,9 +1,10 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
-  D.UI=function(game){this.game=game;this.panel=null;this.dialogNpc=null;this.toastId=0;};
-  D.UI.prototype.closeAll=function(){document.getElementById('panel').classList.remove('show');document.getElementById('dialog').classList.remove('show');document.getElementById('menu').classList.remove('show');this.panel=null;this.dialogNpc=null;if(this.game.state==='play')this.game.paused=false;this.syncLayoutState();this.clearInputLocks();};
-  D.UI.prototype.clearInputLocks=function(){const g=this.game;if(!g.input||!g.input.mouse)return;g.input.mouse.leftDown=false;g.input.mouse.rightDown=false;g.input.mouse.leftHeld=0;if(g.player){g.player.blocking=false;g.player.heavyCharging=false;}};
-  D.UI.prototype.syncLayoutState=function(){
+  window.Duskfall = window.Duskfall || {};
+const US = window.UnkScape = window.Duskfall;
+  US.UI=function(game){this.game=game;this.panel=null;this.dialogNpc=null;this.toastId=0;};
+  US.UI.prototype.closeAll=function(){document.getElementById('panel').classList.remove('show');document.getElementById('dialog').classList.remove('show');document.getElementById('menu').classList.remove('show');this.panel=null;this.dialogNpc=null;if(this.game.state==='play')this.game.paused=false;this.syncLayoutState();this.clearInputLocks();};
+  US.UI.prototype.clearInputLocks=function(){const g=this.game;if(!g.input||!g.input.mouse)return;g.input.mouse.leftDown=false;g.input.mouse.rightDown=false;g.input.mouse.leftHeld=0;if(g.player){g.player.blocking=false;g.player.heavyCharging=false;}};
+  US.UI.prototype.syncLayoutState=function(){
     const root=document.getElementById('ui-root');
     const panel=document.getElementById('panel').classList.contains('show');
     const dialog=document.getElementById('dialog').classList.contains('show');
@@ -12,14 +13,14 @@
     root.classList.toggle('dialog-open',dialog&&!panel&&!menu);
     root.classList.toggle('menu-open',menu);
   };
-  D.UI.prototype.update=function(){this.syncLayoutState();this.renderHUD();this.renderCombatUI();this.renderHotbar();this.renderActionHint();};
-  D.UI.prototype.floatText=function(x,y,text,color){if(this.game.settings?.display?.floatingText===false)return;this.game.entities.effects.push({x,y,text,color,t:1,maxT:1,float:55,size:16});};
-  D.UI.prototype.applyDisplaySettings=function(){
+  US.UI.prototype.update=function(){this.syncLayoutState();this.renderHUD();this.renderCombatUI();this.renderHotbar();this.renderActionHint();};
+  US.UI.prototype.floatText=function(x,y,text,color){if(this.game.settings?.display?.floatingText===false)return;this.game.entities.effects.push({x,y,text,color,t:1,maxT:1,float:55,size:16});};
+  US.UI.prototype.applyDisplaySettings=function(){
     const d=this.game.settings.display||{};
     document.documentElement.dataset.uiScale=d.uiScale||'normal';
     document.body.classList.toggle('reduced-fx',!!d.reducedFx);
   };
-  D.UI.prototype.renderActionHint=function(){
+  US.UI.prototype.renderActionHint=function(){
     const el=document.getElementById('action-hint'), g=this.game, p=g.player;
     if(!el||!p||g.state!=='play'||g.paused){if(el){el.classList.remove('show');el.innerHTML='';}return;}
     const mx=g.input.mouse.worldX,my=g.input.mouse.worldY;
@@ -30,18 +31,18 @@
     const nearResource=g.entities.resources.filter(r=>r.amount>0&&Math.hypot(r.x-mx,r.y-my)<=r.r+26&&Math.hypot(r.x-p.x,r.y-p.y)<=96).sort((a,b)=>Math.hypot(a.x-mx,a.y-my)-Math.hypot(b.x-mx,b.y-my))[0];
     const nearNpc=g.entities.npcs.find(n=>Math.hypot(n.x-mx,n.y-my)<34&&Math.hypot(n.x-p.x,n.y-p.y)<80);
     const nearDrop=g.entities.drops.find(d=>Math.hypot(d.x-mx,d.y-my)<32&&Math.hypot(d.x-p.x,d.y-p.y)<55);
-    if(g.buildMode){text=`<span class="hint-dot"></span><b>LMB</b> Place • <b>RMB</b> Remove • <b>T</b> Cycle ${D.TILES[g.systems.build.selected()].name}`;}
+    if(g.buildMode){text=`<span class="hint-dot"></span><b>LMB</b> Place • <b>RMB</b> Remove • <b>T</b> Cycle ${US.TILES[g.systems.build.selected()].name}`;}
     else if(nearNpc){text=`<span class="hint-dot"></span><b>F</b> Talk to ${nearNpc.cfg.name}`;}
     else if(nearNode){text=`<span class="hint-dot"></span><b>LMB</b> Chop Harvest Tree`;} 
     else if(nearResource){text=`<span class="hint-dot"></span><b>LMB</b> ${nearResource.cfg.action||'Gather'} ${nearResource.cfg.name}`;}
     else if(nearEnemy){const style=g.systems.combat.weaponStyle(p);text=`<span class="hint-dot"></span><b>LMB</b> ${style==='range'?'Shoot':style==='mage'?'Cast':'Attack'} ${nearEnemy.cfg.name} • <b>Hold</b> Heavy • <b>RMB</b> Block`;}
-    else if(nearDrop){text=`<span class="hint-dot"></span>Walk over to pick up ${D.ITEMS[nearDrop.id]?.name||nearDrop.id}`;}
+    else if(nearDrop){text=`<span class="hint-dot"></span>Walk over to pick up ${US.ITEMS[nearDrop.id]?.name||nearDrop.id}`;}
     if(!text){el.classList.remove('show');el.innerHTML='';return;}
-    el.innerHTML=text;el.style.left=D.clamp(screenX,120,g.viewW-120)+'px';el.style.top=D.clamp(screenY,60,g.viewH-100)+'px';el.classList.add('show');
+    el.innerHTML=text;el.style.left=US.clamp(screenX,120,g.viewW-120)+'px';el.style.top=US.clamp(screenY,60,g.viewH-100)+'px';el.classList.add('show');
   };
 
 // ── World Loading Screen ──────────────────────────────────────────────────
-D.UI.prototype.showLoader=function(title){
+US.UI.prototype.showLoader=function(title){
 let el=document.getElementById('world-loader');
 if(!el){
 el=document.createElement('div');
@@ -55,13 +56,13 @@ if(t) t.textContent=title||'Loading...';
 const bar=el.querySelector('#loader-bar');
 if(bar){bar.style.width='0%';bar.style.transition='none';}
 };
-D.UI.prototype.updateLoader=function(pct,label){
+US.UI.prototype.updateLoader=function(pct,label){
 const bar=document.getElementById('loader-bar');
 const lbl=document.getElementById('loader-label');
-if(bar){bar.style.transition='width 0.18s ease';bar.style.width=Math.round(D.clamp(pct,0,1)*100)+'%';}
+if(bar){bar.style.transition='width 0.18s ease';bar.style.width=Math.round(US.clamp(pct,0,1)*100)+'%';}
 if(lbl) lbl.textContent=label||'';
 };
-D.UI.prototype.hideLoader=function(){
+US.UI.prototype.hideLoader=function(){
 const el=document.getElementById('world-loader');
 if(!el)return;
 el.style.opacity='0';
