@@ -1,4 +1,4 @@
-// client/ai/mobController.js
+—→// client/ai/mobController.js
 // UnkScape.AI.MobEngine — Hostile PvE Mob Pursuit Vector AI
 // Reads mobSpawns[] from UnkScape.World, loops every frame tick,
 // switches IDLE → PURSUIT when player enters aggro radius,
@@ -15,7 +15,7 @@
   // ── Config constants ──
   const DAY_AGGRO_TILES   = 10;    // tiles radius during day
   const NIGHT_AGGRO_TILES = 25;    // tiles radius during night — apocalypse
-  const TILE_PX           = 48;    // pixels per tile (matches D.TILE)
+  const TILE_PX           = 48;    // pixels per tile (matches US.TILE)
   const CONTACT_DIST_PX   = 28;    // pixels — collision circle
   const CONTACT_COOLDOWN  = 1.5;   // seconds between damage ticks
   const DAMAGE_PER_HIT    = 5;
