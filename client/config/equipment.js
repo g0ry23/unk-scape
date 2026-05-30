@@ -1,6 +1,7 @@
 (function(){
-  const D = window.Duskfall = window.Duskfall || {};
-  D.EQUIPMENT = {
+  window.Duskfall = window.Duskfall || {};
+const US = window.UnkScape = window.Duskfall;
+  US.EQUIPMENT = {
     fists:{name:'Fists',slot:'weapon',attack:1,accuracy:.62,speed:1.15,range:42},
     crude_sword:{name:'Crude Sword',slot:'weapon',attack:4,accuracy:.72,speed:1.0,range:50},
     iron_sword:{name:'Iron Sword',slot:'weapon',attack:8,accuracy:.78,speed:.92,range:54},
@@ -20,7 +21,7 @@
     iron_pickaxe:{name:'Iron Pickaxe',slot:'tool',mining:3}
   };
 
-  D.STAT_BASE = {
+  US.STAT_BASE = {
     hp:100,
     attack:1,
     defense:0,
@@ -35,7 +36,7 @@
     critDamage:1.65
   };
 
-  D.ATTRIBUTES = {
+  US.ATTRIBUTES = {
     vitality:{name:'Vitality',icon:'❤️',desc:'+HP and tank survival.'},
     strength:{name:'Strength',icon:'💪',desc:'+melee damage and block pressure.'},
     dexterity:{name:'Dexterity',icon:'🎯',desc:'+range accuracy, movement, and crit.'},
@@ -45,20 +46,20 @@
     luck:{name:'Luck',icon:'🍀',desc:'+crit chance, rare drops, and gathering luck.'}
   };
 
-  D.CLASS_ROLES = {
+  US.CLASS_ROLES = {
     melee:'Tank / Melee DPS', range:'Ranged DPS', mage:'Magic DPS', wanderer:'Hybrid', brawler:'Bruiser DPS', gatherer:'Skiller Support', prospector:'Economy Support', cleric:'Healer', warden:'Tank Support'
   };
 
-  D.xpForCharacterLevel=function(level){
+  US.xpForCharacterLevel=function(level){
     if(level<=1)return 0;
     return Math.floor(75*Math.pow(level-1,1.85)+(level-1)*45);
   };
-  D.characterLevelForXp=function(xp){
+  US.characterLevelForXp=function(xp){
     let lvl=1;
-    while(lvl<60 && xp>=D.xpForCharacterLevel(lvl+1))lvl++;
+    while(lvl<60 && xp>=US.xpForCharacterLevel(lvl+1))lvl++;
     return lvl;
   };
-  D.defaultAttributes=function(role='hybrid'){
+  US.defaultAttributes=function(role='hybrid'){
     const base={vitality:5,strength:5,dexterity:5,intellect:5,wisdom:5,endurance:5,luck:5};
     if(role==='tank'){base.vitality+=3;base.endurance+=3;base.strength+=1;}
     if(role==='melee'){base.strength+=4;base.endurance+=2;base.vitality+=1;}
@@ -70,11 +71,11 @@
     return base;
   };
 
-  D.getEquipmentStats = function(player){
-    const out = {...D.STAT_BASE};
+  US.getEquipmentStats = function(player){
+    const out = {...US.STAT_BASE};
     const eq = player.equipment || {};
-    const weapon = D.EQUIPMENT[eq.weapon] || D.EQUIPMENT.fists;
-    const attr = player.attributes || D.defaultAttributes(player.roleType || 'hybrid');
+    const weapon = US.EQUIPMENT[eq.weapon] || US.EQUIPMENT.fists;
+    const attr = player.attributes || US.defaultAttributes(player.roleType || 'hybrid');
     out.attack += weapon.attack || 0;
     out.attack += Math.floor((attr.strength||0)*.35) + Math.floor((attr.intellect||0)*.20);
     out.defense += Math.floor((attr.endurance||0)*.45);
@@ -88,7 +89,7 @@
     out.range = weapon.range || out.range;
 
     ['head','offhand','body','tool'].forEach(slot=>{
-      const item = eq[slot] && D.EQUIPMENT[eq[slot]];
+      const item = eq[slot] && US.EQUIPMENT[eq[slot]];
       if(!item) return;
       out.defense += item.defense || 0;
       out.block = (out.block||0) + (item.block||0);
@@ -100,7 +101,7 @@
     return out;
   };
 
-  D.CLASSES = D.CLASSES || {
+  US.CLASSES = US.CLASSES || {
     wanderer:{
       name:'Wanderer', icon:'🧭',
       desc:'Balanced survivor with extra supplies.',
