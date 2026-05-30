@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   // Extend US.FACTIONS (defined in classes.js) with the two overarching warring factions
   US.FACTIONS = US.FACTIONS || {};
 
