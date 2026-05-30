@@ -4,19 +4,20 @@
 // Version: v0.4.7 (Modular UI Core)
 // ============================================================
 // Exposes on window.Duskfall (D):
-//   D.UIState            - shared UI flag + faction color dict
-//   D.RenderPlayerHUD()  - top-left floating HP/MP status board
-//   D.RenderStatsWindow()- centered character attributes window
-//   D.toggleStatsWindow()- toggle stats window on/off
-// Called from game.js render frame after D.render(this) if desired,
+//   US.UIState            - shared UI flag + faction color dict
+//   US.RenderPlayerHUD()  - top-left floating HP/MP status board
+//   US.RenderStatsWindow()- centered character attributes window
+//   US.toggleStatsWindow()- toggle stats window on/off
+// Called from game.js render frame after US.render(this) if desired,
 // or directly from UnkScape.Engine.Renderer.renderFrame().
 // ============================================================
 
 ((D) => {
+const US = D;
   console.log('[UNK-SCAPE] HUD & Interface Layer v0.4.7 loading...');
 
   // ── UI State Configuration ──
-  D.UIState = D.UIState || {
+  US.UIState = US.UIState || {
     showStatsWindow: false,  // false by default: toggled open by keybind/button
     factionColors: {
       blood_oath: '#c0392b',  // Crimson Red
@@ -42,9 +43,9 @@
   /**
    * Renders Top-Left Floating Player Status HUD.
    * Call each frame OUTSIDE g.camera.apply(ctx) - screen-space coords.
-   *   D.RenderPlayerHUD(g.ctx, g.player);
+   *   US.RenderPlayerHUD(g.ctx, g.player);
    */
-  D.RenderPlayerHUD = function(ctx, player) {
+  US.RenderPlayerHUD = function(ctx, player) {
     if (!ctx || !player) return;
     ctx.save();
 
@@ -66,7 +67,7 @@
     ctx.fillText(name + ' (LVL ' + lvl + ')', 30, 40);
 
     const factionKey   = player.factionId || player.faction || '';
-    const factionColor = (D.UIState.factionColors && D.UIState.factionColors[factionKey]) || '#bdc3c7';
+    const factionColor = (US.UIState.factionColors && US.UIState.factionColors[factionKey]) || '#bdc3c7';
     const factionLabel = factionKey === 'blood_oath' ? 'Blood-Oath Clans'
                        : factionKey === 'iron_crown'  ? 'Iron-Crown Accord'
                        : (player.factionName || 'Wanderer');
@@ -117,11 +118,11 @@
 
   /**
    * Renders Centered Character Statistics Window.
-   * Toggle with D.UIState.showStatsWindow or D.toggleStatsWindow().
-   *   D.RenderStatsWindow(g.ctx, g.viewW, g.viewH, g.player);
+   * Toggle with US.UIState.showStatsWindow or US.toggleStatsWindow().
+   *   US.RenderStatsWindow(g.ctx, g.viewW, g.viewH, g.player);
    */
-  D.RenderStatsWindow = function(ctx, canvasWidth, canvasHeight, player) {
-    if (!ctx || !D.UIState.showStatsWindow || !player) return;
+  US.RenderStatsWindow = function(ctx, canvasWidth, canvasHeight, player) {
+    if (!ctx || !US.UIState.showStatsWindow || !player) return;
 
     const W = 340, H = 310;
     const wx = Math.floor((canvasWidth  / 2) - (W / 2));
@@ -131,7 +132,7 @@
 
     // ── Window body ──
     const factionKey  = player.factionId || player.faction || '';
-    const borderColor = (D.UIState.factionColors && D.UIState.factionColors[factionKey]) || '#7f8c8d';
+    const borderColor = (US.UIState.factionColors && US.UIState.factionColors[factionKey]) || '#7f8c8d';
     roundRect(ctx, wx, wy, W, H, 8);
     ctx.fillStyle   = '#2c3e50';
     ctx.fill();
@@ -201,10 +202,10 @@
 
   /**
    * Toggle the stats window open/closed.
-   * Wire into game.js keybind: if (key === 'p') D.toggleStatsWindow();
+   * Wire into game.js keybind: if (key === 'p') US.toggleStatsWindow();
    */
-  D.toggleStatsWindow = function() {
-    D.UIState.showStatsWindow = !D.UIState.showStatsWindow;
+  US.toggleStatsWindow = function() {
+    US.UIState.showStatsWindow = !US.UIState.showStatsWindow;
   };
 
 })(window.Duskfall = window.Duskfall || {});
