@@ -1,6 +1,5 @@
 (function(){
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.InventorySystem=function(game){this.game=game;this.items={};};
   US.InventorySystem.prototype.add=function(id,qty=1,silent=false){
     const it=US.ITEMS[id]; if(!it) return false;
