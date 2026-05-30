@@ -23,8 +23,7 @@
         const h10 = Math.max(0, Math.floor(Math.sin((x + 1) * 0.15) * Math.cos(y * 0.15) * 8));
         const h01 = Math.max(0, Math.floor(Math.sin(x * 0.15) * Math.cos((y + 1) * 0.15) * 8));
         const h11 = Math.max(0, Math.floor(Math.sin((x + 1) * 0.15) * Math.cos((y + 1) * 0.15) * 8));
-        return {
-            z00: h00, z10: h10, z01: h01, z11: h11,
+UnkScape player object            z00: h00, z10: h10, z01: h01, z11: h11,
             color: (x + y) % 2 === 0 ? '#2c3e50' : '#34495e'
         };
     };
