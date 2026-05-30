@@ -12,7 +12,7 @@
   let _elapsed   = 0;          // seconds into current cycle
   let _isNight   = false;      // public flag
   let _wasNight  = false;      // edge-detection
-  let _gameRef   = null;       // reference to D.game injected at boot
+  let _gameRef   = null;       // reference to US.game injected at boot
   let _ticking   = false;
 
   U.Engine.Environment = {
