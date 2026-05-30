@@ -22,7 +22,7 @@ U.Engine.Input = {
   getMovementVector() {
     // Read from D.Input.keys instead of own key store.
     // This is a bridge -- Phase 3 will fold axis() into D.Input directly.
-    var D = window.Duskfall;
+    var D = window.UnkScape;
     var inp = D && D.game && D.game.input;
     if (!inp) return { x: 0, y: 0 };
     var k = inp.keys || {};
@@ -69,7 +69,7 @@ U.Player = {
     if (!req) return true;
     var slot = playerSkills && playerSkills[req.skill];
     if (!slot) return false;
-    var D = window.Duskfall;
+    var D = window.UnkScape;
     var lvl = slot.level || (D && D.levelForXp ? D.levelForXp(slot.xp || 0) : 1);
     return lvl >= req.level;
   }
