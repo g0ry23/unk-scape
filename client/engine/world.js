@@ -4,6 +4,7 @@
    Version: v0.4.9 (Entity & Tree Sync)
    ============================================================ */
 (function(D) {
+  const US = D;
 
     console.log('[UNK-SCAPE] World Matrix & Entity Bridge v0.4.9 loading...');
 
