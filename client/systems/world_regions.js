@@ -1,11 +1,10 @@
 /**
  * UNK-SCAPE World Region & Territory Manager
  * Path: client/systems/world_regions.js
- * Namespace: window.Duskfall.WorldRegions (US.WorldRegions)
+ * Namespace: window.UnkScape.WorldRegions (US.WorldRegions)
  */
 (function() {
-    window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+    const US = window.UnkScape = window.UnkScape || {};
     US.WorldRegions = {};
 
     // In-memory runtime tracking state for territory control
