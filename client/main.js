@@ -1,6 +1,5 @@
 window.addEventListener('DOMContentLoaded',()=>{
-  window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+  const US = window.UnkScape = window.UnkScape || {};
   US.runSmokeTests = function(){
     const testWorld = US.generateWorld(12345);
     console.assert(testWorld && testWorld.tiles && testWorld.tiles.length === US.WORLD.h, 'Smoke test failed: world generation did not create tiles.');
