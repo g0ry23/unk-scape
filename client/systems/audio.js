@@ -1,6 +1,5 @@
 (function(){
-window.Duskfall = window.Duskfall || {};
-const US = window.UnkScape = window.Duskfall;
+const US = window.UnkScape = window.UnkScape || {};
 
 // AudioSystem - procedural Web Audio API sound engine
 US.AudioSystem = function(game) {
