@@ -1,5 +1,5 @@
 /**
- * UNK-SCAPE Boundless MMO Survival World Generator & Projection Engine
+ * UNKSCAPE Boundless MMO Survival World Generator & Projection Engine
  * Architecture Namespace: window.UnkScape.World
  * Implementation Path: client/world/mmoWorld.js
  *
