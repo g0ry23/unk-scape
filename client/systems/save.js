@@ -192,8 +192,8 @@ US.SaveSystem.prototype.delete = function() {
   if (active) this.deleteCharacter(active.worldId, active.characterId);
 };
 
-// ── expose on Duskfall alias for callers not yet migrated ─
-window.Duskfall.SAVE_VERSION = US.SAVE_VERSION;
-window.Duskfall.SaveSystem   = US.SaveSystem;
+
+
+
 
 })();
