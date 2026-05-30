@@ -61,7 +61,7 @@ this.refreshActiveTab();
 // ── Internal helpers ──────────────────────────────────────────────────
 
 /**
- * Safe accessor — returns the live Duskfall game instance or null
+ * Safe accessor — returns the live UnkScape game instance or null
  */
 _game() {
 const D = window.UnkScape;
