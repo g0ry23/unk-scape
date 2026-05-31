@@ -5,7 +5,8 @@
   D.UI.prototype.renderDialog=function(){
     const npc=this.dialogNpc;if(!npc)return; const cfg=npc.cfg, el=document.getElementById('dialog');
     if(npc.id==='trader') return this.renderShop(npc);
-    if(npc.id==='banker') return this.openPanel('bank');
+    // Oathstead Step 1: canon banker + legacy fallback both open bank panel
+    if(npc.id==='banker'||npc.id==='npc_oathstead_banker_torvin_vaultseal') return this.openPanel('bank');
     el.innerHTML=`<div class="dialog-box"><div class="dialog-top"><div class="portrait">${cfg.icon}</div><div><h3>${cfg.name}</h3><small style="color:var(--muted)">${cfg.role}</small></div></div><div class="dialog-text">${cfg.lines[Math.floor(Math.random()*cfg.lines.length)]}</div><div class="dialog-actions"><button class="action-btn" onclick="UnkScape.game.ui.openPanel('quests')">Open Quests</button><button class="action-btn" onclick="UnkScape.game.ui.closeDialog()">Leave</button></div></div>`;
   };
   D.UI.prototype.renderShop=function(npc){
