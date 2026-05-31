@@ -154,7 +154,7 @@ US.Input = function(game) {
   this._orbitLastY    = 0;
   this._initDone      = false;
   this._init();
-  console.log("[Input] v11: action-menu gathering + smoother camera orbit.");
+  console.log("[Input] v12: zoom 5-45, P1-P4 movement + camera upgrade.");
 };
 
 US.Input.prototype._init = function() {
@@ -247,7 +247,7 @@ US.Input.prototype._init = function() {
     var E = getR3D();
     if (E) {
       var delta = e.deltaY > 0 ? 2.5 : -2.5;
-      var newTarget = Math.max(8, Math.min(50,
+      var newTarget = Math.max(5, Math.min(45,
         (E.cameraZoomTarget !== undefined ? E.cameraZoomTarget : E.cameraZoomOffset || 18) + delta));
       E.cameraZoomTarget = newTarget;
     }
@@ -376,12 +376,12 @@ US.Input.prototype._handleHotkey = function(e, k) {
 
   var E2 = getR3D();
   if (k === kb.zoomIn || k === '=') {
-    if (E2) E2.cameraZoomTarget = Math.max(8,
+    if (E2) E2.cameraZoomTarget = Math.max(5,
       (E2.cameraZoomTarget !== undefined ? E2.cameraZoomTarget : E2.cameraZoomOffset || 18) - 3);
     e.preventDefault();
   }
   if (k === kb.zoomOut || k === '-') {
-    if (E2) E2.cameraZoomTarget = Math.min(50,
+    if (E2) E2.cameraZoomTarget = Math.min(45,
       (E2.cameraZoomTarget !== undefined ? E2.cameraZoomTarget : E2.cameraZoomOffset || 18) + 3);
     e.preventDefault();
   }
