@@ -167,8 +167,7 @@ US.SaveSystem.prototype.load = function(worldId, characterId) {
 // ── delete one character save ─────────────────────────
 US.SaveSystem.prototype.deleteCharacter = function(worldId, characterId) {
   let saves = this.getAllSaves();
-  saves = saves.filter(s => !(s.worldId === worldId && s.characterId === characterId));
-  this._write(this.keys.saves, saves);
+  saves = saves.filter(s => !(s.worldId === worldId && s.characterId === characterId));this._write(this.keys.saves, saves);const _active = this._read(this.keys.active);if (_active && _active.worldId === worldId && _active.characterId === characterId) { const _next = saves[0]; this._write(this.keys.active, _next ? {worldId:_next.worldId,characterId:_next.characterId} : null); }
   if (!saves.some(s => s.worldId === worldId)) {
     const worlds = this.getAllWorlds();
     delete worlds[worldId];
