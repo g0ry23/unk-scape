@@ -239,6 +239,7 @@ if(!this.player || this.state === 'loading') return;
 this.time += dt;
 this.tick++;
 this.input.update(dt);
+  this.camera.update(dt);
 this.systems.daynight.update(dt);
 this.systems.audio.update(dt);
 if(this.settings.hungerEnabled) this.systems.survival.update(dt); else if(this.player) this.player.hunger = this.player.maxHunger;
