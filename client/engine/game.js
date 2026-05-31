@@ -161,6 +161,8 @@ game.flags = data.flags || {survivedNights:0,lastNight:false,bankDeposits:0};
 game.stats = data.stats || {kills:{},deaths:0,resourcesGathered:0,crafted:0};
 game.entities = {resources:[],enemies:[],npcs:[],portals:[],projectiles:[],drops:[],effects:[]};
 game.state = 'loading';
+game.worldId = data.worldId || game.worldId;
+game.worldName = data.worldName || game.worldName;
 game.ui.showLoader('Loading World...');
 US.generateWorldAsync(game.seed, function(pct, label){
 game.ui.updateLoader(pct * .65, label);
@@ -172,7 +174,7 @@ game.ui.updateLoader(.65 + pct * .30, label);
 });
 }).then(function(){
 game.player = US.createPlayer(game, data.classId || 'wanderer', data.factionId || null);
-US.applyPlayerSave(game.player, data.player);
+US.applyPlayerSave(game.player, data.player);game.player.characterId = data.characterId || game.player.characterId;game.player.characterName = data.characterName || game.player.characterName;
 if(data.resources){
 const depleted = new Set(data.resources.depleted||[]);
 game.entities.resources.forEach(r=>{ if(depleted.has(r.uid)) r.amount=0; });
