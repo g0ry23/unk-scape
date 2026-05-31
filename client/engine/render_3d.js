@@ -4,7 +4,7 @@ const E = window.UnkScape3D;
 
 (function() {
 
-console.log("UnkScape3D: v2.6 - atmospheric fog (R=38, fog 92-128)");
+console.log("UnkScape3D: v2.7 - NPC 3D markers");
 
 E.active = false;
 E.scene = null;
@@ -14,6 +14,7 @@ E.playerMesh = null;
 E.playerVisual = null;
 E.terrainGroup = null;
 E.propGroup = null;
+E.npcGroup = null;
 E.lastChunkX = -9999;
 E.lastChunkY = -9999;
 E.lastPropX = -9999;
@@ -295,6 +296,115 @@ function buildPropMesh(res, surfY, TE) {
   return propNode;
 }
 
+
+// ── NPC 3D Markers ──────────────────────────────────────────────────────────
+// Lightweight colored figures for all in-range NPCs. No heavy meshes.
+// Each NPC gets: a body cylinder + head sphere + role-colored accent + floating marker ring.
+// Special: banker (Torvin) gets a gold vault sign above him.
+
+var NPC_COLORS = {
+  'npc_oathstead_banker_torvin_vaultseal': { body: '#c8860a', head: '#d4a95a', accent: '#f1c40f', label: 'BANK' },
+  'trainer_': { body: '#2980b9', head: '#5dade2', accent: '#85c1e9', label: 'TRAINER' },
+  'emissary_': { body: '#8e44ad', head: '#bb8fce', accent: '#d7bde2', label: 'ENVOY' },
+  'elder': { body: '#1a5276', head: '#5dade2', accent: '#aed6f1', label: 'ELDER' },
+  'trader': { body: '#1e8449', head: '#58d68d', accent: '#a9dfbf', label: 'SHOP' },
+  'banker': { body: '#784212', head: '#d4ac0d', accent: '#f9e79f', label: 'BANK' },
+  'default': { body: '#5d6d7e', head: '#aab7b8', accent: '#d5dbdb', label: 'NPC' }
+};
+
+function getNpcColors(npc) {
+  if (NPC_COLORS[npc.id]) return NPC_COLORS[npc.id];
+  for (var prefix in NPC_COLORS) {
+    if (npc.id && npc.id.startsWith(prefix)) return NPC_COLORS[prefix];
+  }
+  return NPC_COLORS['default'];
+}
+
+function buildNpcMesh(npc, surfY) {
+  var colors = getNpcColors(npc);
+  var group = new THREE.Group();
+  var nx = npc.x * SCALE;
+  var nz = npc.y * SCALE;
+  group.position.set(nx, surfY, nz);
+
+  // Body — cylinder
+  var bodyGeo = new THREE.CylinderGeometry(0.35, 0.42, 1.6, 8);
+  var bodyMesh = new THREE.Mesh(bodyGeo, getCachedMat(colors.body));
+  bodyMesh.position.set(0, 0.8, 0);
+  group.add(bodyMesh);
+
+  // Head — sphere
+  var headGeo = new THREE.SphereGeometry(0.32, 8, 6);
+  var headMesh = new THREE.Mesh(headGeo, getCachedMat(colors.head));
+  headMesh.position.set(0, 1.9, 0);
+  group.add(headMesh);
+
+  // Accent ring at feet (role color indicator)
+  var ringGeo = new THREE.TorusGeometry(0.55, 0.08, 6, 16);
+  var ringMesh = new THREE.Mesh(ringGeo, getCachedMat(colors.accent));
+  ringMesh.rotation.x = Math.PI / 2;
+  ringMesh.position.set(0, 0.08, 0);
+  group.add(ringMesh);
+
+  // Floating marker pole above head
+  var poleGeo = new THREE.CylinderGeometry(0.04, 0.04, 1.2, 5);
+  var poleMesh = new THREE.Mesh(poleGeo, getCachedMat(colors.accent));
+  poleMesh.position.set(0, 2.8, 0);
+  group.add(poleMesh);
+
+  // Diamond marker at top of pole
+  var diamondGeo = new THREE.OctahedronGeometry(0.22, 0);
+  var diamondMesh = new THREE.Mesh(diamondGeo, getCachedMat(colors.accent));
+  diamondMesh.position.set(0, 3.5, 0);
+  group.add(diamondMesh);
+
+  // Special: banker gets a small box "vault" sign
+  if (npc.id && (npc.id.includes('banker') || npc.id === 'banker')) {
+    var vaultGeo = new THREE.BoxGeometry(0.9, 0.55, 0.2);
+    var vaultMesh = new THREE.Mesh(vaultGeo, getCachedMat('#f1c40f'));
+    vaultMesh.position.set(0, 3.85, 0);
+    group.add(vaultMesh);
+    // Coin stack decoration
+    var coinGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.12, 8);
+    var coinMesh = new THREE.Mesh(coinGeo, getCachedMat('#f9ca24'));
+    coinMesh.rotation.z = Math.PI / 2;
+    coinMesh.position.set(0.0, 0.25, 0.12);
+    group.add(coinMesh);
+  }
+
+  return group;
+}
+
+E.RebuildNPCs = function(pxX, pxY) {
+  if (!E.scene) return;
+  // Remove old npc group
+  if (E.npcGroup) {
+    E.scene.remove(E.npcGroup);
+    E.npcGroup.traverse(function(child) { if (child.isMesh) child.geometry.dispose(); });
+    E.npcGroup = null;
+  }
+  E.npcGroup = new THREE.Group();
+
+  var D = window.UnkScape;
+  var npcs = D && D.game && D.game.entities && D.game.entities.npcs;
+  if (!npcs || !npcs.length) { E.scene.add(E.npcGroup); return; }
+
+  var NPC_RADIUS = PROP_PIXEL_RADIUS; // same render distance as props
+  var built = 0;
+  for (var i = 0; i < npcs.length; i++) {
+    var npc = npcs[i];
+    if (!npc || !npc.x) continue;
+    if (Math.abs(npc.x - pxX) > NPC_RADIUS) continue;
+    if (Math.abs(npc.y - pxY) > NPC_RADIUS) continue;
+    var surfY = getSurfaceYAtPixel(npc.x, npc.y);
+    var mesh = buildNpcMesh(npc, surfY);
+    if (mesh) { E.npcGroup.add(mesh); built++; }
+  }
+  E.scene.add(E.npcGroup);
+  console.log('[UNKSCAPE] NPC meshes rebuilt: ' + built + ' NPCs visible');
+};
+
+
 E.RebuildProps = function(pxX, pxY) {
   if (!E.scene) return;
   if (E.propGroup) {
@@ -335,6 +445,7 @@ E.RebuildProps = function(pxX, pxY) {
     if (propNode) { E.propGroup.add(propNode); built++; }
   }
   E.scene.add(E.propGroup);
+  E.RebuildNPCs(pxX, pxY);
   console.log("UnkScape3D: Props rebuilt at ("+Math.round(pxX)+","+Math.round(pxY)+") - "+built+" meshes");
 };
 
