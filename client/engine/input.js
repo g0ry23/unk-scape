@@ -1,16 +1,15 @@
 /**
- * input.js -- v10 REBUILD
+ * input.js -- v11
  * ONE namespace: window.UnkScape (US) only.
  * ONE mousedown, ONE mousemove, ONE mouseup, ONE wheel, ONE keydown, ONE keyup.
- * 3D-native raycaster click path. No silent misses. No old 2D code.
+ * 3D-native raycaster click path.
  *
- * Camera controls:
- *   Right-mouse drag  → orbit camera (horizontal + vertical)
- *   Middle-mouse drag → orbit camera (same, alternate)
- *   Scroll wheel      → smooth zoom in/out
- *   = / -             → keyboard zoom
- *   WASD / Arrow keys → move player (always relative to camera angle)
- *   Camera auto-resets behind player after ~1.8s of no orbit input.
+ * v11 changes:
+ * - LMB on resource → calls gathering.tryStartAt() which opens action menu
+ * - [F] key → calls gathering.tryInteractF() to confirm or open menu
+ * - [ESC] while action menu open → closes menu instead of pausing
+ * - Camera orbit: smoother sensitivity (horizontal 0.010, vertical 0.007)
+ * - WASD unchanged, zoom unchanged
  */
 (function(D) {
 "use strict";
@@ -24,7 +23,7 @@ function getR3D() {
 }
 
 var NEAR_MISS_RADIUS = 80;
-var GATHER_RANGE = 200;
+var GATHER_RANGE     = 200;
 
 function logClick(screenX, screenY, hitInfo, result) {
   console.log("[INPUT-CLICK] screen("+Math.round(screenX)+","+Math.round(screenY)+")"
@@ -35,7 +34,7 @@ function feedback(msg, type) {
   var g = D && D.game;
   if (!g) return;
   if (g.ui && g.ui.toast) g.ui.toast(msg, '', type || 'gold');
-  if (g.ui && g.ui.log)   g.ui.log(msg, type || 'gold');
+  if (g.ui && g.ui.log) g.ui.log(msg, type || 'gold');
 }
 
 function autoPathTo(player, res, game) {
@@ -103,14 +102,17 @@ function handleGroundClick(inp, screenX, screenY, game) {
       if (t > 0) { worldX = (orig.x + dir.x * t) * 10; worldY = (orig.z + dir.z * t) * 10; }
     }
   }
-  if (worldX === undefined) { feedback('Nothing here.', 'bad'); return; }
+  if (worldX === undefined) return; // silent miss — ground click does nothing
   var res = nearestResource(worldX, worldY, game);
   if (res) { resolveResourceClickDirect(inp, res, screenX, screenY, game); }
-  else     { feedback('Nothing here.', 'bad'); }
+  // Ground click with no resource = walk-to click (move player)
+  else if (game.player) {
+    game.player._clickTarget = { x: worldX, y: worldY };
+  }
 }
 
 function resolveResourceClick(inp, resourceId, screenX, screenY, game) {
-  if (!resourceId) { feedback('Nothing here.', 'bad'); return; }
+  if (!resourceId) return;
   var resources = game.entities && game.entities.resources;
   var res = null;
   if (resources) {
@@ -118,40 +120,41 @@ function resolveResourceClick(inp, resourceId, screenX, screenY, game) {
       if (resources[i].uid === resourceId) { res = resources[i]; break; }
     }
   }
-  if (!res) { feedback('Nothing here.', 'bad'); return; }
+  if (!res) return;
   resolveResourceClickDirect(inp, res, screenX, screenY, game);
 }
 
+// LMB on resource: call tryStartAt which opens action menu (no auto-gather)
 function resolveResourceClickDirect(inp, res, screenX, screenY, game) {
   var gs = game.systems && game.systems.gathering;
-  if (gs && gs.active && gs.active.uid === res.uid && gs.timer > 0) return;
-  var player = game.player;
-  var dist = Math.hypot(player.x - res.x, player.y - res.y);
-  if (dist <= GATHER_RANGE) {
-    if (gs && typeof gs.tryStartAt === 'function') { gs.tryStartAt(res.x, res.y); }
-    else { feedback('Gathering system not ready.', 'bad'); }
-  } else {
-    autoPathTo(player, res, game);
+  if (!gs) return;
+  // If currently gathering this node, cancel
+  if (gs.active && gs.active.uid === res.uid) {
+    gs.cancel();
+    return;
+  }
+  // tryStartAt v5: walks if far, opens action menu if close — never auto-starts
+  if (typeof gs.tryStartAt === 'function') {
+    gs.tryStartAt(res.x, res.y);
   }
 }
 
 // ── Input constructor ────────────────────────────────────────────────────────
 US.Input = function(game) {
-  this.game = game;
-  this.keys = {};
+  this.game  = game;
+  this.keys  = {};
   this.pressed = {};
   this.mouse = {
     x: 0, y: 0, leftDown: false, rightDown: false,
     worldX: 0, worldY: 0, leftStarted: 0, leftHeld: 0
   };
   this.waitingForBind = null;
-  // Orbit drag state — supports both right-mouse and middle-mouse
-  this._orbitDragging  = false;
-  this._orbitLastX     = 0;
-  this._orbitLastY     = 0;
-  this._initDone = false;
+  this._orbitDragging = false;
+  this._orbitLastX    = 0;
+  this._orbitLastY    = 0;
+  this._initDone      = false;
   this._init();
-  console.log("[Input] v10: WASD + right-mouse orbit + auto-reset camera.");
+  console.log("[Input] v11: action-menu gathering + smoother camera orbit.");
 };
 
 US.Input.prototype._init = function() {
@@ -176,7 +179,7 @@ US.Input.prototype._init = function() {
     }
   };
   window.addEventListener('keydown', this._onKeyDown, false);
-  window.addEventListener('keyup',   this._onKeyUp,   false);
+  window.addEventListener('keyup', this._onKeyUp, false);
 
   var gameCanvas = document.getElementById('game');
   if (!gameCanvas) {
@@ -186,7 +189,6 @@ US.Input.prototype._init = function() {
   }
 
   this._onMouseDown = function(e) {
-    // Left click → game click (raycaster)
     if (e.button === 0) {
       self.mouse.leftDown    = true;
       self.mouse.leftStarted = performance.now();
@@ -197,11 +199,10 @@ US.Input.prototype._init = function() {
         handleGameClick(self, e);
       }
     }
-    // Right click or Middle click → begin camera orbit drag
     if (e.button === 2 || e.button === 1) {
       self._orbitDragging = true;
-      self._orbitLastX    = e.clientX;
-      self._orbitLastY    = e.clientY;
+      self._orbitLastX = e.clientX;
+      self._orbitLastY = e.clientY;
       e.preventDefault();
     }
   };
@@ -211,7 +212,7 @@ US.Input.prototype._init = function() {
     self.mouse.y = e.clientY;
     var g = game;
     if (g && g.camera) {
-      self.mouse.worldX = e.clientX + (g.camera.x || 0) - window.innerWidth  * 0.5;
+      self.mouse.worldX = e.clientX + (g.camera.x || 0) - window.innerWidth * 0.5;
       self.mouse.worldY = e.clientY + (g.camera.y || 0) - window.innerHeight * 0.5;
     }
     if (self._orbitDragging) {
@@ -221,10 +222,11 @@ US.Input.prototype._init = function() {
       self._orbitLastY = e.clientY;
       var E = getR3D();
       if (E) {
-        E.cameraOrbitAngle = (E.cameraOrbitAngle || 0) - dx * 0.012;
+        // v11: reduced sensitivity for smoother feel (was 0.012 / 0.005)
+        E.cameraOrbitAngle = (E.cameraOrbitAngle || 0) - dx * 0.010;
         E.cameraOrbitPhi   = Math.max(0.15, Math.min(1.35,
-          (E.cameraOrbitPhi || 0.45) + dy * 0.005));
-        E.notifyOrbitInput(); // reset auto-reset timer
+          (E.cameraOrbitPhi || 0.45) + dy * 0.007));
+        E.notifyOrbitInput();
       }
     }
   };
@@ -234,7 +236,6 @@ US.Input.prototype._init = function() {
     if (e.button === 2 || e.button === 1) { self._orbitDragging = false; }
   };
 
-  // Suppress right-click context menu on the canvas so orbit drag works cleanly
   this._onContextMenu = function(e) { e.preventDefault(); };
   gameCanvas.addEventListener('contextmenu', this._onContextMenu, false);
 
@@ -242,11 +243,10 @@ US.Input.prototype._init = function() {
   window.addEventListener('mousemove', this._onMouseMove, false);
   window.addEventListener('mouseup',   this._onMouseUp,   false);
 
-  // Smooth zoom: write to cameraZoomTarget so render_3d lerps toward it
   this._onWheel = function(e) {
     var E = getR3D();
     if (E) {
-      var delta  = e.deltaY > 0 ? 2.5 : -2.5;
+      var delta = e.deltaY > 0 ? 2.5 : -2.5;
       var newTarget = Math.max(8, Math.min(50,
         (E.cameraZoomTarget !== undefined ? E.cameraZoomTarget : E.cameraZoomOffset || 18) + delta));
       E.cameraZoomTarget = newTarget;
@@ -256,10 +256,10 @@ US.Input.prototype._init = function() {
   window.addEventListener('wheel', this._onWheel, { passive: false });
 
   this._initDone = true;
-  console.log("[Input] Listeners: keydown, keyup, mousedown, mousemove, mouseup, wheel, contextmenu.");
+  console.log("[Input] v11 listeners active.");
 };
 
-// ── WASD axis — always relative to camera orbit angle ──────────────────────
+// ── WASD axis ──────────────────────────────────────────────────────────────
 US.Input.prototype.axis = function() {
   var k = this.keys;
   var raw = { x: 0, y: 0 };
@@ -276,16 +276,15 @@ US.Input.prototype.axis = function() {
   var orbitAngle = E ? (E.cameraOrbitAngle || 0) : 0;
   if (this.game && this.game.camera) this.game.camera.angle = orbitAngle;
 
-  // Rotate input vector by orbit angle so W = away from camera
   var cos = Math.cos(orbitAngle);
   var sin = Math.sin(orbitAngle);
   return {
-    x:  raw.x * cos + raw.y * sin,
+    x: raw.x * cos + raw.y * sin,
     y: -raw.x * sin + raw.y * cos
   };
 };
 
-// ── Per-frame update ───────────────────────────────────────────────────────
+// ── Per-frame update ──────────────────────────────────────────────────────
 US.Input.prototype.update = function(dt) {
   if (this.mouse.leftDown)
     this.mouse.leftHeld = (performance.now() - this.mouse.leftStarted) / 1000;
@@ -293,9 +292,9 @@ US.Input.prototype.update = function(dt) {
   var game   = this.game;
   var player = game && game.player;
   if (player && player._clickTarget) {
-    var ct   = player._clickTarget;
-    var dx   = ct.x - player.x;
-    var dy   = ct.y - player.y;
+    var ct = player._clickTarget;
+    var dx = ct.x - player.x;
+    var dy = ct.y - player.y;
     var dist = Math.hypot(dx, dy);
     if (dist < 24) {
       if (ct.resourceId && game.systems && game.systems.gathering) {
@@ -320,7 +319,7 @@ US.Input.prototype.update = function(dt) {
   this.pressed = {};
 };
 
-// ── Hotkey handler ─────────────────────────────────────────────────────────
+// ── Hotkey handler ────────────────────────────────────────────────────────
 US.Input.prototype._handleHotkey = function(e, k) {
   var tag = e && e.target && e.target.tagName;
   if (tag === 'INPUT' || tag === 'TEXTAREA') return;
@@ -337,20 +336,34 @@ US.Input.prototype._handleHotkey = function(e, k) {
   if (k === kb.bank)      { game.ui.togglePanel('bank');      e.preventDefault(); }
   if (k === kb.map)       { game.ui.togglePanel('map');       e.preventDefault(); }
   if (k === kb.stats)     { game.ui.togglePanel('stats');     e.preventDefault(); }
-  if (k === kb.interact && game.player) { game.player.tryInteract(); e.preventDefault(); }
+
+  // [F] key: first try gathering action menu, then fall back to NPC interact
+  if (k === kb.interact || k === 'f') {
+    var gs = game.systems && game.systems.gathering;
+    var interactHandled = gs && typeof gs.tryInteractF === 'function' && gs.tryInteractF();
+    if (!interactHandled && game.player) game.player.tryInteract();
+    e.preventDefault();
+  }
+
   if (k === kb.attack || k === ' ') {
     if (game.state === 'play' && game.systems && game.systems.combat) {
       game.systems.combat.playerAttack();
     }
     e.preventDefault();
   }
+
   if (k === kb.pause || k === 'escape') {
-    if (game.state === 'play') {
+    // If gathering action menu is open, close it instead of pausing
+    var gs2 = game.systems && game.systems.gathering;
+    if (gs2 && gs2._menuEl) {
+      gs2._closeActionMenu();
+    } else if (game.state === 'play') {
       game.paused = !game.paused;
       game.ui.toast(game.paused ? 'Paused' : 'Resumed', '', 'gold');
     }
     e.preventDefault();
   }
+
   if (k === kb.save || k === 'f5') {
     if (game.systems && game.systems.save) game.systems.save.save();
     e.preventDefault();
@@ -361,20 +374,15 @@ US.Input.prototype._handleHotkey = function(e, k) {
     e.preventDefault();
   }
 
-  // Keyboard zoom: write to cameraZoomTarget so it lerps smoothly
   var E2 = getR3D();
   if (k === kb.zoomIn || k === '=') {
-    if (E2) {
-      E2.cameraZoomTarget = Math.max(8, (E2.cameraZoomTarget !== undefined ?
-        E2.cameraZoomTarget : E2.cameraZoomOffset || 18) - 3);
-    }
+    if (E2) E2.cameraZoomTarget = Math.max(8,
+      (E2.cameraZoomTarget !== undefined ? E2.cameraZoomTarget : E2.cameraZoomOffset || 18) - 3);
     e.preventDefault();
   }
   if (k === kb.zoomOut || k === '-') {
-    if (E2) {
-      E2.cameraZoomTarget = Math.min(50, (E2.cameraZoomTarget !== undefined ?
-        E2.cameraZoomTarget : E2.cameraZoomOffset || 18) + 3);
-    }
+    if (E2) E2.cameraZoomTarget = Math.min(50,
+      (E2.cameraZoomTarget !== undefined ? E2.cameraZoomTarget : E2.cameraZoomOffset || 18) + 3);
     e.preventDefault();
   }
 
@@ -402,14 +410,10 @@ US.displayKey = function(k) {
 })(window.UnkScape = window.UnkScape || {});
 
 /*
- * v10 REBUILD — Listener inventory:
- * keydown: 1  keyup: 1  mousedown: 1 (capture)  mousemove: 1  mouseup: 1  wheel: 1  contextmenu: 1
- *
- * Camera controls:
- *   Right-mouse drag  → horizontal + vertical orbit; notifies render_3d auto-reset timer
- *   Middle-mouse drag → same
- *   Scroll wheel      → smooth zoom (writes E.cameraZoomTarget, render_3d lerps)
- *   = / -             → keyboard zoom (same target)
- *   WASD / Arrows     → move relative to current camera orbit angle (W = away from camera)
- *   Auto-reset        → after ~1.8s stillness render_3d lerps camera behind player facing
+ * v11 — Key changes over v10:
+ * - LMB on resource → opens action menu (gathering.tryStartAt), not auto-gather
+ * - [F] key → gathering.tryInteractF() first, then player.tryInteract()
+ * - [ESC] → closes action menu if open, else pause
+ * - Ground LMB → move player to clicked location
+ * - Camera orbit: horizontal 0.010 (was 0.012), vertical 0.007 (was 0.005)
  */
