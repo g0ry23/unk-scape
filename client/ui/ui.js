@@ -12,7 +12,19 @@
     root.classList.toggle('dialog-open',dialog&&!panel&&!menu);
     root.classList.toggle('menu-open',menu);
   };
-  US.UI.prototype.update=function(){this.syncLayoutState();this.renderHUD();this.renderCombatUI();this.renderHotbar();this.renderActionHint();};
+  US.UI.prototype.update=function(){this.syncLayoutState();this._syncHUDVisibility();this.renderHUD();this.renderCombatUI();this.renderHotbar();this.renderActionHint();};
+US.UI.prototype._syncHUDVisibility=function(){
+  var g=this.game;
+  var inPlay=g&&g.state==='play';
+  var show=inPlay?'':'none';
+  var ids=['log','hud','hotbar','combat-ui','float-texts'];
+  for(var i=0;i<ids.length;i++){
+    var el=document.getElementById(ids[i]);
+    if(!el)continue;
+    if(!inPlay&&el.id==='log')el.innerHTML='';
+    el.style.display=show;
+  }
+};
   US.UI.prototype.floatText=function(x,y,text,color){if(this.game.settings?.display?.floatingText===false)return;this.game.entities.effects.push({x,y,text,color,t:1,maxT:1,float:55,size:16});};
   US.UI.prototype.applyDisplaySettings=function(){
     const d=this.game.settings.display||{};
