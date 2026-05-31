@@ -4,7 +4,7 @@ const E = window.UnkScape3D;
 
 (function() {
 
-console.log("UnkScape3D: v2.3 - sky + biome colors + prop grounding (Batch B)");
+console.log("UnkScape3D: v2.4 - terrain radius + fog + grounded distant props");
 
 E.active = false;
 E.scene = null;
@@ -40,8 +40,8 @@ var SCALE = 0.1;
 var TILE = 32;
 var TSCALE = TILE * SCALE;
 
-var TERRAIN_RADIUS = 14;
-var PROP_PIXEL_RADIUS = TERRAIN_RADIUS * TILE * 3.5;
+var TERRAIN_RADIUS = 22;
+var PROP_PIXEL_RADIUS = TERRAIN_RADIUS * TILE * 1.8;
 var PROP_MAX = 150;
 var PROP_REBUILD_THRESHOLD = TILE * 3;
 
@@ -155,6 +155,7 @@ E._updateSkyColor = function() {
   var g = dayColor.g + (nightColor.g - dayColor.g) * nightAmt;
   var b = dayColor.b + (nightColor.b - dayColor.b) * nightAmt;
   E.scene.background.setRGB(r, g, b);
+  if (E.scene.fog) E.scene.fog.color.setRGB(r, g, b);
   if (E._sunLight) {
     E._sunLight.color.setRGB(
       Math.max(0.05, 1.0 - nightAmt * 0.8),
@@ -181,6 +182,7 @@ E.Initialize3D = function() {
   gameCanvas.parentElement.insertBefore(webglCanvas, gameCanvas);
 
   E.scene = new THREE.Scene();
+  E.scene.fog = new THREE.Fog(0x7ec8e3, 38, 70);
   E.scene.background = new THREE.Color(0x7ec8e3);
 
   var aspect = window.innerWidth / window.innerHeight;
