@@ -4,7 +4,7 @@ const E = window.UnkScape3D;
 
 (function() {
 
-console.log("UnkScape3D: v2.1 - improved camera feel: faster follow, shorter reset delay");
+console.log("UnkScape3D: v2.2 - smooth directional facing (Phase 3)");
 
 E.active = false;
 E.scene = null;
