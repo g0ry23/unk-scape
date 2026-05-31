@@ -4,7 +4,7 @@ const E = window.UnkScape3D;
 
 (function() {
 
-console.log("UnkScape3D: v2.5 - extended view distance (R=30, fog 58-90)");
+console.log("UnkScape3D: v2.6 - atmospheric fog (R=38, fog 92-128)");
 
 E.active = false;
 E.scene = null;
@@ -40,7 +40,7 @@ var SCALE = 0.1;
 var TILE = 32;
 var TSCALE = TILE * SCALE;
 
-var TERRAIN_RADIUS = 30;
+var TERRAIN_RADIUS = 38;
 var PROP_PIXEL_RADIUS = TERRAIN_RADIUS * TILE * 1.8;
 var PROP_MAX = 150;
 var PROP_REBUILD_THRESHOLD = TILE * 5;
@@ -182,7 +182,7 @@ E.Initialize3D = function() {
   gameCanvas.parentElement.insertBefore(webglCanvas, gameCanvas);
 
   E.scene = new THREE.Scene();
-  E.scene.fog = new THREE.Fog(0x7ec8e3, 58, 90);
+  E.scene.fog = new THREE.Fog(0x7ec8e3, 92, 128);
   E.scene.background = new THREE.Color(0x7ec8e3);
 
   var aspect = window.innerWidth / window.innerHeight;
