@@ -61,7 +61,7 @@ US.UI.prototype._wizLanding=function(container){
     });
   }
   container.innerHTML=`<div class="menu-card" style="width:min(460px,90vw);text-align:center">
-    <h1 style="font-family:var(--display);font-size:clamp(32px,5vw,46px);margin:0 0 6px;background:linear-gradient(90deg,#fff,#ffd783,#ff9b5c);-webkit-background-clip:text;color:transparent">UNK-SCAPE</h1>
+    <h1 style="font-family:var(--display);font-size:clamp(32px,5vw,46px);margin:0 0 6px;background:linear-gradient(90deg,#fff,#ffd783,#ff9b5c);-webkit-background-clip:text;color:transparent">UNKSCAPE</h1>
     <p style="color:#9aa8c7;margin:0 0 22px;font-size:13px">Production RPG Engine v${US.SAVE_VERSION||'0.4.0'}</p>
     <div class="menu-actions" style="flex-direction:column;gap:10px">
       <button class="big-btn" style="padding:14px 28px;width:100%" onclick="UnkScape.game.ui.advanceWizardStep('identity')">Establish New Realm</button>
