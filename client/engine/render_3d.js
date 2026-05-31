@@ -4,7 +4,7 @@ const E = window.UnkScape3D;
 
 (function() {
 
-console.log("UnkScape3D: v2.0 - WASD movement + over-shoulder camera + auto-reset");
+console.log("UnkScape3D: v2.1 - improved camera feel: faster follow, shorter reset delay");
 
 E.active = false;
 E.scene = null;
