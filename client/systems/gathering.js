@@ -2,61 +2,54 @@
 const US = window.UnkScape = window.UnkScape || {};
 
 // ─────────────────────────────────────────────────────────────────────────────
-// UNKSCAPE GatheringSystem  v4
+// UNKSCAPE GatheringSystem v5
 //
-// Complete interaction model:
+// INTERACTION MODEL (new):
+//   - LMB click on a resource → does NOT auto-start gathering
+//   - Instead shows a contextual action menu popup near the resource
+//   - Player must CHOOSE the action (Chop, Mine, Harvest, etc) from the menu
+//   - Pressing [F] near a resource also opens the action menu
+//   - ESC or clicking elsewhere closes menu without acting
+//   - Pressing [F] near an NPC opens dialog (unchanged)
 //
-//  1. Left-click any resource (mesh hit or ground-near-miss):
-//       • If too far → player auto-walks to resource, then auto-starts on arrival
-//       • If in range → immediately starts gathering
+// REACH:
+//   - INTERACT_RANGE = 64px (2 tiles × 32px/tile ≈ 1 tile from object edge)
+//   - AUTO_WALK_RANGE = 200px — if beyond this, player auto-walks first
+//   - Action menu only appears when within INTERACT_RANGE
 //
-//  2. Per-hit swing model:
-//       • Each gather cycle = N swings (cfg.hitsToHarvest)
-//       • Each swing takes ~swingInterval seconds
-//       • Every swing shows a hit flash + swing XP
-//       • On the FINAL swing of a cycle → loot roll + full XP reward
-//       • Resource visual dims as hitProgress fills
-//
-//  3. Continuous mode:
-//       • After a successful gather, if the node still has charges,
-//         automatically begin next cycle — no re-click needed
-//       • Player only stops if: node depleted, player walks away, ESC pressed,
-//         or another action begins
-//
-//  4. NPC proximity prompts:
-//       • When player walks within NPC range a prompt appears
-//       • Left-click on an NPC opens dialog (handled by player.tryInteract)
-//
-//  5. Full skill tree coverage:
-//       Every resource node maps to one of the 15 canonical skills.
-//       All skill interactions are routed through this single system.
-//
+// ALL ELSE UNCHANGED from v4:
+//   - Per-hit swing model
+//   - Continuous mode after success
+//   - All 15 canonical skills
+//   - Respawn cooldown ticks
 // ─────────────────────────────────────────────────────────────────────────────
 
-var AUTO_WALK_RANGE  = 220;  // px — max range to auto-walk to a resource
-var INTERACT_RANGE   = 180;  // px — max range to START gathering without walking
-var ABANDON_RANGE    = 260;  // px — if player drifts beyond this, cancel gathering
-var NPC_PROMPT_RANGE = 90;   // px — distance to show NPC action prompt
+var AUTO_WALK_RANGE  = 200;  // px — max range to auto-walk to a resource
+var INTERACT_RANGE   = 64;   // px — 2 tiles; must be THIS close for action menu
+var ABANDON_RANGE    = 140;  // px — if player drifts beyond this, cancel
+var NPC_PROMPT_RANGE = 90;   // px — distance to show NPC [F] prompt
 var SWING_BASE_TIME  = 0.80; // seconds per swing at skill level 1
 var SWING_MIN_TIME   = 0.30; // fastest possible swing
 
 US.GatheringSystem = function(game) {
-  this.game          = game;
-  this.active        = null;   // current resource node being gathered
-  this.swingTimer    = 0;      // time within current swing
-  this.swingDuration = 0.80;   // computed per node/skill
-  this.seeded        = false;
-  this._pendingNode  = null;   // node player is auto-walking toward
-  this._npcPromptEl  = null;   // DOM element for NPC prompt
+  this.game        = game;
+  this.active      = null;
+  this.swingTimer  = 0;
+  this.swingDuration = 0.80;
+  this.seeded      = false;
+  this._pendingNode  = null;
+  this._npcPromptEl  = null;
   this._lastNpcId    = null;
+  this._menuNode     = null;  // resource node whose action menu is open
+  this._menuEl       = null;  // DOM element for the action menu
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 US.GatheringSystem.prototype._swingDuration = function(node) {
   if (!node || !node.cfg) return SWING_BASE_TIME;
-  var p   = this.game.player;
-  var sk  = node.cfg.skill;
+  var p  = this.game.player;
+  var sk = node.cfg.skill;
   var lvl = US.levelForXp(p.skills[sk] ? p.skills[sk].xp || 0 : 0);
   var raw = SWING_BASE_TIME + (node.cfg.tier || 1) * 0.15 - lvl * 0.025;
   return Math.max(SWING_MIN_TIME, Math.min(SWING_BASE_TIME * 1.5, raw));
@@ -75,8 +68,8 @@ US.GatheringSystem.prototype._actionLabel = function(node) {
 // ── Level gate check ─────────────────────────────────────────────────────────
 US.GatheringSystem.prototype._checkLevel = function(node) {
   if (!node || !node.cfg) return true;
-  var p   = this.game.player;
-  var sk  = node.cfg.skill;
+  var p  = this.game.player;
+  var sk = node.cfg.skill;
   var lvl = US.levelForXp(p.skills[sk] ? p.skills[sk].xp || 0 : 0);
   if (lvl < node.cfg.level) {
     this.game.ui.toast(
@@ -95,10 +88,10 @@ US.GatheringSystem.prototype._checkTool = function(node) {
   if (!req) return true;
   var UP = window.UnkScape && window.UnkScape.Player;
   if (!UP || !UP.canUseTool) return true;
-  var p   = this.game.player;
-  var ok  = UP.canUseTool(req, p.skills);
+  var p  = this.game.player;
+  var ok = UP.canUseTool(req, p.skills);
   if (!ok) {
-    var tier      = UP.TOOL_TIERS[req] || {};
+    var tier = UP.TOOL_TIERS[req] || {};
     var skillName = this._skillName(tier.skill);
     this.game.ui.toast(
       'Tool too weak',
@@ -118,26 +111,16 @@ US.GatheringSystem.prototype._showProgress = function() {
   var hits = cfg.hitsToHarvest || 1;
   var pct  = Math.min(1, node.hitProgress / hits);
   var swingPct = Math.min(1, this.swingTimer / this.swingDuration);
-  var barW     = Math.round(pct * 160);
-  var swingW   = Math.round(swingPct * 160);
-  var label    = this._actionLabel(node);
+  var barW  = Math.round(pct * 160);
+  var swingW = Math.round(swingPct * 160);
+  var label = this._actionLabel(node);
   var skillCol = (cfg.skill && US.SKILLS[cfg.skill]) ? US.SKILLS[cfg.skill].color : '#f1c40f';
   hint.style.cssText = [
-    'position:fixed',
-    'bottom:180px',
-    'left:50%',
-    'transform:translateX(-50%)',
-    'background:rgba(14,11,20,0.92)',
-    'border:2px solid #47385a',
-    'border-radius:6px',
-    'padding:8px 16px',
-    'color:' + skillCol,
-    'font-family:Courier New,monospace',
-    'font-size:13px',
-    'z-index:9999',
-    'min-width:220px',
-    'text-align:center',
-    'pointer-events:none'
+    'position:fixed','bottom:180px','left:50%','transform:translateX(-50%)',
+    'background:rgba(14,11,20,0.92)','border:2px solid #47385a',
+    'border-radius:6px','padding:8px 16px','color:' + skillCol,
+    'font-family:Courier New,monospace','font-size:13px',
+    'z-index:9999','min-width:220px','text-align:center','pointer-events:none'
   ].join(';');
   hint.innerHTML =
     '<div style="margin-bottom:4px;">' + label + '</div>' +
@@ -161,11 +144,11 @@ US.GatheringSystem.prototype._updateNpcPrompt = function() {
   var near = null, bestDist = NPC_PROMPT_RANGE;
   for (var i = 0; i < g.entities.npcs.length; i++) {
     var npc = g.entities.npcs[i];
-    var d   = Math.hypot(npc.x - p.x, npc.y - p.y);
+    var d = Math.hypot(npc.x - p.x, npc.y - p.y);
     if (d < bestDist) { bestDist = d; near = npc; }
   }
   var hint = document.getElementById('action-hint');
-  if (near && !this.active) {
+  if (near && !this.active && !this._menuNode) {
     if (near.uid !== this._lastNpcId) {
       this._lastNpcId = near.uid;
       if (hint) {
@@ -176,14 +159,177 @@ US.GatheringSystem.prototype._updateNpcPrompt = function() {
           'font-family:Courier New,monospace','font-size:13px',
           'z-index:9999','min-width:180px','text-align:center','pointer-events:none'
         ].join(';');
-        var npcName = near.name || near.cfg && near.cfg.name || 'NPC';
+        var npcName = near.name || (near.cfg && near.cfg.name) || 'NPC';
         hint.innerHTML = '<div>[F] Talk to ' + npcName + '</div>';
       }
     }
   } else if (!near && this._lastNpcId) {
     this._lastNpcId = null;
-    if (!this.active) this._clearProgress();
+    if (!this.active && !this._menuNode) this._clearProgress();
   }
+};
+
+// ── Action Menu (popup) ───────────────────────────────────────────────────────
+// Opens a small popup near the resource with action button(s)
+US.GatheringSystem.prototype._openActionMenu = function(node) {
+  if (this._menuEl) this._closeActionMenu();
+
+  var self    = this;
+  var g       = this.game;
+  var p       = g.player;
+  var cfg     = node.cfg || {};
+  var action  = cfg.action  || 'Gather';
+  var resName = cfg.name    || 'Resource';
+  var skill   = cfg.skill   || 'woodcutting';
+  var skillCol = (US.SKILLS[skill]) ? US.SKILLS[skill].color : '#f1c40f';
+  var icon    = (US.SKILLS[skill]) ? US.SKILLS[skill].icon : '🔹';
+
+  var el = document.createElement('div');
+  el.id = 'unkscape-action-menu';
+  el.style.cssText = [
+    'position:fixed',
+    'bottom:200px',
+    'left:50%',
+    'transform:translateX(-50%)',
+    'background:rgba(14,11,20,0.97)',
+    'border:2px solid ' + skillCol,
+    'border-radius:8px',
+    'padding:10px 16px',
+    'color:#e2e8f0',
+    'font-family:Courier New,monospace',
+    'font-size:13px',
+    'z-index:10000',
+    'min-width:200px',
+    'text-align:center',
+    'pointer-events:auto',
+    'box-shadow:0 4px 24px rgba(0,0,0,0.8)'
+  ].join(';');
+
+  var lvl = US.levelForXp(p.skills[skill] ? p.skills[skill].xp || 0 : 0);
+  var reqLvl = cfg.level || 1;
+  var canAct = lvl >= reqLvl;
+
+  el.innerHTML =
+    '<div style="color:' + skillCol + '; font-weight:bold; margin-bottom:8px; font-size:14px;">' +
+    icon + ' ' + resName + '</div>' +
+    '<div style="color:#94a3b8; font-size:11px; margin-bottom:10px;">' + skill.replace(/_/g,' ') + ' Lv.' + reqLvl + ' required — you: Lv.' + lvl + '</div>' +
+    '<button id="unkaction-confirm" style="' +
+      'background:' + (canAct ? skillCol : '#4a4060') + ';' +
+      'border:none; color:#fff; font-family:Courier New,monospace;' +
+      'font-size:12px; padding:8px 20px; border-radius:4px;' +
+      'cursor:' + (canAct ? 'pointer' : 'not-allowed') + ';' +
+      'margin-right:8px; font-weight:bold;' +
+    '">' + action + ' [F]</button>' +
+    '<button id="unkaction-cancel" style="' +
+      'background:rgba(71,56,90,0.7); border:none; color:#94a3b8;' +
+      'font-family:Courier New,monospace; font-size:12px; padding:8px 14px;' +
+      'border-radius:4px; cursor:pointer;' +
+    '">Cancel [ESC]</button>';
+
+  document.body.appendChild(el);
+  this._menuEl   = el;
+  this._menuNode = node;
+
+  // Wire confirm button
+  var confirmBtn = el.querySelector('#unkaction-confirm');
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!canAct) {
+        self.game.ui.toast('Level too low', resName + ' requires ' + skill.replace(/_/g,' ') + ' Lv.' + reqLvl + '.', 'bad');
+        self._closeActionMenu();
+        return;
+      }
+      self._closeActionMenu();
+      self._startGathering(node);
+    });
+  }
+
+  // Wire cancel button
+  var cancelBtn = el.querySelector('#unkaction-cancel');
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      self._closeActionMenu();
+    });
+  }
+
+  // Show resource proximity hint in action-hint bar as well
+  var hint = document.getElementById('action-hint');
+  if (hint && !this.active) {
+    hint.style.cssText = [
+      'position:fixed','bottom:166px','left:50%','transform:translateX(-50%)',
+      'background:rgba(14,11,20,0.7)','border:1px solid #47385a',
+      'border-radius:4px','padding:4px 12px','color:#94a3b8',
+      'font-family:Courier New,monospace','font-size:11px',
+      'z-index:9998','min-width:160px','text-align:center','pointer-events:none'
+    ].join(';');
+    hint.innerHTML = '[F] ' + action + ' • [ESC] Close';
+  }
+};
+
+US.GatheringSystem.prototype._closeActionMenu = function() {
+  if (this._menuEl) {
+    this._menuEl.remove();
+    this._menuEl  = null;
+  }
+  this._menuNode = null;
+  if (!this.active) this._clearProgress();
+};
+
+// ── Called by input.js [F] key when near resource or NPC ──────────────────────
+US.GatheringSystem.prototype.tryInteractF = function() {
+  // If action menu is open → confirm action
+  if (this._menuEl && this._menuNode) {
+    var node = this._menuNode;
+    this._closeActionMenu();
+    this._startGathering(node);
+    return true;
+  }
+  // Otherwise find nearest resource and open menu if in range
+  var g = this.game, p = g.player;
+  if (!p) return false;
+  var resources = g.entities && g.entities.resources;
+  if (!resources) return false;
+  var best = null, bestDist = INTERACT_RANGE;
+  for (var i = 0; i < resources.length; i++) {
+    var r = resources[i];
+    if (!r || r.amount <= 0 || r.cooldown > 0) continue;
+    var d = Math.hypot(r.x - p.x, r.y - p.y);
+    if (d < bestDist) { bestDist = d; best = r; }
+  }
+  if (best) {
+    this._openActionMenu(best);
+    return true;
+  }
+  return false;
+};
+
+// ── Called by input.js on LMB click on a resource mesh ────────────────────────
+// wx,wy = world coordinates of the clicked resource
+US.GatheringSystem.prototype.tryStartAt = function(wx, wy) {
+  this.ensureNodes();
+  var g = this.game, p = g.player;
+  if (!p) return false;
+
+  // Find closest available node to click point
+  var node = this._findNear(wx, wy, INTERACT_RANGE + 120);
+  if (!node) return false;
+
+  var dist = Math.hypot(node.x - p.x, node.y - p.y);
+
+  if (dist > INTERACT_RANGE) {
+    // Too far — auto-walk toward resource and show action menu on arrival
+    this._pendingNode = node;
+    p._clickTarget = { x: node.x, y: node.y, resourceId: node.uid };
+    var rname = node.cfg ? node.cfg.name : 'resource';
+    g.ui.toast('Walking to ' + rname + '...', '', 'gold');
+    return true;
+  }
+
+  // In range — show action menu (don't auto-start)
+  this._openActionMenu(node);
+  return true;
 };
 
 // ── Seed starter nodes near player on first game start ───────────────────────
@@ -197,15 +343,15 @@ US.GatheringSystem.prototype.ensureNodes = function() {
   var nearbyTree = resources.find(function(r) {
     return r && r.type === 'tree' && Math.hypot(r.x - px, r.y - py) < 500;
   });
-  if (nearbyTree) return; // already seeded or worldgen placed them
+  if (nearbyTree) return;
 
   var STARTER = [
-    { type:'tree',   angle:0.4,  dist:90  },
-    { type:'tree',   angle:2.0,  dist:110 },
-    { type:'rock',   angle:3.3,  dist:95  },
-    { type:'berry',  angle:4.8,  dist:80  },
-    { type:'copper', angle:1.2,  dist:130 },
-    { type:'herb',   angle:5.5,  dist:75  }
+    { type:'tree',   angle:0.4, dist:90  },
+    { type:'tree',   angle:2.0, dist:110 },
+    { type:'rock',   angle:3.3, dist:95  },
+    { type:'berry',  angle:4.8, dist:80  },
+    { type:'copper', angle:1.2, dist:130 },
+    { type:'herb',   angle:5.5, dist:75  }
   ];
   var idx = 0;
   STARTER.forEach(function(s) {
@@ -215,7 +361,7 @@ US.GatheringSystem.prototype.ensureNodes = function() {
     if (node) resources.push(node);
     idx++;
   });
-  g.ui && g.ui.log('Starter resources placed. Walk up and left-click to gather!', 'gold');
+  g.ui && g.ui.log('Resources placed nearby. Walk close and press [F] to interact!', 'gold');
   var E = window.UnkScape3D;
   if (E && E.RebuildProps) E.RebuildProps(px, py);
 };
@@ -234,45 +380,18 @@ US.GatheringSystem.prototype._findNear = function(wx, wy, radius) {
   return best;
 };
 
-// ── Primary entry point: called by input.js on any resource click ─────────────
-// wx,wy = world coordinates of click
-US.GatheringSystem.prototype.tryStartAt = function(wx, wy) {
-  this.ensureNodes();
-  var g = this.game, p = g.player;
-  if (!p) return false;
-
-  // Find the closest available node to click point
-  var node = this._findNear(wx, wy, INTERACT_RANGE + 100);
-  if (!node) return false;
-
-  var dist = Math.hypot(node.x - p.x, node.y - p.y);
-
-  // Too far — auto-walk then auto-start
-  if (dist > INTERACT_RANGE) {
-    this._pendingNode = node;
-    p._clickTarget   = { x: node.x, y: node.y, resourceId: node.uid };
-    var rname = node.cfg ? node.cfg.name : 'resource';
-    g.ui.toast('Walking to ' + rname + '...', '', 'gold');
-    return true;
-  }
-
-  // In range — start immediately
-  return this._startGathering(node);
-};
-
 // ── Actually begin a gather cycle on a node ───────────────────────────────────
 US.GatheringSystem.prototype._startGathering = function(node) {
   var g = this.game, p = g.player;
   if (!node || node.amount <= 0 || node.cooldown > 0) return false;
   if (!this._checkLevel(node)) return false;
-  if (!this._checkTool(node))  return false;
+  if (!this._checkTool(node)) return false;
 
-  this.active        = node;
+  this.active = node;
   this.swingDuration = this._swingDuration(node);
-  this.swingTimer    = 0;
-  this._pendingNode  = null;
+  this.swingTimer = 0;
+  this._pendingNode = null;
   if (p) { p.gathering = true; p.blocking = false; p.heavyCharging = false; }
-  // Cancel any pending click-to-walk target
   if (p && p._clickTarget && p._clickTarget.resourceId === node.uid) p._clickTarget = null;
 
   g.ui && g.ui.log('Started ' + this._actionLabel(node).toLowerCase() + '.', 'gold');
@@ -283,40 +402,37 @@ US.GatheringSystem.prototype._startGathering = function(node) {
 US.GatheringSystem.prototype.cancel = function() {
   var p = this.game.player;
   if (p) p.gathering = false;
-  this.active       = null;
-  this.swingTimer   = 0;
+  this.active = null;
+  this.swingTimer = 0;
   this._pendingNode = null;
+  this._closeActionMenu();
   this._clearProgress();
 };
 
-// ── One swing completes — resolve loot on final swing ─────────────────────────
+// ── One swing completes ────────────────────────────────────────────────────────
 US.GatheringSystem.prototype._resolveSwing = function() {
-  var g    = this.game;
-  var p    = g.player;
+  var g   = this.game;
+  var p   = g.player;
   var node = this.active;
-  var cfg  = node.cfg;
-  var sk   = cfg.skill;
+  var cfg = node.cfg;
+  var sk  = cfg.skill;
   var hits = cfg.hitsToHarvest || 1;
 
-  // Tiny swing XP on every swing attempt
   var swingXp = cfg.swingXp || 1;
   if (g.systems.skills) g.systems.skills.addXp(sk, swingXp);
 
-  // Hit flash
   var hitCol = cfg.hitColor || '#f1c40f';
-  var verb   = cfg.action || 'Hit';
+  var verb   = cfg.action   || 'Hit';
   g.ui.floatText(node.x, node.y - 30, verb + '!', hitCol);
 
-  // Increment swing counter
   node.hitProgress = (node.hitProgress || 0) + 1;
 
-  // Not yet at final swing — just show progress
   if (node.hitProgress < hits) {
-    this.swingTimer = 0; // reset for next swing
+    this.swingTimer = 0;
     return;
   }
 
-  // ── FINAL SWING — do the loot roll ────────────────────────────────────────
+  // ── Final swing — loot roll ────────────────────────────────────────
   node.hitProgress = 0;
   var lvl  = US.levelForXp(p.skills[sk] ? p.skills[sk].xp || 0 : 0);
   var tool = p.stats ? (p.stats()[sk] || 0) : 0;
@@ -324,17 +440,14 @@ US.GatheringSystem.prototype._resolveSwing = function() {
 
   if (!ok) {
     g.ui.floatText(p.x, p.y - 40, 'Failed', '#9aa8c7');
-    // Still give partial XP for attempt
     if (g.systems.skills) g.systems.skills.addXp(sk, Math.max(1, Math.floor(cfg.xp * 0.12)));
-    // Continue trying (don't cancel) — player keeps swinging
     this.swingTimer = 0;
     return;
   }
 
-  // Success — award loot + full XP
   var extraChance = 0.10 + ((p.mods && p.mods.extraGather) || 0);
-  var qty  = 1 + (Math.random() < extraChance ? 1 : 0);
-  qty      = Math.min(qty, node.amount);
+  var qty = 1 + (Math.random() < extraChance ? 1 : 0);
+  qty = Math.min(qty, node.amount);
 
   var item = (cfg.altItem && Math.random() < (cfg.altChance || 0)) ? cfg.altItem : cfg.item;
   node.amount -= qty;
@@ -345,23 +458,19 @@ US.GatheringSystem.prototype._resolveSwing = function() {
   g.ui.floatText(p.x, p.y - 44, '+' + qty + ' ' + itemName, '#38d978');
 
   var xpGained = cfg.xp * qty;
-  if (g.systems.skills) {
-    g.systems.skills.addXp(sk, xpGained);
-  }
-  if (g.systems.audio) g.systems.audio.play(sk === 'mining' ? 'mine' : 'chop');
+  if (g.systems.skills) g.systems.skills.addXp(sk, xpGained);
+  if (g.systems.audio)  g.systems.audio.play(sk === 'mining' ? 'mine' : 'chop');
   if (g.systems.quests) g.systems.quests.notify('gather', item, qty);
   g.stats.resourcesGathered = (g.stats.resourcesGathered || 0) + qty;
 
   if (node.amount <= 0) {
-    // Node depleted — set respawn cooldown on the node itself
-    node.cooldown = cfg.respawn || 30;
+    node.cooldown    = cfg.respawn || 30;
     node.hitProgress = 0;
-    g.ui.log(cfg.name + ' depleted. It will respawn in ' + Math.round(cfg.respawn) + 's.', 'gold');
+    g.ui.log(cfg.name + ' depleted. Respawns in ' + Math.round(cfg.respawn) + 's.', 'gold');
     this.cancel();
     return;
   }
 
-  // Node still has charges — continue automatically
   this.swingTimer = 0;
 };
 
@@ -369,10 +478,9 @@ US.GatheringSystem.prototype._resolveSwing = function() {
 US.GatheringSystem.prototype.update = function(dt) {
   var g = this.game, p = g.player;
 
-  // Seed starter nodes
   this.ensureNodes();
 
-  // Tick all resource respawn cooldowns
+  // Tick respawn cooldowns
   var resources = g.entities && g.entities.resources;
   if (resources) {
     for (var i = 0; i < resources.length; i++) {
@@ -380,7 +488,7 @@ US.GatheringSystem.prototype.update = function(dt) {
       if (!r || r.cooldown <= 0) continue;
       r.cooldown -= dt;
       if (r.cooldown <= 0) {
-        r.cooldown = 0;
+        r.cooldown    = 0;
         r.hitProgress = 0;
         if (r.cfg && r.cfg.amount) {
           var mn = Array.isArray(r.cfg.amount) ? r.cfg.amount[0] : r.cfg.amount;
@@ -391,30 +499,28 @@ US.GatheringSystem.prototype.update = function(dt) {
     }
   }
 
-  // NPC proximity prompt (runs when not gathering)
+  // NPC proximity prompt
   this._updateNpcPrompt();
 
   if (!p) { this._clearProgress(); return; }
 
-  // Auto-walk arrival: if player was walking toward a pending node, start gathering when close
-  if (this._pendingNode && !this.active) {
-    var pending = this._pendingNode;
+  // Auto-walk arrival: show action menu when close enough
+  if (this._pendingNode && !this.active && !this._menuNode) {
+    var pending  = this._pendingNode;
     var pendDist = Math.hypot(pending.x - p.x, pending.y - p.y);
     if (pendDist <= INTERACT_RANGE) {
-      this._startGathering(pending);
+      this._pendingNode = null;
+      this._openActionMenu(pending);
     } else if (pendDist > AUTO_WALK_RANGE * 3) {
-      // Player walked away from target, cancel pending
       this._pendingNode = null;
     }
   }
 
-  // No active gathering
-  if (!this.active) { this._clearProgress(); return; }
+  if (!this.active) { return; }
 
-  // Check node still valid
   if (this.active.amount <= 0 || this.active.cooldown > 0) { this.cancel(); return; }
 
-  // Abandon if player drifted too far
+  // Abandon if drifted too far
   var gDist = Math.hypot(this.active.x - p.x, this.active.y - p.y);
   if (gDist > ABANDON_RANGE) {
     g.ui.log('You moved away and stopped ' + this._actionLabel(this.active).toLowerCase() + '.', 'bad');
@@ -422,7 +528,6 @@ US.GatheringSystem.prototype.update = function(dt) {
     return;
   }
 
-  // Advance swing timer
   this.swingTimer += dt;
   this._showProgress();
 
