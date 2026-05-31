@@ -1,7 +1,7 @@
 (function(){
   const US = window.UnkScape = window.UnkScape || {};
   US.TILE = 32;
-  US.WORLD = { w: 2000, h: 2000, pxW: 2000*32, pxH: 2000*32 }; // Smaller tiles + larger tile-grid map for better scale and less chunky visuals. // Phase 1: expanded open-world scale for larger starter regions.
+  US.WORLD = { w: 500, h: 400, pxW: 500*32, pxH: 400*32 }; // Official world: 16,000x12,800 px (500x400 tiles @ 32px/tile). Phase 2 resize.
 
   US.TILES = {
     grass:{name:'Grass',solid:false,color:'#25472d',variant:'#2f5a39',speed:1},
