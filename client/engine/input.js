@@ -25,11 +25,8 @@ function logClick(screenX, screenY, hitInfo, result) {
     + " | result=" + result;
   console.log(msg);
   var D2 = window.UnkScape;
-  if (D2 && D2.game && D2.game.ui && D2.game.ui.log) {
-    D2.game.ui.log(msg, 'gold');
-  }
-}
-
+// logClick: console-only; ui.log removed to keep activity log clean
+  
 function feedback(msg, type) {
   var D2 = window.UnkScape;
   if (!D2 || !D2.game) return;
