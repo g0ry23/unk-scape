@@ -1,5 +1,5 @@
 /**
- * input.js -- v11
+ * input.js -- v13
  * ONE namespace: window.UnkScape (US) only.
  * ONE mousedown, ONE mousemove, ONE mouseup, ONE wheel, ONE keydown, ONE keyup.
  * 3D-native raycaster click path.
@@ -154,7 +154,7 @@ US.Input = function(game) {
   this._orbitLastY    = 0;
   this._initDone      = false;
   this._init();
-  console.log("[Input] v12: zoom 5-45, P1-P4 movement + camera upgrade.");
+  console.log("[Input] v13: ESC opens pause/settings menu via toggleMenu().");
 };
 
 US.Input.prototype._init = function() {
@@ -358,9 +358,8 @@ US.Input.prototype._handleHotkey = function(e, k) {
     if (gs2 && gs2._menuEl) {
       gs2._closeActionMenu();
     } else if (game.state === 'play') {
-      game.paused = !game.paused;
-      game.ui.toast(game.paused ? 'Paused' : 'Resumed', '', 'gold');
-    }
+        game.ui.toggleMenu();
+      }
     e.preventDefault();
   }
 
