@@ -4,7 +4,7 @@ const E = window.UnkScape3D;
 
 (function() {
 
-console.log("UnkScape3D: v2.2 - smooth directional facing (Phase 3)");
+console.log("UnkScape3D: v2.3 - sky + biome colors + prop grounding (Batch B)");
 
 E.active = false;
 E.scene = null;
@@ -46,21 +46,21 @@ var PROP_MAX = 150;
 var PROP_REBUILD_THRESHOLD = TILE * 3;
 
 var TILE_COLORS = {
-grass: '#2d6a3f',
-darkgrass: '#1d3a2a',
-dirt: '#6b4c2e',
-path: '#7a6040',
-water: '#1a5276',
-stone: '#566573',
+grass:      '#3a8c4f',
+darkgrass:  '#1e5232',
+dirt:       '#7a5c3a',
+path:       '#8c7348',
+water:      '#1e6fa8',
+stone:      '#6b7280',
 wall: '#1c2833',
-sand: '#b7950b',
-swamp: '#2e4d22',
-plaza: '#8d7a52',
-stonepath: '#717d8c',
-woodfloor: '#7d5a38',
+sand:       '#c8a855',
+swamp:      '#3a5c1e',
+plaza:      '#a08858',
+stonepath:  '#7a8490',
+woodfloor:  '#8c6440',
 roof: '#4a2332',
 fence: '#5c3d1a',
-farmland: '#7a5c2a'
+farmland:   '#8c6e32'
 };
 
 var RESOURCE_VISUALS = {
@@ -97,7 +97,7 @@ function getTileType(tx, ty) {
 
 function getTileColor(tx, ty) {
   var type = getTileType(tx, ty);
-  return TILE_COLORS[type] || ((tx + ty) % 2 === 0 ? '#2d6a3f' : '#36854f');
+  return TILE_COLORS[type] || ((tx + ty) % 2 === 0 ? '#3a8c4f' : '#4aaa60');
 }
 
 function getTileHeight(tx, ty) {
@@ -114,6 +114,19 @@ function getSurfaceY(tx, ty) {
   return Math.max(0.4, 1 + h);
 }
 
+function getSurfaceYAtPixel(pxX, pxY) {
+  var tx = Math.floor(pxX / TILE);
+  var ty = Math.floor(pxY / TILE);
+  var fx = (pxX - tx * TILE) / TILE;
+  var fy = (pxY - ty * TILE) / TILE;
+  var h00 = getTileHeight(tx,   ty);
+  var h10 = getTileHeight(tx+1, ty);
+  var h01 = getTileHeight(tx,   ty+1);
+  var h11 = getTileHeight(tx+1, ty+1);
+  var interp = h00*(1-fx)*(1-fy) + h10*fx*(1-fy) + h01*(1-fx)*fy + h11*fx*fy;
+  return Math.max(0.4, 1 + interp);
+}
+
 // ── Angle lerp (shortest path, wraps around ±PI) ───────────────────────────
 function lerpAngle(from, to, t) {
   var diff = to - from;
@@ -121,6 +134,36 @@ function lerpAngle(from, to, t) {
   while (diff < -Math.PI) diff += Math.PI * 2;
   return from + diff * t;
 }
+
+
+// ── Sky color based on day/night cycle ─────────────────────────────────────
+E._updateSkyColor = function() {
+  if (!E.scene) return;
+  var D = window.UnkScape;
+  var dn = D && D.game && D.game.systems && D.game.systems.daynight;
+  var nightAmt = dn ? dn.nightAmount() : 0;
+  var phase = dn ? dn.phase() : 0.3;
+  var isDawnDusk = (phase > 0.55 && phase < 0.72) || (phase > 0.10 && phase < 0.22);
+  var dawnDuskAmt = isDawnDusk ? Math.sin((phase - (phase > 0.55 ? 0.55 : 0.10)) / 0.12 * Math.PI) * 0.6 : 0;
+  dawnDuskAmt = Math.max(0, Math.min(1, dawnDuskAmt));
+  var dr = Math.round(0x7e + (0xff - 0x7e) * dawnDuskAmt);
+  var dg = Math.round(0xc8 + (0x8c - 0xc8) * dawnDuskAmt);
+  var db = Math.round(0xe3 + (0x42 - 0xe3) * dawnDuskAmt);
+  var dayColor = new THREE.Color(dr/255, dg/255, db/255);
+  var nightColor = new THREE.Color(0x0d/255, 0x1b/255, 0x2e/255);
+  var r = dayColor.r + (nightColor.r - dayColor.r) * nightAmt;
+  var g = dayColor.g + (nightColor.g - dayColor.g) * nightAmt;
+  var b = dayColor.b + (nightColor.b - dayColor.b) * nightAmt;
+  E.scene.background.setRGB(r, g, b);
+  if (E._sunLight) {
+    E._sunLight.color.setRGB(
+      Math.max(0.05, 1.0 - nightAmt * 0.8),
+      Math.max(0.05, 0.91 - nightAmt * 0.5),
+      Math.max(0.2,  0.75 - nightAmt * 0.3)
+    );
+    E._sunLight.intensity = Math.max(0.3, 1.2 - nightAmt * 0.9);
+  }
+};
 
 E.Initialize3D = function() {
   if (typeof THREE === 'undefined') {
@@ -138,7 +181,7 @@ E.Initialize3D = function() {
   gameCanvas.parentElement.insertBefore(webglCanvas, gameCanvas);
 
   E.scene = new THREE.Scene();
-  E.scene.background = null;
+  E.scene.background = new THREE.Color(0x7ec8e3);
 
   var aspect = window.innerWidth / window.innerHeight;
   E.camera = new THREE.PerspectiveCamera(55, aspect, 0.1, 2000);
@@ -165,6 +208,7 @@ E.Initialize3D = function() {
   var sun = new THREE.DirectionalLight('#ffe8c0', 1.2);
   sun.position.set(80, 120, 60);
   E.scene.add(sun);
+  E._sunLight = sun;
 
   var D2 = window.UnkScape;
   if (D2 && D2.CharacterVisuals && D2.CharacterVisuals.createModularMesh) {
@@ -284,7 +328,7 @@ E.RebuildProps = function(pxX, pxY) {
   var built = 0;
   for (var ci = 0; ci < candidates.length && built < PROP_MAX; ci++) {
     var res = candidates[ci];
-    var surfY = getSurfaceY(Math.floor(res.x/TILE), Math.floor(res.y/TILE));
+    var surfY = getSurfaceYAtPixel(res.x, res.y);
     var propNode = buildPropMesh(res, surfY, TE);
     if (propNode) { E.propGroup.add(propNode); built++; }
   }
@@ -333,6 +377,7 @@ E.Update3DTerrain = function(pxX, pxY) {
 // ── Main render + camera update ────────────────────────────────────────────
 E.RenderFrame3D = function(playerData) {
   if (!E.active || !E.renderer) return;
+  E._updateSkyColor();
 
   if (playerData && E.playerVisual) {
     var pxX = playerData.x || 0;
