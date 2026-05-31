@@ -152,6 +152,26 @@ US.SaveSystem.prototype.autosave = function() {
 };
 
 // ── load ──────────────────────────────────────────────
+
+// ── faction migration: old sub-faction IDs → canon faction IDs ────────────
+US.SaveSystem.prototype._migrateFaction = function(saveData) {
+  if (!saveData) return saveData;
+  var MAP = window.UnkScape && window.UnkScape.FACTION_MIGRATION;
+  if (!MAP) MAP = {
+    ironbound:'blood_oath', bloodoak:'blood_oath', thornwatch:'blood_oath',
+    ashveil:'blood_oath', embercourt:'iron_crown', moonveil:'iron_crown'
+  };
+  // Migrate top-level factionId
+  if (saveData.factionId && MAP[saveData.factionId]) {
+    saveData.factionId = MAP[saveData.factionId];
+  }
+  // Migrate player sub-object factionId if present
+  if (saveData.player && saveData.player.factionId && MAP[saveData.player.factionId]) {
+    saveData.player.factionId = MAP[saveData.player.factionId];
+  }
+  return saveData;
+};
+
 US.SaveSystem.prototype.load = function(worldId, characterId) {
   if (!worldId) {
     const active = this._read(this.keys.active);
@@ -161,7 +181,7 @@ US.SaveSystem.prototype.load = function(worldId, characterId) {
   }
   const saves = this.getAllSaves();
   var found   = saves.find(s => s.worldId === worldId && s.characterId === characterId) || null;
-  return found ? this._migrateInventory(found) : null;
+  return found ? this._migrateFaction(this._migrateInventory(found)) : null;
 };
 
 // ── delete one character save ─────────────────────────
