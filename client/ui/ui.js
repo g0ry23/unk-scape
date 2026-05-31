@@ -32,8 +32,6 @@
     const nearDrop=g.entities.drops.find(d=>Math.hypot(d.x-mx,d.y-my)<32&&Math.hypot(d.x-p.x,d.y-p.y)<55);
     if(g.buildMode){text=`<span class="hint-dot"></span><b>LMB</b> Place • <b>RMB</b> Remove • <b>T</b> Cycle ${US.TILES[g.systems.build.selected()].name}`;}
     else if(nearNpc){text=`<span class="hint-dot"></span><b>F</b> Talk to ${nearNpc.cfg.name}`;}
-    else if(nearNode){text=`<span class="hint-dot"></span><b>LMB</b> Chop Harvest Tree`;} 
-    else if(nearResource){text=`<span class="hint-dot"></span><b>LMB</b> ${nearResource.cfg.action||'Gather'} ${nearResource.cfg.name}`;}
     else if(nearEnemy){const style=g.systems.combat.weaponStyle(p);text=`<span class="hint-dot"></span><b>LMB</b> ${style==='range'?'Shoot':style==='mage'?'Cast':'Attack'} ${nearEnemy.cfg.name} • <b>Hold</b> Heavy • <b>RMB</b> Block`;}
     else if(nearDrop){text=`<span class="hint-dot"></span>Walk over to pick up ${US.ITEMS[nearDrop.id]?.name||nearDrop.id}`;}
     if(!text){el.classList.remove('show');el.innerHTML='';return;}
