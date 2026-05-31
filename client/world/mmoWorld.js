@@ -24,7 +24,7 @@
 U.World = {
 
 // Master parameters
-worldGridSize: 2048,
+worldGridSize: 500,
 chunkSize: 32,
 loadedChunks: {},
 grid: {},
@@ -35,7 +35,7 @@ ZONES: {
   HARVEST_A:  { x0: 120, y0:   0, x1: 300, y1: 300, name: 'Greenwood Reach',   safe: true  },
   HARVEST_B:  { x0: 300, y0:   0, x1: 500, y1: 500, name: 'Ironveil Thicket',  safe: true  },
   BUFFER:     { x0: 400, y0: 400, x1: 500, y1: 500, name: 'Ashfall Border',     safe: true  },
-  WILDERNESS: { x0: 500, y0: 500, x1:2048, y1:2048, name: 'The Corrupted Wilds', safe: false }
+  WILDERNESS: { x0: 350, y0: 350, x1: 500, y1: 400, name: 'The Corrupted Wilds', safe: false }
 },
 
 // Enemy spawn registry populated during wilderness chunk generation
@@ -61,10 +61,10 @@ init() {
  * Returns a zone key string based on tile coordinates.
  */
 classifyZone(ax, ay) {
-  if (ax < 120 && ay < 120)           return 'capital';
-  if (ax < 300 && ay < 300)           return 'harvestA';
-  if (ax < 500 && ay < 500)           return 'harvestB';
-  if (ax >= 500 && ay >= 500)         return 'wilderness';
+  if (ax < 30 && ay < 24)         return 'capital';
+  if (ax < 125 && ay < 200)       return 'harvestA';
+  if (ax < 250 && ay < 400)       return 'harvestB';
+  if (ax >= 350 && ay >= 350)     return 'wilderness';
   return 'buffer';
 },
 
@@ -96,7 +96,7 @@ updateLoadedChunks(playerX, playerY) {
       const key = tcx + '_' + tcy;
       if (tcx < 0 || tcy < 0 ||
           tcx * this.chunkSize >= this.worldGridSize ||
-          tcy * this.chunkSize >= this.worldGridSize) continue;
+          tcy * this.chunkSize >= 400) continue;
       newChunks[key] = this.loadedChunks[key] ||
                        this.generateProceduralChunk(tcx, tcy);
     }
