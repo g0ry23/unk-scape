@@ -182,7 +182,13 @@ game.entities.npcs.push({uid:US.uid('npc'),kind:'npc',id:'emissary_'+id+'_'+fid,
 });
 game.entities.npcs.push(US.createNPC('elder',(cx-4)*t+t/2,(cy-1)*t+t/2));
 game.entities.npcs.push(US.createNPC('trader',(cx+4)*t+t/2,(cy-1)*t+t/2));
-game.entities.npcs.push(US.createNPC('banker',(cx-4)*t+t/2,(cy+4)*t+t/2));
+// Oathstead Step 1: replace placeholder banker with canon NPC via spawnOathsteadNPCs()
+if(typeof US.spawnOathsteadNPCs==='function'){
+  var _oathNpcs=US.spawnOathsteadNPCs(cx,cy,t);
+  _oathNpcs.forEach(function(n){game.entities.npcs.push(n);});
+} else {
+  game.entities.npcs.push(US.createNPC('banker',(cx-4)*t+t/2,(cy+4)*t+t/2));
+}
 game.entities.portals.push(US.createPortal('dungeon',(cx+10)*t+t/2,(cy+9)*t+t/2));
 }
 
