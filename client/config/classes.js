@@ -1,25 +1,25 @@
 (function(){
   const US = window.UnkScape = window.UnkScape || {};
-  US.FACTIONS = {
-    ironbound:{name:'Ironbound Order',icon:'🛡️',color:'#9ea7b8',desc:'Fortify land, hold roads, and win through discipline.',buff:{defense:2}},
-    bloodoak:{name:'Bloodoak Clan',icon:'🪓',color:'#ff5c7a',desc:'Aggressive melee raiders who claim turf by force.',buff:{attack:1}},
-    thornwatch:{name:'Thornwatch Rangers',icon:'🏹',color:'#63e6a4',desc:'Scouts and hunters who control forests and crossings.',buff:{accuracy:.03}},
-    ashveil:{name:'Ashveil Stalkers',icon:'🦊',color:'#ff9b5c',desc:'Ambush fighters built around speed, range, and survival.',buff:{moveSpeed:.04}},
-    embercourt:{name:'Ember Court',icon:'🔥',color:'#ffcf6e',desc:'Battle mages who dominate ruins with fire and claim magic.',buff:{attack:1,accuracy:.02}},
-    moonveil:{name:'Moonveil Circle',icon:'🌙',color:'#b98cff',desc:'Mystic defenders who grow stronger around claimed territory.',buff:{defense:1,accuracy:.02}}
+  // ── Canon Factions: blood_oath + iron_crown (defined in factions.js) ──────────
+  // Old sub-factions removed. All classes now map to two canon faction IDs.
+  // Save migration: old factionId → canon factionId (applied in save.js)
+  US.FACTION_MIGRATION = {
+    ironbound: 'blood_oath', bloodoak: 'blood_oath', thornwatch: 'blood_oath',
+    ashveil: 'blood_oath', embercourt: 'iron_crown', moonveil: 'iron_crown'
   };
+  // US.FACTIONS.blood_oath and .iron_crown are set by factions.js
   US.CLASS_FACTIONS = {
-    melee:['ironbound','bloodoak'],
-    range:['thornwatch','ashveil'],
-    mage:['embercourt','moonveil'],
-    wanderer:['ironbound','thornwatch'],
-    brawler:['ironbound','bloodoak'],
-    gatherer:['thornwatch','ashveil'],
-    prospector:['embercourt','moonveil'],
-    cleric:['embercourt','moonveil'],
-    warden:['ironbound','thornwatch']
+  melee:['blood_oath','iron_crown'],
+  range:['blood_oath','iron_crown'],
+  mage:['iron_crown','blood_oath'],
+  wanderer:['blood_oath','iron_crown'],
+  brawler:['blood_oath','iron_crown'],
+  gatherer:['blood_oath','iron_crown'],
+  prospector:['iron_crown','blood_oath'],
+  cleric:['iron_crown','blood_oath'],
+  warden:['blood_oath','iron_crown']
   };
-  US.getClassFactions = id => US.CLASS_FACTIONS[id] || ['ironbound','thornwatch'];
+  US.getClassFactions = id => US.CLASS_FACTIONS[id] || ['blood_oath','iron_crown'];
 
   US.CLASSES = {
     melee:{
@@ -29,7 +29,7 @@
       skills:{combat:80,survival:25,crafting:10},
       equipment:{weapon:'crude_sword',offhand:'wooden_shield',head:'bronze_helm'},
       perks:['thick_skin'],
-      start:{x:47,y:37}, zone:'Ironwake Hold'
+      start:{x:47,y:37}, zone:'Blood Oath Highlands'
     },
     range:{
       name:'Range', icon:'🏹', archetype:'range',
@@ -58,7 +58,7 @@
   };
 
   US.STARTER_ZONES = {
-    melee:{name:'Ironwake Hold',icon:'⚔️',x:70,y:56,r:57,biome:'stone',road:'stonepath',accent:'plaza',resourceBias:['rock','copper','iron'],desc:'Huge layered martial highlands with fortified ridges, quarry shelves, and sword-and-shield training roads.'},
+    melee:{name:'Blood Oath Highlands',icon:'⚔️',x:70,y:56,r:57,biome:'stone',road:'stonepath',accent:'plaza',resourceBias:['rock','copper','iron'],desc:'Huge layered martial highlands with fortified ridges, quarry shelves, and sword-and-shield training roads.'},
     range:{name:'Thornfall Wilds',icon:'🏹',x:363,y:59,r:63,biome:'darkgrass',road:'path',accent:'farmland',resourceBias:['tree','pine','berry','herb'],desc:'Large hunting forest with long sightlines, scout paths, raised tree lines, and ranged skirmish lanes.'},
     mage:{name:'Moonspire Ruins',icon:'🔮',x:217,y:293,r:60,biome:'stone',road:'stonepath',accent:'plaza',resourceBias:['silver','gem','herb'],desc:'Massive ruin basin with stepped stone platforms, gem pockets, ritual roads, and enchantment materials.'},
     wanderer:{name:'Central Crossroads',icon:'🧭',x:250,y:200,r:47,biome:'grass',road:'stonepath',accent:'plaza',resourceBias:['tree','berry','fish'],desc:'Neutral central hub where all roads eventually meet and future trading, banking, and world travel expands.'},
@@ -71,7 +71,7 @@
   US.getStarterZone = id => US.STARTER_ZONES[id] || US.STARTER_ZONES.wanderer;
 
   US.CLASS_STORIES = {
-    melee:{title:'The Ironwake Oath',theme:'Hold the line, protect the roads, and prove who owns the battlefield.',starterQuest:'class_melee_oath'},
+    melee:{title:'The Blood Oath',theme:'Hold the line, protect the roads, and prove who owns the battlefield.',starterQuest:'class_melee_oath'},
     range:{title:'The Thornfall Hunt',theme:'Scout the wilds, recover arrows, and control forest routes before the enemy does.',starterQuest:'class_range_hunt'},
     mage:{title:'The Moonspire Spark',theme:'Study the ruins, gather channeling materials, and unlock the first taste of old magic.',starterQuest:'class_mage_spark'},
     wanderer:{title:'The Nine-Road Calling',theme:'Learn the roads, survive the open map, and become the bridge between every starter region.',starterQuest:'class_wanderer_roads'},
@@ -84,7 +84,7 @@
   US.getClassStory = id => US.CLASS_STORIES[id] || US.CLASS_STORIES.wanderer;
 
   US.ZONE_FEATURES = {
-    melee:{trainer:'Marshal Bren',trainerIcon:'🛡️',trainingMob:'goblin',arena:'Ironwake Champion Yard',landmark:'Twin Anvil Gate'},
+    melee:{trainer:'Marshal Bren',trainerIcon:'🛡️',trainingMob:'goblin',arena:'Blood Oath Champion Yard',landmark:'Twin Anvil Gate'},
     range:{trainer:'Scout Veya',trainerIcon:'🏹',trainingMob:'rat',arena:'Thornfall Hunt Ring',landmark:'The Watcher Pines'},
     mage:{trainer:'Archivist Sol',trainerIcon:'🔮',trainingMob:'husk',arena:'Moonspire Ritual Ring',landmark:'The Broken Spire'},
     wanderer:{trainer:'Roadwarden Milo',trainerIcon:'🧭',trainingMob:'rat',arena:'Crossroads Trial Circle',landmark:'The Nine-Road Stone'},
@@ -98,7 +98,7 @@
   US.getZoneFeature = id => US.ZONE_FEATURES[id] || US.ZONE_FEATURES.wanderer;
 
   US.CLASS_QUESTS = {
-    class_melee_oath:{name:'The Ironwake Oath',icon:'⚔️',classId:'melee',desc:'Your melee path begins by arming up, gathering field supplies, and clearing the first threat near Ironwake Hold.',steps:[{type:'collect',id:'log',qty:2,text:'Collect 2 Oak Logs for weapon maintenance'},{type:'kill',id:'goblin',qty:2,text:'Defeat 2 Goblin Raiders near Ironwake'}],rewards:{xp:{combat:90,survival:35},items:{coin:60,health_salve:1}}},
+    class_melee_oath:{name:'The Blood Oath',icon:'⚔️',classId:'melee',desc:'Your melee path begins by arming up, gathering field supplies, and clearing the first threat near Blood Oath Highlands.',steps:[{type:'collect',id:'log',qty:2,text:'Collect 2 Oak Logs for weapon maintenance'},{type:'kill',id:'goblin',qty:2,text:'Defeat 2 Goblin Raiders near the Blood Oath Highlands'}],rewards:{xp:{combat:90,survival:35},items:{coin:60,health_salve:1}}},
     class_range_hunt:{name:'The Thornfall Hunt',icon:'🏹',classId:'range',desc:'Your ranger path begins with forest supplies, arrow discipline, and a controlled hunt around Thornfall Wilds.',steps:[{type:'collect',id:'berry',qty:3,text:'Gather 3 Wild Berries for trail food'},{type:'kill',id:'rat',qty:3,text:'Defeat 3 training beasts from range'}],rewards:{xp:{combat:75,foraging:55},items:{coin:55,arrow:15}}},
     class_mage_spark:{name:'The Moonspire Spark',icon:'🔮',classId:'mage',desc:'Your mage path begins by gathering herbs and testing your first spells against the dusk-touched dead.',steps:[{type:'collect',id:'herb',qty:2,text:'Collect 2 Bitter Herbs for spell focus'},{type:'kill',id:'husk',qty:1,text:'Defeat 1 Husk near Moonspire'}],rewards:{xp:{combat:80,crafting:45},items:{coin:60,dusk_essence:1}}},
     class_wanderer_roads:{name:'The Nine-Road Calling',icon:'🧭',classId:'wanderer',desc:'Your wanderer path begins by learning the central roads and preparing to travel between every starter region.',steps:[{type:'collect',id:'berry',qty:2,text:'Collect 2 Wild Berries'},{type:'collect',id:'log',qty:2,text:'Collect 2 Oak Logs'}],rewards:{xp:{survival:70,foraging:40},items:{coin:50,torch:2}}},
