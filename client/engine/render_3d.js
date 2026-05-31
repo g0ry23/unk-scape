@@ -4,7 +4,7 @@ const E = window.UnkScape3D;
 
 (function() {
 
-console.log("UnkScape3D: v2.4 - terrain radius + fog + grounded distant props");
+console.log("UnkScape3D: v2.5 - extended view distance (R=30, fog 58-90)");
 
 E.active = false;
 E.scene = null;
@@ -40,10 +40,10 @@ var SCALE = 0.1;
 var TILE = 32;
 var TSCALE = TILE * SCALE;
 
-var TERRAIN_RADIUS = 22;
+var TERRAIN_RADIUS = 30;
 var PROP_PIXEL_RADIUS = TERRAIN_RADIUS * TILE * 1.8;
 var PROP_MAX = 150;
-var PROP_REBUILD_THRESHOLD = TILE * 3;
+var PROP_REBUILD_THRESHOLD = TILE * 5;
 
 var TILE_COLORS = {
 grass:      '#3a8c4f',
@@ -182,7 +182,7 @@ E.Initialize3D = function() {
   gameCanvas.parentElement.insertBefore(webglCanvas, gameCanvas);
 
   E.scene = new THREE.Scene();
-  E.scene.fog = new THREE.Fog(0x7ec8e3, 38, 70);
+  E.scene.fog = new THREE.Fog(0x7ec8e3, 58, 90);
   E.scene.background = new THREE.Color(0x7ec8e3);
 
   var aspect = window.innerWidth / window.innerHeight;
@@ -342,7 +342,7 @@ E.Update3DTerrain = function(pxX, pxY) {
   if (!E.scene) return;
   var tileX = Math.floor(pxX / TILE);
   var tileY = Math.floor(pxY / TILE);
-  if (Math.abs(tileX-E.lastChunkX) < 3 && Math.abs(tileY-E.lastChunkY) < 3) return;
+  if (Math.abs(tileX-E.lastChunkX) < 5 && Math.abs(tileY-E.lastChunkY) < 5) return;
   E.lastChunkX = tileX;
   E.lastChunkY = tileY;
 
