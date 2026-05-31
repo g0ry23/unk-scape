@@ -84,9 +84,9 @@ US.SaveSystem.prototype.data = function() {
   if (!p) return null;
   return {
     saveVersion: US.SAVE_VERSION,
-    worldId:     g.worldId   || 'world_001',
+    worldId:     g.worldId || (this._read(this.keys.active)||{}).worldId || 'world_001',
     worldName:   g.worldName || 'Unnamed Realm',
-    characterId: p.characterId || 'char_001',
+    characterId: p.characterId || (this._read(this.keys.active)||{}).characterId || 'char_001',
     characterName: p.characterName || 'Survivor',
     factionId: p.factionId,
     raceId:    p.raceId || 'human',
