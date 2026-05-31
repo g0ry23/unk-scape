@@ -21,7 +21,7 @@
         {
             id: 'region_spawn_stones',
             name: 'The Dawn Horizons',
-            bounds: { minX: 900, maxX: 1100, minY: 900, maxY: 1100 },
+            bounds: { minX: 225, maxX: 275, minY: 180, maxY: 220 },
             security: 'safezone',
             defaultBiome: 'temperate_grass',
             baseTileColor: '#27ae60'
@@ -29,7 +29,7 @@
         {
             id: 'region_north_crest',
             name: 'The Ironbound High-Plains',
-            bounds: { minX: 0, maxX: 2000, minY: 0, maxY: 900 },
+            bounds: { minX: 0, maxX: 500, minY: 0, maxY: 180 },
             security: 'contested',
             defaultBiome: 'boreal_highland',
             baseTileColor: '#4a5b6c'
@@ -37,7 +37,7 @@
         {
             id: 'region_south_vanguard',
             name: 'The Blood-Oath Badlands',
-            bounds: { minX: 0, maxX: 2000, minY: 1100, maxY: 2000 },
+            bounds: { minX: 0, maxX: 500, minY: 220, maxY: 400 },
             security: 'contested',
             defaultBiome: 'arid_steppe',
             baseTileColor: '#8a4f3e'
@@ -51,8 +51,8 @@
      * @returns {Object} Region configuration object
      */
     US.WorldRegions.getRegionByCoords = function(x, y) {
-        var boundedX = Math.max(0, Math.min(1999, x));
-        var boundedY = Math.max(0, Math.min(1999, y));
+        var boundedX = Math.max(0, Math.min(499, x));
+        var boundedY = Math.max(0, Math.min(399, y));
 
         for (var i = 0; i < REGION_MAP_CONFIG.length; i++) {
             var reg = REGION_MAP_CONFIG[i];
