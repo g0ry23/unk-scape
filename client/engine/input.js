@@ -355,6 +355,9 @@ US.Input.prototype.update = function(dt) {
 };
 
 US.Input.prototype._handleHotkey = function(e, k) {
+  // Skip all hotkeys when typing in an input or textarea
+  var tag = e && e.target && e.target.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return;
   var game = this.game;
   if (!game || !game.ui) return;
   var kb = game.settings && game.settings.keybinds;
