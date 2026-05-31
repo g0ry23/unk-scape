@@ -37,7 +37,7 @@ US.UI.prototype.renderMenu=function(){
   if(step==='faction')  return this._wizFaction(container);
   if(step==='race')     return this._wizRace(container);
   if(step==='class')    return this._wizClass(container, wiz);
-  if(step==='load')     return this._menuLoad();
+  if(step==='load')     return this.advanceWizardStep('landing');
 };
 
 // ── Wizard Step: Landing ──────────────────────────────────────────────────
@@ -231,7 +231,7 @@ US.UI.prototype._loadCharacter=function(worldId,characterId){
 US.UI.prototype._deleteChar=function(worldId,characterId){
   if(!confirm('Delete this character? Cannot be undone.'))return;
   this.game.systems.save?.deleteCharacter(worldId,characterId);
-  this._menuLoad();
+  this.advanceWizardStep('landing');
 };
 
 // ── Pause Menu ────────────────────────────────────────────────────────────
