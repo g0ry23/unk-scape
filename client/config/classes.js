@@ -29,7 +29,7 @@
       skills:{combat:80,survival:25,crafting:10},
       equipment:{weapon:'crude_sword',offhand:'wooden_shield',head:'bronze_helm'},
       perks:['thick_skin'],
-      start:{x:187,y:187}, zone:'Ironwake Hold'
+      start:{x:47,y:37}, zone:'Ironwake Hold'
     },
     range:{
       name:'Range', icon:'🏹', archetype:'range',
@@ -38,7 +38,7 @@
       skills:{combat:55,foraging:40,survival:25},
       equipment:{weapon:'training_bow',head:'leather_hood',body:'ranger_tunic'},
       perks:['keen_eye'],
-      start:{x:1013,y:200}, zone:'Thornfall Wilds'
+      start:{x:253,y:40}, zone:'Thornfall Wilds'
     },
     mage:{
       name:'Mage', icon:'🔮', archetype:'mage',
@@ -47,26 +47,26 @@
       skills:{combat:55,crafting:35,survival:20,foraging:20},
       equipment:{weapon:'oak_staff',head:'apprentice_hood',body:'apprentice_robe'},
       perks:['herbalist'],
-      start:{x:600,y:1027}, zone:'Moonspire Ruins'
+      start:{x:150,y:205}, zone:'Moonspire Ruins'
     },
-    wanderer:{name:'Wanderer', icon:'🧭',archetype:'hybrid',desc:'Balanced survivor with supplies and flexible growth.',items:{log:3,berry:4,torch:2,stone_hatchet:1,iron_pickaxe:1,coin:25},skills:{survival:30,foraging:20},equipment:{},perks:['light_footed'],start:{x:600,y:600},zone:'Central Crossroads'},
-    brawler:{name:'Brawler', icon:'🥊',archetype:'melee',desc:'Tougher start with a crude sword and salves.',items:{crude_sword:1,stone_hatchet:1,iron_pickaxe:1,health_salve:2,coin:10},skills:{combat:60,survival:15},equipment:{weapon:'crude_sword'},perks:['thick_skin'],start:{x:200,y:1000},zone:'Bloodoak Pits'},
-    gatherer:{name:'Gatherer', icon:'🌲',archetype:'range',desc:'Skilling-heavy start for crafting and resource progress.',items:{stone_hatchet:1,log:5,stone:5,berry:3,coin:15},skills:{woodcutting:45,mining:25,crafting:20},equipment:{tool:'stone_hatchet'},perks:['keen_eye'],start:{x:1000,y:1000},zone:'Greenroot Grove'},
-    prospector:{name:'Prospector', icon:'⛏️',archetype:'support',roleType:'skiller',desc:'Mining and money-focused start near ancient stone routes.',items:{stone:8,iron_ore:2,berry:2,stone_hatchet:1,iron_pickaxe:1,coin:35},skills:{mining:55,crafting:15},equipment:{},perks:['coin_sense'],start:{x:187,y:600},zone:'Stonehook Quarry'},
-    cleric:{name:'Cleric', icon:'✨', archetype:'healer', roleType:'healer',desc:'Healer/support starter built for group survival, buffs, salves, and holy staff play.',items:{oak_staff:1,apprentice_hood:1,apprentice_robe:1,stone_hatchet:1,iron_pickaxe:1,health_salve:3,herb:5,coin:25},skills:{combat:35,foraging:35,crafting:30,survival:25},equipment:{weapon:'oak_staff',head:'apprentice_hood',body:'apprentice_robe'},perks:['herbalist'],start:{x:1013,y:600}, zone:'Sanctum Shoals'},
-    warden:{name:'Warden', icon:'🌿', archetype:'support', roleType:'tank',desc:'Tank/support defender built to protect groups, claim turf, and hold boss pressure.',items:{wooden_shield:1,stone_hatchet:1,hide_armor:1,log:4,health_salve:2,coin:20},skills:{combat:45,woodcutting:35,survival:35,crafting:20},equipment:{offhand:'wooden_shield',body:'hide_armor',tool:'stone_hatchet'},perks:['thick_skin','lumberjack'],start:{x:600,y:187}, zone:'Verdant Bulwark'}
+    wanderer:{name:'Wanderer', icon:'🧭',archetype:'hybrid',desc:'Balanced survivor with supplies and flexible growth.',items:{log:3,berry:4,torch:2,stone_hatchet:1,iron_pickaxe:1,coin:25},skills:{survival:30,foraging:20},equipment:{},perks:['light_footed'],start:{x:150,y:120},zone:'Central Crossroads'},
+    brawler:{name:'Brawler', icon:'🥊',archetype:'melee',desc:'Tougher start with a crude sword and salves.',items:{crude_sword:1,stone_hatchet:1,iron_pickaxe:1,health_salve:2,coin:10},skills:{combat:60,survival:15},equipment:{weapon:'crude_sword'},perks:['thick_skin'],start:{x:50,y:200},zone:'Bloodoak Pits'},
+    gatherer:{name:'Gatherer', icon:'🌲',archetype:'range',desc:'Skilling-heavy start for crafting and resource progress.',items:{stone_hatchet:1,log:5,stone:5,berry:3,coin:15},skills:{woodcutting:45,mining:25,crafting:20},equipment:{tool:'stone_hatchet'},perks:['keen_eye'],start:{x:250,y:200},zone:'Greenroot Grove'},
+    prospector:{name:'Prospector', icon:'⛏️',archetype:'support',roleType:'skiller',desc:'Mining and money-focused start near ancient stone routes.',items:{stone:8,iron_ore:2,berry:2,stone_hatchet:1,iron_pickaxe:1,coin:35},skills:{mining:55,crafting:15},equipment:{},perks:['coin_sense'],start:{x:47,y:120},zone:'Stonehook Quarry'},
+    cleric:{name:'Cleric', icon:'✨', archetype:'healer', roleType:'healer',desc:'Healer/support starter built for group survival, buffs, salves, and holy staff play.',items:{oak_staff:1,apprentice_hood:1,apprentice_robe:1,stone_hatchet:1,iron_pickaxe:1,health_salve:3,herb:5,coin:25},skills:{combat:35,foraging:35,crafting:30,survival:25},equipment:{weapon:'oak_staff',head:'apprentice_hood',body:'apprentice_robe'},perks:['herbalist'],start:{x:253,y:120}, zone:'Sanctum Shoals'},
+    warden:{name:'Warden', icon:'🌿', archetype:'support', roleType:'tank',desc:'Tank/support defender built to protect groups, claim turf, and hold boss pressure.',items:{wooden_shield:1,stone_hatchet:1,hide_armor:1,log:4,health_salve:2,coin:20},skills:{combat:45,woodcutting:35,survival:35,crafting:20},equipment:{offhand:'wooden_shield',body:'hide_armor',tool:'stone_hatchet'},perks:['thick_skin','lumberjack'],start:{x:150,y:37}, zone:'Verdant Bulwark'}
   };
 
   US.STARTER_ZONES = {
-    melee:{name:'Ironwake Hold',icon:'⚔️',x:280,y:280,r:226,biome:'stone',road:'stonepath',accent:'plaza',resourceBias:['rock','copper','iron'],desc:'Huge layered martial highlands with fortified ridges, quarry shelves, and sword-and-shield training roads.'},
-    range:{name:'Thornfall Wilds',icon:'🏹',x:1453,y:293,r:253,biome:'darkgrass',road:'path',accent:'farmland',resourceBias:['tree','pine','berry','herb'],desc:'Large hunting forest with long sightlines, scout paths, raised tree lines, and ranged skirmish lanes.'},
-    mage:{name:'Moonspire Ruins',icon:'🔮',x:867,y:1467,r:240,biome:'stone',road:'stonepath',accent:'plaza',resourceBias:['silver','gem','herb'],desc:'Massive ruin basin with stepped stone platforms, gem pockets, ritual roads, and enchantment materials.'},
-    wanderer:{name:'Central Crossroads',icon:'🧭',x:1000,y:1000,r:187,biome:'grass',road:'stonepath',accent:'plaza',resourceBias:['tree','berry','fish'],desc:'Neutral central hub where all roads eventually meet and future trading, banking, and world travel expands.'},
-    brawler:{name:'Bloodoak Pits',icon:'🥊',x:287,y:1453,r:226,biome:'dirt',road:'path',accent:'plaza',resourceBias:['rock','tree','hide'],desc:'Expanded southern fight camp with rough arena pits, red dirt layers, and bruiser training territory.'},
-    gatherer:{name:'Greenroot Grove',icon:'🌲',x:1447,y:1447,r:267,biome:'grass',road:'path',accent:'farmland',resourceBias:['tree','pine','yew','berry'],desc:'Resource-rich woodland province for skilling, crafting, building, and deep resource progression.'},
-    prospector:{name:'Stonehook Quarry',icon:'⛏️',x:253,y:867,r:246,biome:'stone',road:'stonepath',accent:'dirt',resourceBias:['rock','copper','iron','gold'],desc:'Wide mining corridor with terraced ore shelves, stone roads, rare mineral pockets, and economy routes.'},
-    cleric:{name:'Sanctum Shoals',icon:'✨',x:1480,y:867,r:233,biome:'sand',road:'stonepath',accent:'plaza',resourceBias:['herb','fish','silver'],desc:'Sacred shoreline region with healing gardens, tide roads, herb pockets, and support-class safe routes.'},
-    warden:{name:'Verdant Bulwark',icon:'🌿',x:867,y:253,r:240,biome:'darkgrass',road:'path',accent:'fence',resourceBias:['tree','herb','rock'],desc:'Northern defensive forest wall with layered watch paths, tank/support claim zones, and guardian resources.'}
+    melee:{name:'Ironwake Hold',icon:'⚔️',x:70,y:56,r:57,biome:'stone',road:'stonepath',accent:'plaza',resourceBias:['rock','copper','iron'],desc:'Huge layered martial highlands with fortified ridges, quarry shelves, and sword-and-shield training roads.'},
+    range:{name:'Thornfall Wilds',icon:'🏹',x:363,y:59,r:63,biome:'darkgrass',road:'path',accent:'farmland',resourceBias:['tree','pine','berry','herb'],desc:'Large hunting forest with long sightlines, scout paths, raised tree lines, and ranged skirmish lanes.'},
+    mage:{name:'Moonspire Ruins',icon:'🔮',x:217,y:293,r:60,biome:'stone',road:'stonepath',accent:'plaza',resourceBias:['silver','gem','herb'],desc:'Massive ruin basin with stepped stone platforms, gem pockets, ritual roads, and enchantment materials.'},
+    wanderer:{name:'Central Crossroads',icon:'🧭',x:250,y:200,r:47,biome:'grass',road:'stonepath',accent:'plaza',resourceBias:['tree','berry','fish'],desc:'Neutral central hub where all roads eventually meet and future trading, banking, and world travel expands.'},
+    brawler:{name:'Bloodoak Pits',icon:'🥊',x:72,y:291,r:57,biome:'dirt',road:'path',accent:'plaza',resourceBias:['rock','tree','hide'],desc:'Expanded southern fight camp with rough arena pits, red dirt layers, and bruiser training territory.'},
+    gatherer:{name:'Greenroot Grove',icon:'🌲',x:362,y:289,r:67,biome:'grass',road:'path',accent:'farmland',resourceBias:['tree','pine','yew','berry'],desc:'Resource-rich woodland province for skilling, crafting, building, and deep resource progression.'},
+    prospector:{name:'Stonehook Quarry',icon:'⛏️',x:63,y:173,r:62,biome:'stone',road:'stonepath',accent:'dirt',resourceBias:['rock','copper','iron','gold'],desc:'Wide mining corridor with terraced ore shelves, stone roads, rare mineral pockets, and economy routes.'},
+    cleric:{name:'Sanctum Shoals',icon:'✨',x:370,y:173,r:58,biome:'sand',road:'stonepath',accent:'plaza',resourceBias:['herb','fish','silver'],desc:'Sacred shoreline region with healing gardens, tide roads, herb pockets, and support-class safe routes.'},
+    warden:{name:'Verdant Bulwark',icon:'🌿',x:217,y:51,r:60,biome:'darkgrass',road:'path',accent:'fence',resourceBias:['tree','herb','rock'],desc:'Northern defensive forest wall with layered watch paths, tank/support claim zones, and guardian resources.'}
   };
   US.getStarterZone = id => US.STARTER_ZONES[id] || US.STARTER_ZONES.wanderer;
 
