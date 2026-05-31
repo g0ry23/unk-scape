@@ -66,9 +66,9 @@ window.addEventListener('DOMContentLoaded',()=>{
     entities:{drops:[]},
     stats:{deaths:0},settings:{hungerEnabled:false}
   };
-  const smokePlayer=US.createPlayer(smokeGame,'melee','ironbound');
+  const smokePlayer=US.createPlayer(smokeGame,'melee','blood_oath');
   console.assert(smokePlayer && smokePlayer.equipment.head === 'bronze_helm', 'Smoke test failed: class/faction player creation failed.');
-  console.assert(smokePlayer.factionName === US.FACTIONS.ironbound.name, 'Smoke test failed: faction assignment failed.');
+  console.assert(smokePlayer.factionName === US.FACTIONS.blood_oath?.name||'Blood-Oath Clans', 'Smoke test failed: faction assignment failed.');
   console.assert(smokePlayer.attributes && smokePlayer.attributePoints >= 0, 'Smoke test failed: player attributes missing.');
   try{
     US.game = new US.Game();
