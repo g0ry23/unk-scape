@@ -26,6 +26,7 @@ function logClick(screenX, screenY, hitInfo, result) {
   console.log(msg);
   var D2 = window.UnkScape;
 // logClick: console-only; ui.log removed to keep activity log clean
+}
   
 function feedback(msg, type) {
   var D2 = window.UnkScape;
