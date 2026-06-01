@@ -573,3 +573,132 @@ body:has(#unk-hud) #unkscape-right-tabs { display: none !important; visibility: 
 
 /* Force overflow:hidden on all spec HUD children except inputs */
 #unk-hud *:not(.hsr-input):not(input):not(textarea) { overflow: hidden !important; }
+
+
+/* ================================================================
+HUD SPEC v4 PATCH — Merged equip tab: paper-doll slot grid
+Two-column equip pane: left=text readout, right=paper-doll
+Uses HUD skin (h-frame bg, brass slot rings). No emoji, no scroll.
+================================================================ */
+
+/* Merged equip pane wrapper */
+.hi-equip-merged {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Left col: text readout */
+.hi-equip-text {
+  flex: 0 0 90px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.hi-equip-text .hi-equip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  flex: 1;
+}
+.hi-equip-text .hi-eq-row {
+  padding: 3px 4px;
+  font-size: 8px;
+}
+.hi-equip-text .hi-eq-slot {
+  width: 28px;
+  font-size: 8px;
+}
+
+/* Right col: paper-doll */
+.hi-equip-doll {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+  padding: 2px;
+}
+
+/* Paper-doll 3-col grid, 5 rows */
+.hed-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+.hed-row {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Individual paper-doll slot — uses HUD skin (iron frame + brass ring) */
+.hed-slot {
+  width: 32px;
+  height: 32px;
+  background: var(--h-slot-bg);
+  border: 1px solid var(--h-slot-border);
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  box-shadow: inset 0 0 0 1px rgba(120,90,55,0.18);
+}
+/* Brass ring inset — matches the h-frame rivet skin */
+.hed-slot::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 2px;
+  border: 1px solid rgba(120,90,55,0.30);
+  pointer-events: none;
+}
+.hed-slot:hover { border-color: var(--h-border-hi); }
+.hed-slot.hed-has-item {
+  border-color: var(--h-border-hi);
+  background: var(--h-slot-sel);
+  box-shadow: inset 0 0 0 1px rgba(212,168,75,0.22), 0 0 6px var(--h-gold-glow);
+}
+.hed-slot.hed-empty {
+  opacity: 0.0;
+  pointer-events: none;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+.hed-slot.hed-empty::after { display: none; }
+
+/* Slot label (abbreviation shown when empty) */
+.hed-lbl {
+  font: bold 7px var(--h-font);
+  color: var(--h-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+  user-select: none;
+}
+/* Item icon/name shown when slot is filled */
+.hed-val {
+  font-size: 11px;
+  line-height: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  color: var(--h-text);
+  overflow: hidden;
+}
+.hed-slot.hed-has-item .hed-lbl { display: none; }
+.hed-slot:not(.hed-has-item) .hed-val { display: none; }
