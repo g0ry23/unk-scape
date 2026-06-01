@@ -21,7 +21,7 @@ const US = D;
     showStatsWindow: false,  // false by default: toggled open by keybind/button
     factionColors: {
       blood_oath: '#c0392b',  // Crimson Red
-      iron_crown: '#2980b9'   // Cobalt Blue
+      highborn: '#2980b9'   // Cobalt Blue
     }
   };
 
@@ -68,8 +68,8 @@ const US = D;
 
     const factionKey   = player.factionId || player.faction || '';
     const factionColor = (US.UIState.factionColors && US.UIState.factionColors[factionKey]) || '#bdc3c7';
-    const factionLabel = factionKey === 'blood_oath' ? 'Blood-Oath Clans'
-                       : factionKey === 'iron_crown'  ? 'Iron-Crown Accord'
+    const factionLabel = factionKey === 'blood_oath' ? 'Blood Oath'
+                       : factionKey === 'highborn'    ? 'Highborn'
                        : (player.factionName || 'Wanderer');
     ctx.fillStyle = factionColor;
     ctx.font      = '11px monospace';
