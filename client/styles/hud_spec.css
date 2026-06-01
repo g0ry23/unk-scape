@@ -162,7 +162,7 @@
 .hv-bar-fill.hung { background: linear-gradient(90deg, #5a6820, #8db030); }
 .hv-bar-fill.thrs { background: linear-gradient(90deg, #1a4a6a, var(--h-blue)); }
 .hv-bar-val {
-  width: 32px;
+  width: 46px;
   text-align: left;
   font-size: 9px;
   color: var(--h-text);
