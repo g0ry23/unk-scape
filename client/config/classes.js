@@ -1,25 +1,25 @@
 (function(){
   const US = window.UnkScape = window.UnkScape || {};
-  // ── Canon Factions: blood_oath + iron_crown (defined in factions.js) ──────────
+  // ── Canon Factions: blood_oath + highborn (defined in factions.js) ──────────
   // Old sub-factions removed. All classes now map to two canon faction IDs.
   // Save migration: old factionId → canon factionId (applied in save.js)
   US.FACTION_MIGRATION = {
     ironbound: 'blood_oath', bloodoak: 'blood_oath', thornwatch: 'blood_oath',
-    ashveil: 'blood_oath', embercourt: 'iron_crown', moonveil: 'iron_crown'
+    ashveil: 'blood_oath', embercourt: 'highborn', moonveil: 'highborn'
   };
-  // US.FACTIONS.blood_oath and .iron_crown are set by factions.js
+  // US.FACTIONS.blood_oath and .highborn are set by factions.js
   US.CLASS_FACTIONS = {
-  melee:['blood_oath','iron_crown'],
-  range:['blood_oath','iron_crown'],
-  mage:['iron_crown','blood_oath'],
-  wanderer:['blood_oath','iron_crown'],
-  brawler:['blood_oath','iron_crown'],
-  gatherer:['blood_oath','iron_crown'],
-  prospector:['iron_crown','blood_oath'],
-  cleric:['iron_crown','blood_oath'],
-  warden:['blood_oath','iron_crown']
+  melee:['blood_oath','highborn'],
+  range:['blood_oath','highborn'],
+  mage:['highborn','blood_oath'],
+  wanderer:['blood_oath','highborn'],
+  brawler:['blood_oath','highborn'],
+  gatherer:['blood_oath','highborn'],
+  prospector:['highborn','blood_oath'],
+  cleric:['highborn','blood_oath'],
+  warden:['blood_oath','highborn']
   };
-  US.getClassFactions = id => US.CLASS_FACTIONS[id] || ['blood_oath','iron_crown'];
+  US.getClassFactions = id => US.CLASS_FACTIONS[id] || ['blood_oath','highborn'];
 
   US.CLASSES = {
     melee:{
