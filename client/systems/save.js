@@ -1,14 +1,14 @@
 (function(){
 const US = window.UnkScape = window.UnkScape || {};
 
-// === SAVE SYSTEM v3 — UnkScape canonical namespace, _migrateInventory fixed ===
+// === SAVE SYSTEM v5 — canon factions: blood_oath + highborn (iron_crown retired) ===
 // Storage keys are namespaced to avoid collisions
 // unkscape:worlds → { worldId: { id, name, created } }
 // unkscape:saves  → [ { worldId, characterId, ... } ]
 // unkscape:active → { worldId, characterId } (last played)
 // Legacy key 'unkscape.save.v1' is migrated on first load
 
-US.SAVE_VERSION = '0.4.0';
+US.SAVE_VERSION = '0.5.0';
 
 US.SaveSystem = function(game) {
   this.game = game;
@@ -153,13 +153,14 @@ US.SaveSystem.prototype.autosave = function() {
 
 // ── load ──────────────────────────────────────────────
 
-// ── faction migration: old sub-faction IDs → canon faction IDs ────────────
+// ── faction migration: old sub-faction IDs + iron_crown → canon faction IDs ──
 US.SaveSystem.prototype._migrateFaction = function(saveData) {
   if (!saveData) return saveData;
   var MAP = window.UnkScape && window.UnkScape.FACTION_MIGRATION;
   if (!MAP) MAP = {
     ironbound:'blood_oath', bloodoak:'blood_oath', thornwatch:'blood_oath',
-    ashveil:'blood_oath', embercourt:'iron_crown', moonveil:'iron_crown'
+    ashveil:'blood_oath', embercourt:'highborn', moonveil:'highborn'
+iron_crown:'highborn'
   };
   // Migrate top-level factionId
   if (saveData.factionId && MAP[saveData.factionId]) {
