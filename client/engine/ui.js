@@ -90,8 +90,8 @@ U.TabUI = {
       const name = def.name || key;
 
       return '<div style="'
-        + 'background:#16111f;'
-        + 'padding:5px 6px;'
+        + 'background:#16111f;overflow:hidden;min-width:0;'
+        + 'padding:3px 4px;'
         + 'border:1px solid #2e2440;'
         + 'border-radius:4px;'
         + 'display:flex; flex-direction:column; gap:2px;'
@@ -113,7 +113,7 @@ U.TabUI = {
       + '<span style="color:#f1c40f; font-weight:bold; font-size:12px; letter-spacing:1px;">SURVIVAL ATTRIBUTES</span>'
       + '<span style="float:right;">Total Level: <strong style="color:#f1c40f;">' + total + '</strong></span>'
       + '</div>'
-      + '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px;">'
+      + '<div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:3px; overflow:hidden;">'
       + cards
       + '</div>';
   },
