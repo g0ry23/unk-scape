@@ -550,3 +550,26 @@ body:has(#unk-hud) #log        { display: none !important; }
 
 /* Keep legacy elements accessible for engine writes but invisible */
 #hud, #hotbar, #combat-ui, #log { pointer-events: none; }
+
+
+/* ================================================================
+HUD SPEC v3 PATCH — Scroll-kill + legacy right-tabs hard suppress
+================================================================ */
+
+/* Hard-suppress #unkscape-right-tabs — JS sets inline flex, need !important */
+body:has(#unk-hud) #unkscape-right-tabs { display: none !important; visibility: hidden !important; }
+#unkscape-right-tabs { display: none !important; visibility: hidden !important; }
+
+/* Kill scrollbars on banner title, action icons, and all spec elements */
+.hb-title { overflow: hidden !important; }
+.ha-ico { overflow: hidden !important; display: block !important; }
+.ha-slot { overflow: hidden !important; }
+.hi-slot { overflow: hidden !important; }
+.hi-skill-cell { overflow: hidden !important; }
+
+/* Nuclear no-scroll: every element inside #unk-hud gets scrollbar:none */
+#unk-hud * { scrollbar-width: none !important; }
+#unk-hud *::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+
+/* Force overflow:hidden on all spec HUD children except inputs */
+#unk-hud *:not(.hsr-input):not(input):not(textarea) { overflow: hidden !important; }
