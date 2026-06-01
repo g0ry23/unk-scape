@@ -3,7 +3,7 @@
 <html lang="en">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UNKSCAPE — Survival RPG</title>
-<link rel="stylesheet" href="client/styles/main.css">
+<link rel="stylesheet" href="client/styles/main.css?v=2">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="client/render/textures.js?v=1"></script>
@@ -30,13 +30,13 @@
 </div>
 
 <!-- Right panel: Skills / Quests / G.E. tabs (populated by UnkScape.UI) -->
-<div id="unkscape-right-tabs" style="position: absolute; right: 20px; top: 20px; width: 330px; background: rgba(22, 18, 30, 0.95); border: 2px solid #47385a; border-radius: 5px; pointer-events: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.8); color: #e2e8f0; display: flex; flex-direction: column;">
+<div id="unkscape-right-tabs" style="position: absolute; right: 20px; top: 20px; width: 240px; background: rgba(22, 18, 30, 0.95); border: 2px solid #47385a; border-radius: 5px; pointer-events: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.8); color: #e2e8f0; display: flex; flex-direction: column;">
 <div style="display: flex; background: #120e1a; border-bottom: 2px solid #47385a; height: 42px;">
 <button onclick="UnkScape.TabUI.switchTab('skills')" style="flex: 1; background: none; border: none; color: #f1c40f; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 12px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">SKILLS</button>
 <button onclick="UnkScape.TabUI.switchTab('quests')" style="flex: 1; background: none; border: none; color: #f1c40f; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 12px; border-left: 1px solid #47385a; border-right: 1px solid #47385a; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">QUESTS</button>
 <button onclick="UnkScape.TabUI.switchTab('ge')" style="flex: 1; background: none; border: none; color: #f1c40f; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 12px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">G.E.</button>
 </div>
-<div id="tab-content-viewport" style="padding: 18px; height: auto; min-height: 340px; max-height: 480px; overflow-y: auto; font-size: 13px; line-height: 1.4; background-image: radial-gradient(circle at top, rgba(88, 66, 119, 0.1) 0%, rgba(0,0,0,0) 80%);"></div>
+<div id="tab-content-viewport" style="padding: 12px; height: auto; min-height: 220px; max-height: 360px; overflow-y: auto; font-size: 11px; line-height: 1.4; background-image: radial-gradient(circle at top, rgba(88, 66, 119, 0.1) 0%, rgba(0,0,0,0) 80%);"></div>
 </div>
 
 <!-- Chat / event log -->
@@ -88,7 +88,7 @@
 <script src="client/engine/render.js?v=3"></script>
 <script src="client/engine/world.js?v=3"></script>
 <script src="client/engine/environment.js"></script>
-<script src="client/engine/ui_overlay.js?v=2"></script>
+<script src="client/engine/ui_overlay.js?v=3"></script>
 <script src="client/engine/ui.js?v=2"></script>
 <script src="client/engine/game.js?v=10"></script>
 
