@@ -159,8 +159,7 @@ US.SaveSystem.prototype._migrateFaction = function(saveData) {
   var MAP = window.UnkScape && window.UnkScape.FACTION_MIGRATION;
   if (!MAP) MAP = {
     ironbound:'blood_oath', bloodoak:'blood_oath', thornwatch:'blood_oath',
-    ashveil:'blood_oath', embercourt:'highborn', moonveil:'highborn'
-iron_crown:'highborn'
+    ashveil:'blood_oath', embercourt:'highborn', moonveil:'highborn', iron_crown:'highborn'
   };
   // Migrate top-level factionId
   if (saveData.factionId && MAP[saveData.factionId]) {
