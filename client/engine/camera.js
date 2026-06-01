@@ -40,7 +40,7 @@
   US.Camera.prototype.setOverhead = function() { var E = window.UnkScape3D; if (E) { E.cameraOrbitPhi = 1.4; } };
   US.Camera.prototype.toggleMode = function() {};
   US.Camera.prototype.rotate = function(delta) { var E = window.UnkScape3D; if (E && E.active) { E.cameraOrbitAngle = (E.cameraOrbitAngle || 0) + (delta || 0); } };
-  US.Camera.prototype.setZoom = function(delta) { var E = window.UnkScape3D; if (E && E.active) { E.cameraZoomOffset = Math.max(8, Math.min(80, (E.cameraZoomOffset || 24) + (delta > 0 ? 2 : -2))); } };
+  US.Camera.prototype.setZoom = function(delta) { var E = window.UnkScape3D; if (E && E.active) { E.cameraZoomOffset = Math.max(8, Math.min(120, (E.cameraZoomOffset || 24) + (delta > 0 ? 2 : -2))); } };
   US.Camera.prototype.bump = function() {};
   US.Camera.prototype.clamp = function() {};
   US.Camera.prototype.modeLabel = function() { return 'UNK-SCAPE 3D'; };
