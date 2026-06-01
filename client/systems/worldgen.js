@@ -219,7 +219,7 @@ for(let x=0;x<w;x++) if(inBounds(x,cy,w,h)&&tiles[cy][x]!=='water') tiles[cy][x]
 for(let y=0;y<h;y++) if(inBounds(cx,y,w,h)&&tiles[y][cx]!=='water') tiles[y][cx]='stonepath';
 for(let x=cx-14;x<=cx+14;x++){if(inBounds(x,cy-12,w,h))tiles[cy-12][x]='fence';if(inBounds(x,cy+12,w,h))tiles[cy+12][x]='fence';}
 for(let y=cy-12;y<=cy+12;y++){if(inBounds(cx-14,y,w,h))tiles[y][cx-14]='fence';if(inBounds(cx+14,y,w,h))tiles[y][cx+14]='fence';}
-tiles[cy][cx-14]='stonepath';tiles[cy][cx+14]='stonepath';tiles[cy-12][cx]='stonepath';tiles[cy+12][cx]='stonepath';
+tiles[cy-1][cx-14]='stonepath';tiles[cy][cx-14]='stonepath';tiles[cy+1][cx-14]='stonepath';tiles[cy-1][cx+14]='stonepath';tiles[cy][cx+14]='stonepath';tiles[cy+1][cx+14]='stonepath';tiles[cy-12][cx-1]='stonepath';tiles[cy-12][cx]='stonepath';tiles[cy-12][cx+1]='stonepath';tiles[cy+12][cx-1]='stonepath';tiles[cy+12][cx]='stonepath';tiles[cy+12][cx+1]='stonepath';
 rect(tiles,cx-10,cy-8,5,4,'woodfloor');rect(tiles,cx-10,cy-9,5,1,'roof');
 rect(tiles,cx+6,cy-8,5,4,'woodfloor');rect(tiles,cx+6,cy-9,5,1,'roof');
 rect(tiles,cx-10,cy+5,5,4,'woodfloor');rect(tiles,cx-10,cy+4,5,1,'roof');
