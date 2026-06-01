@@ -16,7 +16,7 @@ const faction=US.FACTIONS[chosenFaction]||US.FACTIONS.ironbound;
 const start=cls.start||{x:US.WORLD.w/2,y:US.WORLD.h/2};
 const p={
 uid:'player',kind:'player',classId,factionId:chosenFaction,factionName:faction.name,zoneName:cls.zone||'Central Crossroads',role:US.CLASS_ROLES[classId]||'Hybrid',roleType:cls.roleType||cls.archetype||'hybrid',characterXp:0,characterLevel:1,attributePoints:3,attributes:US.defaultAttributes(cls.roleType||cls.archetype||'hybrid'),x:start.x*US.TILE+US.TILE/2,y:start.y*US.TILE+US.TILE/2,r:16,vx:0,vy:0,dir:{x:1,y:0},
-hp:100,maxHp:100,hunger:100,maxHunger:100,dead:false,attackCooldown:0,attackAnim:0,attackAnimMax:.2,attackAngle:0,facingAngle:0,walkTime:0,interactCooldown:0,blocking:false,heavyCharging:false,heavyCharge:0,gathering:false,
+hp:100,maxHp:100,stamina:100,maxStamina:100,hunger:100,maxHunger:100,dead:false,attackCooldown:0,attackAnim:0,attackAnimMax:.2,attackAngle:0,facingAngle:0,walkTime:0,interactCooldown:0,blocking:false,heavyCharging:false,heavyCharge:0,gathering:false,
 // Phase 2: smooth velocity accum
 _tvx:0,_tvy:0,
 equipment:{head:null,weapon:null,offhand:null,body:null,tool:null}, skills:{}, perks:[], mods:{},
