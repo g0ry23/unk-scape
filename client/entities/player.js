@@ -1,5 +1,13 @@
 (function(){
 const US = window.UnkScape = window.UnkScape || {};
+// -- UnkScape.config: ONE place for tunable constants
+US.config = US.config || {};
+if(US.config.moveSpeed === undefined) US.config.moveSpeed = 200;
+if(US.config.sprintMult === undefined) US.config.sprintMult = 1.55;
+if(US.config.staminaRegen === undefined) US.config.staminaRegen = 12;
+if(US.config.sprintDrain === undefined) US.config.sprintDrain = 22;
+if(US.config.devFastTravel === undefined) US.config.devFastTravel = true;
+// ------------------------------------------------
 US.createPlayer=function(game,classId,factionId=null){
 const cls=US.CLASSES[classId]||US.CLASSES.wanderer;
 const allowedFactions=US.getClassFactions(classId);
@@ -22,9 +30,18 @@ const axis=game.input.axis();
 const stats=this.stats();
 let sp=stats.moveSpeed;
 const moving=axis.x!==0||axis.y!==0;
-const isSprinting=game.input.keys['shift']&&moving&&this.stamina>5;
-if(isSprinting){sp*=1.55;this.stamina=Math.max(0,this.stamina-dt*22);}
-else{this.stamina=Math.min(this.maxStamina,this.stamina+dt*12);}
+const cfg=US.config||{};
+const fastTravel=cfg.devFastTravel!==false;
+const isSprinting=!fastTravel&&game.input.keys['shift']&&moving&&this.stamina>5;
+if(fastTravel){
+sp=(cfg.moveSpeed||200);
+this.stamina=Math.min(this.maxStamina,this.stamina+(dt*(cfg.staminaRegen||12)));
+}else if(isSprinting){
+sp*=(cfg.sprintMult||1.55);
+this.stamina=Math.max(0,this.stamina-dt*(cfg.sprintDrain||22));
+}else{
+this.stamina=Math.min(this.maxStamina,this.stamina+dt*(cfg.staminaRegen||12));
+}
 if(this.blocking)sp*=.58;
 if(this.heavyCharging)sp*=.72;
 const tile=US.tileAt(game.world,this.x,this.y);if(tile)sp*=US.TILES[tile].speed||1;
@@ -67,7 +84,7 @@ stats(){
 const s=US.getEquipmentStats(this);
 s.defense += this.mods.defense||0;
 // Phase 2: ensure base moveSpeed is appropriate for large world (200 px/s feels right)
-if(s.moveSpeed<180)s.moveSpeed=200;
+if(s.moveSpeed<(US.config&&US.config.moveSpeed||180))s.moveSpeed=(US.config&&US.config.moveSpeed)||200;
 s.moveSpeed *= 1+(this.mods.moveSpeed||0);
 s.accuracy += this.mods.accuracy||0;
 s.attack += Math.floor((US.levelForXp(this.skills.combat?.xp||0)-1)/2);
