@@ -4,6 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UNKSCAPE — Survival RPG</title>
 <link rel="stylesheet" href="client/styles/main.css?v=5">
+<link rel="stylesheet" href="client/styles/hud_spec.css?v=1">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="client/render/textures.js?v=1"></script>
@@ -23,14 +24,14 @@
 <!-- UnkScape HUD overlay — pointer-events none by default, re-enabled per child -->
 <div id="unkscape-hud-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;">
 
-<!-- Title banner -->
-<div style="position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: rgba(18, 14, 26, 0.9); border: 2px solid #cbd5e1; padding: 6px 24px; color: #ffffff; text-align: center; border-radius: 4px; pointer-events: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.6);">
+<!-- Title banner (hidden by hud_spec) -->
+<div style="display:none;position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: rgba(18, 14, 26, 0.9); border: 2px solid #cbd5e1; padding: 6px 24px; color: #ffffff; text-align: center; border-radius: 4px; pointer-events: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.6);">
 <h1 style="margin: 0; font-size: 18px; color: #f1c40f; letter-spacing: 3px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">UNKSCAPE</h1>
 <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">UNKSCAPE Sandbox MMORPG</div>
 </div>
 
 <!-- Right panel: Skills / Quests / G.E. tabs (populated by UnkScape.UI) -->
-<div id="unkscape-right-tabs" style="position: absolute; right: 20px; top: 20px; width: 240px; background: rgba(22, 18, 30, 0.95); border: 2px solid #47385a; border-radius: 5px; pointer-events: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.8); color: #e2e8f0; display: flex; flex-direction: column;">
+<div id="unkscape-right-tabs" style="display:none;position: absolute; right: 20px; top: 20px; width: 240px; background: rgba(22, 18, 30, 0.95); border: 2px solid #47385a; border-radius: 5px; pointer-events: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.8); color: #e2e8f0; display: flex; flex-direction: column;">
 <div style="display: flex; background: #120e1a; border-bottom: 2px solid #47385a; height: 32px;">
 <button onclick="UnkScape.TabUI.switchTab('skills')" style="flex: 1; background: none; border: none; color: #f1c40f; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 10px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">SKILLS</button>
 <button onclick="UnkScape.TabUI.switchTab('quests')" style="flex: 1; background: none; border: none; color: #f1c40f; font-weight: bold; font-family: inherit; cursor: pointer; font-size: 12px; border-left: 1px solid #47385a; border-right: 1px solid #47385a; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'">QUESTS</button>
@@ -45,7 +46,7 @@
 
 <!-- Legacy DOM hooks required by the UnkScape game engine -->
 <div id="ui-root"></div>
-<div id="hud"></div>
+<div id="hud" style="display:none!important"></div>
 <div id="panel"></div>
 <div id="dialog"></div>
 <div id="menu" class="hidden"></div>
@@ -53,8 +54,8 @@
 <div id="action-hint"></div>
 <div id="log"></div>
 <canvas id="minimap" width="164" height="164" style="display:none"></canvas>
-<div id="hotbar"></div>
-<div id="combat-ui"></div>
+<div id="hotbar" style="display:none!important"></div>
+<div id="combat-ui" style="display:none!important"></div>
 <div id="float-texts"></div>
 
 </div><!-- /unkscape-game-container -->
@@ -145,6 +146,7 @@
 <!-- ============================================================ -->
 <!-- BOOT                                                         -->
 <!-- ============================================================ -->
+<script src="client/ui/hud_spec.js?v=1"></script>
 <script src="client/main.js?v=3"></script>
 
 </body>
