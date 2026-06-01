@@ -432,36 +432,44 @@ US.GatheringSystem.prototype._resolveSwing = function() {
     return;
   }
 
-  // ── Final swing — loot roll ────────────────────────────────────────
-  node.hitProgress = 0;
-  var lvl  = US.levelForXp(p.skills[sk] ? p.skills[sk].xp || 0 : 0);
-  var tool = p.stats ? (p.stats()[sk] || 0) : 0;
-  var ok   = US.rollSkillSuccess(lvl + tool, cfg.difficulty);
+  // ── Final swing — loot roll (harvest yield system v6) ────────────────────────
+node.hitProgress = 0;
+var lvl = US.levelForXp(p.skills[sk] ? p.skills[sk].xp || 0 : 0);
+var tool = p.stats ? (p.stats()[sk] || 0) : 0;
+var ok = US.rollSkillSuccess(lvl + tool, cfg.difficulty);
 
-  if (!ok) {
-    g.ui.floatText(p.x, p.y - 40, 'Failed', '#9aa8c7');
-    if (g.systems.skills) g.systems.skills.addXp(sk, Math.max(1, Math.floor(cfg.xp * 0.12)));
-    this.swingTimer = 0;
-    return;
-  }
+if (!ok) {
+g.ui.floatText(node.x, node.y - 30, 'Failed', '#9aa8c7');
+if (g.systems.skills) g.systems.skills.addXp(sk, Math.max(1, Math.floor(cfg.xp * 0.12)));
+this.swingTimer = 0;
+return;
+}
 
-  var extraChance = 0.10 + ((p.mods && p.mods.extraGather) || 0);
-  var qty = 1 + (Math.random() < extraChance ? 1 : 0);
-  qty = Math.min(qty, node.amount);
+// Harvest yield system: baseYield from nodeTier, luckyChance from skillLevel
+var nodeTier = cfg.tier || 1;
+var luckyChance = Math.min(0.05 + lvl * 0.005, 0.30);
+var isLucky = Math.random() < luckyChance;
+var baseYield = nodeTier;
+var extraChance = 0.10 + ((p.mods && p.mods.extraGather) || 0);
+var qty = baseYield + (isLucky ? 1 : 0) + (Math.random() < extraChance ? 1 : 0);
+qty = Math.min(qty, node.amount);
 
-  var item = (cfg.altItem && Math.random() < (cfg.altChance || 0)) ? cfg.altItem : cfg.item;
-  node.amount -= qty;
+var item = (cfg.altItem && Math.random() < (cfg.altChance || 0)) ? cfg.altItem : cfg.item;
+node.amount -= qty;
 
-  g.systems.inventory.add(item, qty);
+g.systems.inventory.add(item, qty);
 
-  var itemName = (US.ITEMS && US.ITEMS[item]) ? US.ITEMS[item].name : item.replace(/_/g, ' ');
-  g.ui.floatText(p.x, p.y - 44, '+' + qty + ' ' + itemName, '#38d978');
+var itemName = (US.ITEMS && US.ITEMS[item]) ? US.ITEMS[item].name : item.replace(/_/g, ' ');
+var luckLabel = isLucky ? ' [Lucky!]' : '';
+g.ui.floatText(p.x, p.y - 44, '+' + qty + ' ' + itemName + luckLabel, isLucky ? '#f1c40f' : '#38d978');
 
-  var xpGained = cfg.xp * qty;
-  if (g.systems.skills) g.systems.skills.addXp(sk, xpGained);
-  if (g.systems.audio)  g.systems.audio.play(sk === 'mining' ? 'mine' : 'chop');
-  if (g.systems.quests) g.systems.quests.notify('gather', item, qty);
-  g.stats.resourcesGathered = (g.stats.resourcesGathered || 0) + qty;
+// Lucky roll: 2x xp for this harvest
+var xpGained = cfg.xp * qty * (isLucky ? 2 : 1);
+if (isLucky) g.ui.floatText(p.x, p.y - 64, '2x XP!', '#f1c40f');
+if (g.systems.skills) g.systems.skills.addXp(sk, xpGained);
+if (g.systems.audio) g.systems.audio.play(sk === 'mining' ? 'mine' : 'chop');
+if (g.systems.quests) g.systems.quests.notify('gather', item, qty);
+g.stats.resourcesGathered = (g.stats.resourcesGathered || 0) + qty;
 
   if (node.amount <= 0) {
     node.cooldown    = cfg.respawn || 30;
