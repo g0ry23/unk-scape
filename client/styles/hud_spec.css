@@ -534,3 +534,19 @@
 
 /* ── Absolute no-scroll guarantee ── */
 #unk-hud * { box-sizing: border-box; overflow-x: hidden; }
+
+
+/* ================================================================
+   HUD SPEC v1 ADDITIONS — Legacy element suppression
+   Hide old HUD, hotbar, combat-ui once spec HUD is active.
+   The spec HUD renders these natively inside #unk-hud.
+   ================================================================ */
+
+/* Hide legacy HUD layers when spec HUD is present */
+body:has(#unk-hud) #hud        { display: none !important; }
+body:has(#unk-hud) #hotbar     { display: none !important; }
+body:has(#unk-hud) #combat-ui  { display: none !important; }
+body:has(#unk-hud) #log        { display: none !important; }
+
+/* Keep legacy elements accessible for engine writes but invisible */
+#hud, #hotbar, #combat-ui, #log { pointer-events: none; }
