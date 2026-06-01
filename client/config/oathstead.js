@@ -116,14 +116,40 @@ US.NPC_RECORDS.npc_oathstead_banker_torvin_vaultseal = {
   }
 };
 
-// STEP 2+ — registered but not yet spawned (releaseState:'future')
-US.NPC_RECORDS.npc_oathstead_general_vendor_sela_grainhollow = {
-  id:'npc_oathstead_general_vendor_sela_grainhollow', displayName:'Sela Grainhollow',
-  type:'npc', releaseState:'future', versionIntroduced:'alpha_0_1',
-  roleId:'npc_merchant', occupation:'General Vendor', districtId:'district_market',
-  serviceTypes:['buying','selling','supplies'], tags:['vendor','market_row']
-};
-US.NPC_RECORDS.npc_oathstead_town_elder_aldric_ashborne = {
+  // STEP 2 — LIVE (spawned in entities.npcs[])
+    US.NPC_RECORDS.npc_oathstead_general_vendor_sela_grainhollow = {
+          id:                  'npc_oathstead_general_vendor_sela_grainhollow',
+          displayName:         'Sela Grainhollow',
+          type:                'npc',
+          releaseState:        'alpha',
+          versionIntroduced:   'alpha_0_1',
+          raceId:              'race_human',
+          townId:              'town_oathstead_village',
+          realmId:             'realm_hearthvale_fields',
+          factionInfluence:    'faction_blood_oath',
+          roleId:              'npc_merchant',
+          occupation:          'General Vendor',
+          districtId:          'district_market',
+          serviceTypes:        ['buying','selling','supplies'],
+          tags:                ['vendor','alpha','oathstead','market_row'],
+          notes:               'Step 2 — general vendor live.',
+          _cfg: {
+                  icon:  '[S]',
+                  name:  'Sela Grainhollow',
+                  role:  'General Vendor — Market Row',
+                  dialoguePool: {
+                            greeting: "Welcome to the Row. Fields were kind this season — plenty to trade.",
+                            shop:     "Honest goods, honest prices. Take a look.",
+                            hook:     "Headed for the hollow? Don't go empty — food, a torch, something to swing. I've got all of it.",
+                            farewell: "Keep your fire fed. Come back when your pack's light.",
+                            guidance: "Looking for proper work? The Elder — Aldric Ashborne — holds court at the Commons. He'll set you right."
+                  },
+                  shop: {
+                            buy: ['berry','cooked_berry','raw_fish','torch','health_salve','campfire','stone_hatchet','iron_pickaxe','log','stone','herb','hide','bone','crude_sword','wooden_shield','leather_hood','ranger_tunic','hide_armor','bronze_helm','arrow']
+                  }
+          }
+    };
+  US.NPC_RECORDS.npc_oathstead_town_elder_aldric_ashborne = {
   id:'npc_oathstead_town_elder_aldric_ashborne', displayName:'Aldric Ashborne',
   type:'npc', releaseState:'future', versionIntroduced:'alpha_0_1',
   roleId:'npc_quest_giver', occupation:'Village Elder', districtId:'district_commons',
@@ -214,10 +240,24 @@ US.spawnOathsteadNPCs = function(cx, cy, TILE) {
     cfg:   bankerRec._cfg
   });
 
+      // — General Vendor: Sela Grainhollow ————————————————————————
+      // Positioned at district_market: cx+0, cy+2 (Market Row stall)
+      var selaRec = US.NPC_RECORDS.npc_oathstead_general_vendor_sela_grainhollow;
+      npcs.push({
+              uid:   US.uid('npc'),
+              kind:  'npc',
+              id:    selaRec.id,
+              x:     cx * t + t / 2,
+              y:     (cy + 2) * t + t / 2,
+              r:     22,
+              color: '#63e6a4',
+              cfg:   selaRec._cfg
+      });
+
   return npcs;
 };
 
 console.log('[UNKSCAPE] Oathstead data pack v1.0 loaded — ' +
-  Object.keys(US.NPC_RECORDS).length + ' NPC records, 1 alpha-state spawn ready.');
+    Object.keys(US.NPC_RECORDS).length + ' NPC records, 2 alpha-state spawn ready.');
 
 })();
