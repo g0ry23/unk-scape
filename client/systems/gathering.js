@@ -1,13 +1,17 @@
 (function(){
 const US = window.UnkScape = window.UnkScape || {};
 
-// UNKSCAPE GatheringSystem v7
-// v7: per-swing audio fires on EVERY hit (moved before hitProgress<hits guard)
+// UNKSCAPE GatheringSystem v9
+// v9: tighten interaction ranges to strict arm's length
+//   AUTO_WALK_RANGE  200 -> 96   (stop auto-walk-to at close distance)
+//   INTERACT_RANGE    64 -> 48   (must be visibly adjacent)
+//   ABANDON_RANGE    140 -> 64   (cancel if you step back)
+//   NPC_PROMPT_RANGE  90 -> 48   (prompt only when right next to NPC)
 
-var AUTO_WALK_RANGE = 200;
-var INTERACT_RANGE = 64;
-var ABANDON_RANGE = 140;
-var NPC_PROMPT_RANGE = 90;
+var AUTO_WALK_RANGE = 96;
+var INTERACT_RANGE = 48;
+var ABANDON_RANGE = 64;
+var NPC_PROMPT_RANGE = 48;
 var SWING_BASE_TIME = 0.80;
 var SWING_MIN_TIME = 0.30;
 
