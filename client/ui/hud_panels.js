@@ -1,11 +1,13 @@
 (function(){
 var US = window.UnkScape = window.UnkScape || {};
 
-// hud_panels.js v5
-// v5 changes:
-// - Collapse now targets individual frames (hud-inv / hud-sysread) not whole columns
-// - Vitals (hud-vitals) and Radar (hud-radar) remain visible at all times
-// - CSS: frame-collapsed hides only the targeted frame
+// hud_panels.js v8
+// v8 changes:
+// - Wheel spec enforced:
+//     hover over #hud-actionbar  -> cycle action slots
+//     Ctrl/Alt held anywhere     -> cycle action slots
+//     plain wheel over game world -> zoom (passes through to input.js)
+//     any other HUD panel (bag/skills/etc) -> swallowed, does NOTHING
 
 function injectCSS(){
 if (document.getElementById('unk-panels-css')) return;
@@ -85,16 +87,29 @@ var _iv=setInterval(function(){
 if (US.HudPanels.init() || ++_tries>120) clearInterval(_iv);
 },500);
 
-window.addEventListener('wheel',function(e){
-var g=US.game; if(!g||g.state!=='play'||!g.hotbar) return;
-if(e.ctrlKey||e.altKey) return;
-var n=g.hotbar.slots?g.hotbar.slots.length:8;
-var dir=e.deltaY>0?1:-1;
-g.hotbar.selected=((g.hotbar.selected||0)+dir+n)%n;
-if(g.ui&&g.ui.renderHotbar) g.ui.renderHotbar();
-if(US.HUDSpec&&US.HUDSpec.refresh) US.HUDSpec.refresh();
-e.preventDefault();
-},{capture:true,passive:false});
+// ── Wheel logic (exact spec) ──────────────────────────────────────────────────
+//   • Over the action bar (hover)             -> cycle action slots
+//   • Ctrl/Alt held (cursor anywhere)         -> cycle action slots
+//   • Plain wheel over the game world         -> zoom (handled by input.js)
+//   • Over any other HUD panel (bag/skills…)  -> swallowed, does NOTHING
+window.addEventListener('wheel', function(e){
+var g = US.game;
+var overActionbar = e.target && e.target.closest && e.target.closest('#hud-actionbar');
+var modifier = e.ctrlKey || e.altKey;
+
+if (g && g.state==='play' && g.hotbar && (overActionbar || modifier)){
+var n = g.hotbar.slots ? g.hotbar.slots.length : 8;
+var dir = e.deltaY>0 ? 1 : -1;
+g.hotbar.selected = ((g.hotbar.selected||0)+dir+n)%n;
+if (g.ui && g.ui.renderHotbar) g.ui.renderHotbar();
+if (US.HUDSpec && US.HUDSpec.refresh) US.HUDSpec.refresh();
+e.preventDefault(); e.stopPropagation();
+return;
+}
+
+var overHud = e.target && e.target.closest && e.target.closest('#unk-hud');
+if (overHud) { e.preventDefault(); e.stopPropagation(); }
+}, { capture:true, passive:false });
 
 // v4: [ = toggle hub, ] = toggle chat. Off B/C to avoid bank+crafting collisions.
 window.addEventListener('keydown',function(e){
@@ -106,6 +121,6 @@ if(k==='['){ US.HudPanels.toggleHub(); e.preventDefault(); }
 else if(k===']'){ US.HudPanels.toggleChat(); e.preventDefault(); }
 },false);
 
-console.log('[UNKSCAPE] hud_panels.js v5 loaded -- [=inv-frame ]=sysread-frame wheel=hotbar.');
+console.log('[UNKSCAPE] hud_panels v8 loaded — dock toggles; wheel: hover/Ctrl-Alt cycles bar, else zoom, bag never scrolls.');
 
 })();
