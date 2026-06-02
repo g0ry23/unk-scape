@@ -1,12 +1,13 @@
 (function(){
 const US = window.UnkScape = window.UnkScape || {};
 
-// UNKSCAPE GatheringSystem v9
+// UNKSCAPE GatheringSystem v10
+// v10: add [GATHER] diagnostics to _startGathering for harvest-block debugging
 // v9: tighten interaction ranges to strict arm's length
-//   AUTO_WALK_RANGE  200 -> 96   (stop auto-walk-to at close distance)
-//   INTERACT_RANGE    64 -> 48   (must be visibly adjacent)
-//   ABANDON_RANGE    140 -> 64   (cancel if you step back)
-//   NPC_PROMPT_RANGE  90 -> 48   (prompt only when right next to NPC)
+// AUTO_WALK_RANGE 200 -> 96 (stop auto-walk-to at close distance)
+// INTERACT_RANGE 64 -> 48 (must be visibly adjacent)
+// ABANDON_RANGE 140 -> 64 (cancel if you step back)
+// NPC_PROMPT_RANGE 90 -> 48 (prompt only when right next to NPC)
 
 var AUTO_WALK_RANGE = 96;
 var INTERACT_RANGE = 48;
@@ -308,9 +309,13 @@ return best;
 
 US.GatheringSystem.prototype._startGathering = function(node) {
 var g = this.game, p = g.player;
-if (!node || node.amount <= 0 || node.cooldown > 0) return false;
-if (!this._checkLevel(node)) return false;
-if (!this._checkTool(node)) return false;
+if (!node || node.amount <= 0 || node.cooldown > 0) {
+  console.log('[GATHER] blocked: node empty/cooldown', node && {amount:node.amount, cooldown:node.cooldown});
+  return false;
+}
+if (!this._checkLevel(node)) { console.log('[GATHER] blocked: level gate', node.cfg && node.cfg.skill, node.cfg && node.cfg.level); return false; }
+if (!this._checkTool(node)) { console.log('[GATHER] blocked: tool gate', node.cfg && node.cfg.toolReq); return false; }
+console.log('[GATHER] started OK:', node.cfg && node.cfg.name);
 this.active = node;
 this.swingDuration = this._swingDuration(node);
 this.swingTimer = 0;
@@ -459,5 +464,7 @@ if (this.swingTimer >= this.swingDuration) {
 this._resolveSwing();
 }
 };
+
+console.log('[UNKSCAPE] gathering.js v10 loaded — [GATHER] diagnostics active in _startGathering.');
 
 })();
