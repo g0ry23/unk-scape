@@ -1,13 +1,11 @@
 (function(){
 const US = window.UnkScape = window.UnkScape || {};
 
-// UNKSCAPE GatheringSystem v10
+// UNKSCAPE GatheringSystem v11
+// v11: tool-gate gathering -- must hold matching tool (axe->tree, pick->rock, rod->fish)
+//      herbalism/hunting/farming are bare-hand skills (no tool required)
 // v10: add [GATHER] diagnostics to _startGathering for harvest-block debugging
 // v9: tighten interaction ranges to strict arm's length
-// AUTO_WALK_RANGE 200 -> 96 (stop auto-walk-to at close distance)
-// INTERACT_RANGE 64 -> 48 (must be visibly adjacent)
-// ABANDON_RANGE 140 -> 64 (cancel if you step back)
-// NPC_PROMPT_RANGE 90 -> 48 (prompt only when right next to NPC)
 
 var AUTO_WALK_RANGE = 96;
 var INTERACT_RANGE = 48;
@@ -61,18 +59,41 @@ return true;
 };
 
 US.GatheringSystem.prototype._checkTool = function(node) {
-var req = (node.cfg && node.cfg.toolReq) || null;
-if (!req) return true;
-var UP = window.UnkScape && window.UnkScape.Player;
-if (!UP || !UP.canUseTool) return true;
+var cfg = node.cfg || {};
+var skill = cfg.skill;
 var p = this.game.player;
-var ok = UP.canUseTool(req, p.skills);
-if (!ok) {
-var tier = UP.TOOL_TIERS[req] || {};
-var skillName = this._skillName(tier.skill);
-this.game.ui.toast('Tool too weak', 'You need a ' + req.replace(/_/g, ' ') + ' or better (' + skillName + ' Lv.' + tier.level + ').', 'bad');
+var UP = window.UnkScape && window.UnkScape.Player;
+var TT = (UP && UP.TOOL_TIERS) || {};
+
+var BARE_HAND = { herbalism: true, hunting: true, farming: true };
+if (BARE_HAND[skill]) return true;
+
+var held = (this.game.hotbar && this.game.hotbar.slots)
+           ? this.game.hotbar.slots[this.game.hotbar.selected || 0] : null;
+if (!held && p && p.equipment) held = p.equipment.tool || p.equipment.weapon || null;
+
+var heldTier = held ? TT[held] : null;
+var heldSkill = heldTier ? heldTier.skill : null;
+
+if (heldSkill !== skill) {
+  var want = skill === 'woodcutting' ? 'an axe'
+           : skill === 'mining'      ? 'a pickaxe'
+           : skill === 'fishing'     ? 'a fishing rod'
+           : 'the right tool';
+  var heldName = (held && US.ITEMS && US.ITEMS[held]) ? US.ITEMS[held].name : 'that';
+  this.game.ui.toast('Wrong tool', 'You need ' + want + ' in hand to ' +
+    (cfg.action || 'gather').toLowerCase() + ' ' + (cfg.name || 'this') +
+    '. ' + heldName + ' won’t work.', 'bad');
+  return false;
 }
-return ok;
+
+if (UP && UP.canUseTool && !UP.canUseTool(held, p.skills)) {
+  var tier = TT[held] || {};
+  this.game.ui.toast('Tool too weak', 'Your ' + (US.ITEMS && US.ITEMS[held] ? US.ITEMS[held].name : held) +
+    ' needs ' + this._skillName(tier.skill) + ' Lv.' + tier.level + '.', 'bad');
+  return false;
+}
+return true;
 };
 
 US.GatheringSystem.prototype._showProgress = function() {
@@ -465,6 +486,6 @@ this._resolveSwing();
 }
 };
 
-console.log('[UNKSCAPE] gathering.js v10 loaded — [GATHER] diagnostics active in _startGathering.');
+console.log('[UNKSCAPE] gathering.js v11 loaded — tool-gate active (axe/pick/rod required; herbalism bare-hand).');
 
 })();
