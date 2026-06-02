@@ -1,18 +1,19 @@
 (function(){
 var US = window.UnkScape = window.UnkScape || {};
 
-// hud_panels.js v4
-// v4 changes:
-//   - B/C hotkeys moved to [ / ] (B collided with bank, C with crafting)
-//   - Tooltip updated: "Collapse hub (B)" -> "Collapse hub ([)" etc.
+// hud_panels.js v5
+// v5 changes:
+// - Collapse now targets individual frames (hud-inv / hud-sysread) not whole columns
+// - Vitals (hud-vitals) and Radar (hud-radar) remain visible at all times
+// - CSS: frame-collapsed hides only the targeted frame
 
 function injectCSS(){
 if (document.getElementById('unk-panels-css')) return;
 var s = document.createElement('style');
 s.id = 'unk-panels-css';
 s.textContent = [
-'#hud-col-left.col-collapsed > .h-frame{display:none!important}',
-'#hud-col-right.col-collapsed > .h-frame{display:none!important}',
+'#hud-inv.frame-collapsed{display:none!important}',
+'#hud-sysread.frame-collapsed{display:none!important}',
 '.unk-coltab{position:absolute;top:10px;z-index:50;cursor:pointer;border:1px solid #6b5530;background:linear-gradient(180deg,#1c160d,#0e0b06);color:#e8d4a4;font-weight:800;font-size:12px;padding:8px 7px;border-radius:9px;box-shadow:0 2px 8px rgba(0,0,0,.5);writing-mode:vertical-rl;letter-spacing:.12em;user-select:none;transition:.14s}',
 '.unk-coltab:hover{background:rgba(247,198,91,.16);border-color:#caa047}',
 '.unk-coltab.left{left:8px}',
@@ -66,16 +67,16 @@ this._ready=true;
 return true;
 },
 toggleHub: function(){
-var L=document.getElementById('hud-col-left'),tab=document.getElementById('unk-tab-left');
-if(!L)return;
-var col=L.classList.toggle('col-collapsed');
-if(tab)tab.style.display=col?'block':'none';
+var el=document.getElementById('hud-inv'), tab=document.getElementById('unk-tab-left');
+if(!el)return;
+var collapsed=el.classList.toggle('frame-collapsed');
+if(tab)tab.style.display=collapsed?'block':'none';
 },
 toggleChat: function(){
-var R=document.getElementById('hud-col-right'),tab=document.getElementById('unk-tab-right');
-if(!R)return;
-var col=R.classList.toggle('col-collapsed');
-if(tab)tab.style.display=col?'block':'none';
+var el=document.getElementById('hud-sysread'), tab=document.getElementById('unk-tab-right');
+if(!el)return;
+var collapsed=el.classList.toggle('frame-collapsed');
+if(tab)tab.style.display=collapsed?'block':'none';
 }
 };
 
@@ -105,6 +106,6 @@ if(k==='['){ US.HudPanels.toggleHub(); e.preventDefault(); }
 else if(k===']'){ US.HudPanels.toggleChat(); e.preventDefault(); }
 },false);
 
-console.log('[UNKSCAPE] hud_panels.js v4 loaded -- [=hub ]=chat wheel=hotbar.');
+console.log('[UNKSCAPE] hud_panels.js v5 loaded -- [=inv-frame ]=sysread-frame wheel=hotbar.');
 
 })();
