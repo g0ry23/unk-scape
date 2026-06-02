@@ -1,11 +1,15 @@
 /**
-* input.js -- v16
+* input.js -- v20
 * ONE namespace: window.UnkScape (US) only.
 * ONE mousedown, ONE mousemove, ONE mouseup, ONE wheel, ONE keydown, ONE keyup.
 * 3D-native raycaster click path.
 *
+* v20 changes:
+* - Right-click on resource node opens US.NodeMenu rich action panel
+* - Added nodeUnderCursor() raycaster helper
+*
 * v16 changes:
-* - Removed global bank hotkey (kb.bank) — bank opens via NPC interaction only
+* - Removed global bank hotkey (kb.bank) -- bank opens via NPC interaction only
 * - B/C keys freed (B was colliding with bank, C with crafting)
 *
 * v11 changes:
@@ -114,6 +118,27 @@ game.player._clickTarget = { x: worldX, y: worldY };
 }
 }
 
+function nodeUnderCursor(screenX, screenY, game) {
+var E = getR3D();
+var camera = E && E.camera;
+if (!camera || typeof THREE === 'undefined') return null;
+var ndcX = (screenX / window.innerWidth) * 2 - 1;
+var ndcY = -(screenY / window.innerHeight) * 2 + 1;
+var raycaster = new THREE.Raycaster();
+raycaster.setFromCamera({ x: ndcX, y: ndcY }, camera);
+var dir = raycaster.ray.direction, orig = raycaster.ray.origin;
+var worldX, worldY;
+if (Math.abs(dir.y) > 0.001) {
+var t = (1.0 - orig.y) / dir.y;
+if (t > 0) {
+worldX = (orig.x + dir.x * t) * 10;
+worldY = (orig.z + dir.z * t) * 10;
+}
+}
+if (worldX === undefined) return null;
+return nearestResource(worldX, worldY, game);
+}
+
 function resolveResourceClick(inp, resourceId, screenX, screenY, game) {
 if (!resourceId) return;
 var resources = game.entities && game.entities.resources;
@@ -153,7 +178,7 @@ this._orbitLastX = 0;
 this._orbitLastY = 0;
 this._initDone = false;
 this._init();
-console.log("[Input] v16: bank hotkey removed; bank opens via NPC only.");
+console.log("[Input] v20: right-click resource -> NodeMenu rich panel.");
 };
 
 US.Input.prototype._init = function() {
@@ -199,6 +224,12 @@ handleGameClick(self, e);
 }
 }
 if (e.button === 2 || e.button === 1) {
+var _nodeHit = (e.button === 2) ? nodeUnderCursor(e.clientX, e.clientY, game) : null;
+if (_nodeHit && US.NodeMenu) {
+US.NodeMenu.open(_nodeHit, e.clientX, e.clientY);
+e.preventDefault();
+return;
+}
 self._orbitDragging = true;
 self._orbitLastX = e.clientX;
 self._orbitLastY = e.clientY;
@@ -254,7 +285,7 @@ e.preventDefault();
 window.addEventListener('wheel', this._onWheel, { passive: false });
 
 this._initDone = true;
-console.log("[Input] v16 listeners active.");
+console.log("[Input] v20 listeners active.");
 };
 
 US.Input.prototype.axis = function() {
@@ -328,7 +359,7 @@ if (k === kb.inventory) { game.ui.togglePanel('inventory'); e.preventDefault(); 
 if (k === kb.skills) { game.ui.togglePanel('skills'); e.preventDefault(); }
 if (k === kb.quests) { game.ui.togglePanel('quests'); e.preventDefault(); }
 if (k === kb.crafting) { game.ui.togglePanel('crafting'); e.preventDefault(); }
-// kb.bank line REMOVED in v16 — bank opens via NPC interaction only
+// kb.bank line REMOVED in v16 -- bank opens via NPC interaction only
 if (k === kb.map) { game.ui.togglePanel('map'); e.preventDefault(); }
 if (k === kb.stats) { game.ui.togglePanel('stats'); e.preventDefault(); }
 
@@ -402,8 +433,10 @@ return k === " " ? "SPACE" : k === "escape" ? "ESC" : k === "tab" ? "TAB" : Stri
 })(window.UnkScape = window.UnkScape || {});
 
 /*
-* v16 — Key changes over v13:
-* - Removed kb.bank hotkey line from _handleHotkey
-*   Bank now only opens via NPC interaction (talk to Torvin Vaultseal)
-*   Frees up B key (was colliding with hud_panels hub toggle)
+* v20 -- Key changes over v16:
+* - Right-click on resource node -> US.NodeMenu.open() rich action panel
+* - nodeUnderCursor() raycaster helper added (ground-plane cast to find nearest resource)
+* - Orbit-drag still works when no resource is hit
+* v16 -- Removed kb.bank hotkey line from _handleHotkey
+* Bank now only opens via NPC interaction (talk to Torvin Vaultseal)
 */
