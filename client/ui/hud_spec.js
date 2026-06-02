@@ -1,10 +1,10 @@
 /* ================================================================
-   UNKSCAPE HUD SPEC v1 hud_spec.js
+   UNKSCAPE HUD SPEC v9 hud_spec.js
    Wires the spec HUD overlay to window.UnkScape.
    No frameworks, no emoji, no scroll, no canvas resize on toggle.
 ================================================================ */
 ((US) => {
-var INV_SLOT_COUNT=24,ACTION_SLOT_COUNT=6,LOG_MAX_LINES=60;
+var INV_SLOT_COUNT=28,ACTION_SLOT_COUNT=6,LOG_MAX_LINES=60;
 var SKILL_COLORS={combat:"#e74c3c",woodcutting:"#2ecc71",mining:"#95a5a6",fishing:"#3498db",herbalism:"#27ae60",hunting:"#e67e22",farming:"#f1c40f",smithing:"#e59866",cooking:"#ffcf6e",alchemy:"#8e44ad",crafting:"#6aa7ff",survival:"#ff9b5c",building_claim_crafting:"#cd6155",trading_merchanting:"#f7dc6f",extraction:"#1abc9c"};
 var EQUIP_SLOTS=["weapon","shield","helmet","chest","legs","boots","gloves","cape","ring","amulet"];
 var EQUIP_LABELS={weapon:"WPN",shield:"SHD",helmet:"HLM",chest:"CST",legs:"LGS",boots:"BTS",gloves:"GLV",cape:"CPE",ring:"RNG",amulet:"AMU"};
