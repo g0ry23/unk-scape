@@ -136,7 +136,7 @@ const nearNpc=game.entities.npcs.find(n=>US.dist(this,n)<72);
 if(nearNpc){game.ui.openDialog(nearNpc);return;}
 const nearPortal=game.entities.portals.find(p=>US.dist(this,p)<72);
 if(nearPortal){game.systems.dungeon.enter(nearPortal.id);return;}
-const nearRes=game.entities.resources.filter(r=>r.amount>0 && US.dist(this,r)<80).sort((a,b)=>US.dist(this,a)-US.dist(this,b))[0];
+const nearRes=game.entities.resources.filter(r=>r.amount>0 && US.dist(this,r)<48).sort((a,b)=>US.dist(this,a)-US.dist(this,b))[0];
 if(nearRes){game.ui.log(`Walk closer and press [F] to gather ${nearRes.cfg.name}.`, 'gold');return;}
 game.ui.log('Nothing close enough to interact with.','bad');
 }
