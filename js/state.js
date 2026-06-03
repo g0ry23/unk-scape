@@ -22,6 +22,7 @@
     U.Data.SKILLS.forEach(s=>skills[s.id]={xp:0});
     return {
       version: 1,
+             characterId: "char_alpha_human_oathstead",
       name: "Wanderer",
       race: U.Constants.IDENTITY.race,
       raceId: U.Constants.IDENTITY.raceId,
@@ -181,6 +182,7 @@
         if(!P.quests) P.quests={};
         if(!P.metrics) P.metrics={};
         if(!P.tally) P.tally={};
+                 if(!P.characterId) P.characterId="char_alpha_human_oathstead";
         return true;
       }
     }catch(e){ console.warn("load failed", e); }
