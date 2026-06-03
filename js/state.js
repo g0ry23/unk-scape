@@ -11,7 +11,7 @@
   /* ----- tiny event bus (event-driven UI; no per-frame DOM rebuilds) ----- */
   const listeners = {};
   U.Events = {
-    on(ev, fn){ (listeners[ev] = listeners[ev]||[]).push(fn); return ()=>U.Events.off(ev,fn); },
+    on(ev, fn){ (listeners[ev] = listeners[ev]||[]).push(fn); return ()=>U.Events.ofhf(ev,fn); },
     off(ev, fn){ if(listeners[ev]) listeners[ev] = listeners[ev].filter(f=>f!==fn); },
     emit(ev, data){ (listeners[ev]||[]).forEach(fn=>{ try{fn(data);}catch(e){console.error(e);} }); }
   };
@@ -157,7 +157,7 @@
   U.Systems.save = function(){
     try{
       const all = JSON.parse(localStorage.getItem(C.SAVE_KEY) || "{}");
-      all["alpha_human_oathstead"] = { savedAt: Date.now(), player: P };
+            all["alpha_human_oathstead"] = { saveVersion: 1, savedAt: Date.now(), player: P };
       localStorage.setItem(C.SAVE_KEY, JSON.stringify(all));
       // touch world registry without clobbering
       const worlds = JSON.parse(localStorage.getItem(C.WORLD_KEY) || "{}");
